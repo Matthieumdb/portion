@@ -1565,14 +1565,14 @@ const RECIPES = [
   { kinds: ["breakfast"], fr: "Muffins œufs-jambon", en: "Egg and ham muffins", parts: [{ r: "P", o: [10, 11] }, { r: "X", o: [7, 53], g: 50 }, { r: "V", o: [35, 36, 80], g: 80 }, { r: "X", o: [68, 17], g: 20 }, { r: "C", o: [29, 73] }],
     sfr: "Bats {P}, ajoute {X} en dés et {V}. Verse dans des moules et enfourne 15 min à 190 °C. Sers avec {C}.", sen: "Whisk the {P}, add the diced {X} and {V}. Pour into muffin tins and bake 15 min at 190 °C. Serve with the {C}." },
   // Encore plus de recettes healthy
-  { fr: "Bowl poulet, quinoa et légumes rôtis", en: "Chicken quinoa bowl with roasted veg", parts: [{ r: "P", o: [0, 1] }, { r: "C", o: [27, 20] }, { r: "V", o: [35, 84] }, { r: "V", o: [79, 36] }, { r: "F", o: [41] }],
-    sfr: "Fais rôtir {V} 20 min à 200 °C avec {F}. Cuis {C} et saisis {P}. Assemble en bol.", sen: "Roast the {V} for 20 min at 200 °C with the {F}. Cook the {C} and sear the {P}. Build a bowl." },
+  { fr: "Poulet, riz et légumes surgelés", en: "Chicken, rice and frozen veg", parts: [{ r: "P", o: [0, 1] }, { r: "C", o: [19, 20] }, { r: "V", o: [32, 87] }, { r: "F", o: [41] }],
+    sfr: "Cuis {C}. Poêle {P} dans {F} et ajoute {V} 5 min. Sers ensemble.", sen: "Cook the {C}. Pan-fry the {P} in the {F} and add the {V} for 5 min. Serve together." },
   { fr: "Poulet citron, riz complet et haricots verts", en: "Lemon chicken, brown rice and green beans", parts: [{ r: "P", o: [0, 2] }, { r: "C", o: [20, 19] }, { r: "V", o: [31] }, { r: "F", o: [41] }],
     sfr: "Saisis {P} dans {F} avec le jus d'un citron et de l'ail. Sers avec {C} et {V} à la vapeur.", sen: "Sear the {P} in the {F} with lemon juice and garlic. Serve with the {C} and steamed {V}." },
-  { fr: "Salade tiède de lentilles et dinde", en: "Warm lentil and turkey salad", parts: [{ r: "P", o: [1, 0] }, { r: "C", o: [28] }, { r: "V", o: [80, 81] }, { r: "V", o: [79, 84] }, { r: "X", o: [46], g: 10 }, { r: "F", o: [41] }],
-    sfr: "Cuis {C} 20 min. Mélange-les tièdes avec {V}, {P} grillée en dés et une vinaigrette {X} + {F}.", sen: "Cook the {C} for 20 min. Toss warm with the {V}, the grilled diced {P} and a {X} + {F} dressing." },
-  { fr: "Chili maigre aux haricots rouges", en: "Lean chili with kidney beans", parts: [{ r: "P", o: [3, 1] }, { r: "C", o: [77] }, { r: "C", o: [19, 20] }, { r: "V", o: [35, 84] }, { r: "X", o: [45], g: 150 }],
-    sfr: "Fais revenir {P} avec {V}, cumin et paprika. Ajoute {X} et {C}, mijote 20 min. Sers sur le riz.", sen: "Brown the {P} with the {V}, cumin and paprika. Add the {X} and beans, simmer 20 min. Serve over the rice." },
+  { fr: "Dinde, pâtes et haricots verts", en: "Turkey, pasta and green beans", parts: [{ r: "P", o: [1, 0] }, { r: "C", o: [21, 22] }, { r: "V", o: [31] }, { r: "F", o: [41] }],
+    sfr: "Cuis {C} et {V} dans la même casserole. Poêle {P} dans {F}.", sen: "Boil the {C} and {V} in the same pot. Pan-fry the {P} in the {F}." },
+  { fr: "Steak haché, riz et maïs", en: "Lean burger, rice and corn", parts: [{ r: "P", o: [3, 5] }, { r: "C", o: [19, 20] }, { r: "V", o: [75, 87] }, { r: "X", o: [47, 100], g: 30 }],
+    sfr: "Cuis {C}. Poêle {P} 3 min par face. Sers avec {V} chaud et {X}.", sen: "Cook the {C}. Pan-fry the {P} 3 min per side. Serve with warm {V} and the {X}." },
   { fr: "Wok de dinde aux légumes", en: "Turkey vegetable stir-fry", parts: [{ r: "P", o: [1, 0] }, { r: "C", o: [19, 20] }, { r: "V", o: [32, 35] }, { r: "X", o: [99], g: 15 }, { r: "F", o: [41, 98] }],
     sfr: "Saisis {P} en lanières dans {F} bien chaude, ajoute {V} puis {X}. Sers avec {C}.", sen: "Stir-fry the {P} strips in hot {F}, add the {V} then the {X}. Serve with the {C}." },
   { fr: "Steak, pommes vapeur et haricots verts", en: "Steak, steamed potatoes and green beans", parts: [{ r: "P", o: [3, 5] }, { r: "C", o: [23] }, { r: "V", o: [31] }, { r: "F", o: [41] }],
@@ -1581,26 +1581,26 @@ const RECIPES = [
     sfr: "Réhydrate {C} à l'eau bouillante, mélange avec {V} en dés, menthe, citron et {F}. Ajoute {P} grillé.", sen: "Soak the {C} in boiling water, mix with the diced {V}, mint, lemon and the {F}. Top with the grilled {P}." },
   { fr: "Bœuf sauté aux champignons et riz", en: "Beef and mushroom stir-fry with rice", parts: [{ r: "P", o: [5, 3] }, { r: "C", o: [19] }, { r: "V", o: [36, 84] }, { r: "X", o: [99], g: 15 }, { r: "F", o: [41] }],
     sfr: "Saisis {P} en lamelles dans {F}, ajoute {V} et {X}. Sers avec {C}.", sen: "Sear the sliced {P} in the {F}, add the {V} and the {X}. Serve with the {C}." },
-  { fr: "Poulet tandoori léger", en: "Light tandoori chicken", parts: [{ r: "P", o: [0, 2] }, { r: "C", o: [19] }, { r: "V", o: [84, 35] }, { r: "X", o: [13, 65], g: 80 }],
-    sfr: "Mélange {P} avec {X} et des épices tandoori, laisse mariner 15 min. Fais cuire avec {V} et sers avec {C}.", sen: "Coat the {P} in the {X} and tandoori spices, marinate 15 min. Cook with the {V} and serve with the {C}." },
+  { fr: "Poulet paprika et pommes de terre", en: "Paprika chicken and potatoes", parts: [{ r: "P", o: [0, 2] }, { r: "C", o: [23] }, { r: "V", o: [82, 80] }, { r: "F", o: [41] }],
+    sfr: "Cuis {C} 8 min au micro-ondes. Poêle {P} saupoudré de paprika dans {F}. Sers avec {V}.", sen: "Microwave the {C} for 8 min. Pan-fry the {P} dusted with paprika in the {F}. Serve with the {V}." },
   { fr: "Salade de pâtes complètes au thon", en: "Whole-wheat tuna pasta salad", parts: [{ r: "P", o: [8, 0] }, { r: "C", o: [22, 21] }, { r: "V", o: [80, 75] }, { r: "V", o: [81, 35] }, { r: "F", o: [41] }],
     sfr: "Cuis {C} et refroidis-les. Mélange avec {P}, {V} et {F}.", sen: "Cook and cool the {C}. Toss with the {P}, the {V} and the {F}." },
-  { fr: "Agneau, semoule et légumes", en: "Lamb with couscous and vegetables", parts: [{ r: "P", o: [49, 50] }, { r: "C", o: [26] }, { r: "V", o: [79, 35] }, { r: "V", o: [84] }, { r: "F", o: [41] }],
-    sfr: "Fais dorer {P} en cubes dans {F} avec cumin et ras el-hanout, ajoute {V} et un verre d'eau, mijote 20 min. Sers avec {C}.", sen: "Brown the cubed {P} in the {F} with cumin and ras el hanout, add the {V} and a glass of water, simmer 20 min. Serve with the {C}." },
+  { fr: "Agneau grillé, semoule et tomates", en: "Grilled lamb, couscous and tomatoes", parts: [{ r: "P", o: [49, 50] }, { r: "C", o: [26] }, { r: "V", o: [80, 81] }, { r: "F", o: [41] }],
+    sfr: "Verse de l'eau bouillante sur {C} et couvre 5 min. Grille {P} dans {F}. Sers avec {V}.", sen: "Pour boiling water over the {C} and cover 5 min. Grill the {P} in the {F}. Serve with the {V}." },
   { fr: "Escalope de veau, purée et petits pois", en: "Veal escalope, mash and peas", parts: [{ r: "P", o: [50, 1] }, { r: "C", o: [23] }, { r: "V", o: [87] }, { r: "X", o: [63, 64], g: 50 }],
     sfr: "Écrase {C} cuites avec {X}. Poêle {P} 3 min par face. Sers avec {V}.", sen: "Mash the cooked {C} with the {X}. Pan-fry the {P} 3 min per side. Serve with the {V}." },
   { fr: "Burrito bowl au poulet", en: "Chicken burrito bowl", parts: [{ r: "P", o: [0, 3] }, { r: "C", o: [19, 20] }, { r: "C", o: [77] }, { r: "V", o: [75] }, { r: "V", o: [80, 35] }, { r: "X", o: [47], g: 40 }],
     sfr: "Assemble {C}, {P} grillé aux épices mexicaines, {V} et {X}.", sen: "Build a bowl with the {C}, the spiced grilled {P}, the {V} and the {X}." },
-  { fr: "Brochettes de poulet et quinoa", en: "Chicken skewers with quinoa", parts: [{ r: "P", o: [0, 1] }, { r: "V", o: [35, 36] }, { r: "V", o: [84] }, { r: "C", o: [27, 71] }, { r: "F", o: [41] }],
-    sfr: "Enfile {P} et {V} sur des pics, badigeonne de {F} et grille 12 min. Sers avec {C}.", sen: "Thread the {P} and {V} on skewers, brush with the {F} and grill 12 min. Serve with the {C}." },
-  { fr: "Soupe de poulet aux légumes et pâtes", en: "Chicken vegetable noodle soup", parts: [{ r: "P", o: [0, 2] }, { r: "C", o: [21, 22] }, { r: "V", o: [79, 32] }, { r: "V", o: [84] }, { r: "F", o: [41] }],
-    sfr: "Fais suer {V} dans {F}, ajoute 1 L de bouillon et {P} en dés, puis {C} 10 min avant la fin.", sen: "Soften the {V} in the {F}, add 1 L of stock and the diced {P}, then the {C} 10 min before the end." },
+  { fr: "Poulet, quinoa et poivrons poêlés", en: "Chicken, quinoa and pan-fried peppers", parts: [{ r: "P", o: [0, 1] }, { r: "C", o: [27, 19] }, { r: "V", o: [35, 36] }, { r: "F", o: [41] }],
+    sfr: "Cuis {C}. Poêle {P} et {V} dans {F} 10 min.", sen: "Cook the {C}. Pan-fry the {P} and {V} in the {F} for 10 min." },
+  { fr: "Jambon, pommes de terre et salade", en: "Ham, potatoes and salad", parts: [{ r: "P", o: [7, 53] }, { r: "C", o: [23] }, { r: "V", o: [82, 80] }, { r: "X", o: [46], g: 10 }],
+    sfr: "Cuis {C} à l'eau ou au micro-ondes. Sers avec {P}, {V} et {X}.", sen: "Boil or microwave the {C}. Serve with the {P}, the {V} and the {X}." },
   { fr: "Omelette aux champignons et salade", en: "Mushroom omelette with salad", parts: [{ r: "P", o: [10, 11] }, { r: "V", o: [36] }, { r: "V", o: [82] }, { r: "C", o: [29] }, { r: "F", o: [41] }],
     sfr: "Fais revenir {V} dans {F}, verse {P} battus et cuis à feu doux. Sers avec {C}.", sen: "Sauté the {V} in the {F}, pour in the beaten {P} and cook gently. Serve with the {C}." },
-  { fr: "Curry de poulet et pois chiches", en: "Chicken and chickpea curry", parts: [{ r: "P", o: [0, 1] }, { r: "C", o: [76] }, { r: "C", o: [19] }, { r: "V", o: [80, 84] }, { r: "X", o: [45], g: 100 }],
-    sfr: "Saisis {P} avec curry et {V}, ajoute {X} et les pois chiches, mijote 15 min. Sers avec le riz.", sen: "Sear the {P} with curry powder and the {V}, add the {X} and chickpeas, simmer 15 min. Serve with the rice." },
-  { fr: "Saucisses de volaille et lentilles", en: "Chicken sausages with lentils", parts: [{ r: "P", o: [52, 1] }, { r: "C", o: [28] }, { r: "V", o: [79] }, { r: "V", o: [84] }, { r: "X", o: [46], g: 10 }],
-    sfr: "Fais mijoter {C} 25 min avec {V}. Dore {P} à la poêle et sers avec {X}.", sen: "Simmer the {C} for 25 min with the {V}. Brown the {P} and serve with the {X}." },
+  { fr: "Salade poulet, pois chiches et tomates", en: "Chicken, chickpea and tomato salad", parts: [{ r: "P", o: [0, 1] }, { r: "C", o: [76] }, { r: "C", o: [29] }, { r: "V", o: [80, 81] }, { r: "F", o: [41] }],
+    sfr: "Poêle {P}. Mélange avec {C} rincés, {V} en dés et {F}.", sen: "Pan-fry the {P}. Toss with the rinsed chickpeas, the diced {V} and the {F}." },
+  { fr: "Saucisses de volaille, pâtes et petits pois", en: "Chicken sausages, pasta and peas", parts: [{ r: "P", o: [52, 1] }, { r: "C", o: [21, 22] }, { r: "V", o: [87] }, { r: "X", o: [46], g: 10 }],
+    sfr: "Cuis {C} et {V} dans la même eau. Dore {P} à la poêle. Sers avec {X}.", sen: "Boil the {C} and {V} in the same water. Brown the {P} in a pan. Serve with the {X}." },
   { snack: true, fr: "Skyr, pomme et amandes", en: "Skyr, apple and almonds", parts: [{ r: "P", o: [12, 13, 14] }, { r: "R", o: [38, 40] }, { r: "X", o: [43], g: 15 }],
     sfr: "Coupe {R} en dés sur {P} et parsème de {X}.", sen: "Dice the {R} over the {P} and sprinkle with the {X}." },
   { snack: true, fr: "Tartine cottage et concombre", en: "Cottage cheese and cucumber toast", parts: [{ r: "P", o: [15, 14] }, { r: "C", o: [29] }, { r: "V", o: [81, 80], g: 80 }],
@@ -1624,8 +1624,8 @@ const RMETA = [["hbw", 20], ["gb", 25], ["gbw", 30], ["gq", 15], ["hb", 40], ["g
   ["hq", 2], ["q", 2], ["q", 5], ["h", 10], ["hq", 2], ["q", 5], ["gq", 2], ["hq", 5],
   ["gq", 15], ["gq", 10], ["gb", 35], ["gqw", 20], ["g", 30], ["gq", 10],
   ["hq", 5], ["gq", 10], ["hb", 5], ["hq", 10], ["hb", 20],
-  ["hb", 30], ["hb", 25], ["hb", 25], ["hbw", 35], ["hqw", 20], ["hq", 25], ["hbw", 20], ["hqw", 20], ["hw", 30],
-  ["hqb", 15], ["hw", 35], ["h", 30], ["hbw", 25], ["hw", 30], ["hb", 30], ["hq", 15], ["hbw", 30], ["hb", 35],
+  ["hq", 20], ["hb", 25], ["hq", 15], ["hq", 15], ["hqw", 20], ["hq", 25], ["hbw", 20], ["hqw", 20], ["hq", 15],
+  ["hqb", 15], ["hq", 15], ["h", 30], ["hbw", 25], ["hq", 20], ["hq", 15], ["hq", 15], ["hq", 15], ["hq", 15],
   ["hq", 2], ["hq", 5], ["hq", 5], ["hq", 5], ["hq", 10], ["hq", 15]];
 RECIPES.forEach((r, i) => { r.tags = (RMETA[i] || [""])[0].split(""); r.min = (RMETA[i] || [0, 0])[1]; });
 RECIPES.forEach((r, i) => { r.id = "r" + i; });
@@ -1665,20 +1665,24 @@ function poolFor(type) {
     (!styles.length || styles.some((st) => r.tags.includes(st))) &&
     (!r.veg || vegDiet || r.parts[0].o.some((i) => pref(FOODS[i]) === 1)));
 }
+// Tirage « sans remise » : une recette déjà proposée ne revient qu'une fois toutes les autres passées
 function drawRecipes(n, type, avoid = []) {
   const pool = poolFor(type);
   const out = [], used = new Set(avoid);
+  let seen = new Set(store.get("recSeen", []));
   for (let k = 0; k < n; k++) {
-    let cand = pool.filter((r) => !used.has(r.id));
-    if (!cand.length) { used.clear(); cand = pool; }
+    let cand = pool.filter((r) => !used.has(r.id) && !seen.has(r.id));
+    if (!cand.length) { for (const r of pool) seen.delete(r.id); cand = pool.filter((r) => !used.has(r.id)); }
+    if (!cand.length) cand = pool;
     if (!cand.length) break;
-    // Les recettes qui contiennent des aliments aimés sortent plus souvent
-    const w = cand.map((r) => 1 + recipeLikes(r));
+    // Léger bonus aux recettes avec des aliments aimés, sans qu'elles écrasent les autres
+    const w = cand.map((r) => 1 + 0.25 * Math.min(recipeLikes(r), 3));
     let x = Math.random() * w.reduce((a, b) => a + b, 0), pick = cand[0];
     for (let i = 0; i < cand.length; i++) { x -= w[i]; if (x <= 0) { pick = cand[i]; break; } }
-    used.add(pick.id);
+    used.add(pick.id); seen.add(pick.id);
     out.push({ tpl: pick.id, picks: pickParts(pick) });
   }
+  store.set("recSeen", [...seen]);
   return out;
 }
 function buildRecipe(rec, slotT) {
