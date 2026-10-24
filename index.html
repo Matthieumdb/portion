@@ -361,6 +361,11 @@ input[type="search"]::-webkit-search-cancel-button { cursor: pointer; }
 
   <!-- ================= REPAS ================= -->
   <div class="view" id="mealView" role="tabpanel">
+    <div class="notice" id="backupNag" hidden style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <span style="flex:1;min-width:180px" data-i18n="nagT"></span>
+      <button class="btn small" type="button" id="nagExport" style="flex:0 0 auto" data-i18n="export"></button>
+      <button class="btn secondary small" type="button" id="nagLater" style="flex:0 0 auto" data-i18n="later"></button>
+    </div>
     <section aria-labelledby="s1">
       <h2 class="step-title" id="s1"><span class="n">1</span><span data-i18n="whichMeal"></span></h2>
       <div class="slots" id="slots"></div>
@@ -666,6 +671,7 @@ const STR = {
     youDislike: "Tu n'aimes pas cet aliment",
     setDisplay: "Affichage", language: "Langue", units: "Unités", metric: "Métrique (kg, cm)", imperial: "Impérial (lb, in)",
     theme: "Thème", themeAuto: "Auto", themeLight: "Clair", themeDark: "Sombre",
+    nagT: "Ça fait plus d'une semaine : exporte une sauvegarde dans iCloud Drive pour ne rien perdre si tu changes de téléphone.", later: "Plus tard",
     wTitle: "Mon poids", wSave: "Noter", wPh: (u) => `Poids du jour (${u})`, wToday: "Aujourd'hui", wAvg: "Moy. 7 jours", wTrend: "Sur 7 jours",
     wEmpty: "Pèse-toi le matin à jeun, après les toilettes. Note-le ici chaque jour : je fais la moyenne sur 7 jours pour lisser l'eau et le sel.",
     wNeed: (n) => `Encore ${n} pesée${n > 1 ? "s" : ""} et je pourrai juger ta tendance.`,
@@ -779,6 +785,7 @@ const STR = {
     youDislike: "You dislike this food",
     setDisplay: "Display", language: "Language", units: "Units", metric: "Metric (kg, cm)", imperial: "Imperial (lb, in)",
     theme: "Theme", themeAuto: "Auto", themeLight: "Light", themeDark: "Dark",
+    nagT: "It's been over a week: export a backup to iCloud Drive so nothing is lost if you change phones.", later: "Later",
     wTitle: "My weight", wSave: "Log", wPh: (u) => `Today's weight (${u})`, wToday: "Today", wAvg: "7-day avg", wTrend: "Over 7 days",
     wEmpty: "Weigh yourself in the morning, before eating. Log it here every day: I average 7 days to smooth out water and salt.",
     wNeed: (n) => `${n} more weigh-in${n > 1 ? "s" : ""} and I can judge your trend.`,
@@ -968,8 +975,44 @@ const MAX_G = 600;
 /* ================= État ================= */
 const store = {
   get(key, fallback) { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; } catch { return fallback; } },
-  set(key, v) { try { localStorage.setItem(key, JSON.stringify(v)); } catch {} },
+  set(key, v) { try { localStorage.setItem(key, JSON.stringify(v)); } catch {} mirrorSoon(); },
 };
+/* Copie de secours automatique : après chaque changement, tout le stockage est recopié dans IndexedDB.
+   Si Safari vide le localStorage, l'app se restaure toute seule au prochain lancement. */
+function idb() {
+  return new Promise((ok, ko) => {
+    const r = indexedDB.open("portion-backup", 1);
+    r.onupgradeneeded = () => r.result.createObjectStore("kv");
+    r.onsuccess = () => ok(r.result); r.onerror = () => ko(r.error);
+  });
+}
+const readSnap = (db) => new Promise((ok) => { const r = db.transaction("kv").objectStore("kv").get("snap"); r.onsuccess = () => ok(r.result); r.onerror = () => ok(null); });
+async function mirrorNow() {
+  try {
+    const db = await idb();
+    // Stockage vidé mais copie présente : on ne l'écrase pas, la restauration s'en charge
+    if (!localStorage.getItem("_alive")) { if (await readSnap(db)) return; localStorage.setItem("_alive", "1"); }
+    const all = {};
+    for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); all[k] = localStorage.getItem(k); }
+    db.transaction("kv", "readwrite").objectStore("kv").put({ at: Date.now(), all }, "snap");
+  } catch {}
+}
+let mirrorT = null;
+function mirrorSoon() { clearTimeout(mirrorT); mirrorT = setTimeout(mirrorNow, 800); }
+async function restoreIfWiped() {
+  try {
+    if (localStorage.getItem("_alive")) return;
+    const db = await idb();
+    const snap = await readSnap(db);
+    if (!snap || !snap.all) return;
+    localStorage.clear();
+    for (const [k, v] of Object.entries(snap.all)) localStorage.setItem(k, v);
+    location.reload();
+  } catch {}
+}
+restoreIfWiped();
+try { navigator.storage?.persist?.(); } catch {}
+addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") mirrorNow(); });
 const clone = (o) => JSON.parse(JSON.stringify(o));
 const dayKey = () => new Date().toLocaleDateString("fr-CA");
 let S = Object.assign(clone(DEFAULT_SETTINGS), store.get("settings", {}));
@@ -2098,7 +2141,13 @@ function applyLang() {
   $("hello").textContent = `${t(hour < 5 || hour >= 18 ? "evening" : "hello")}${S.profile.name ? " " + S.profile.name : ""}`;
 }
 // Tout ce qui dépend des cibles ou de la langue est redessiné
+function renderNag() {
+  const days = (d) => d ? (new Date(dayKey()) - new Date(d)) / 864e5 : 99;
+  const hasData = Object.keys(weights).length || store.get("recipes", null) || shopList.length;
+  $("backupNag").hidden = !hasData || days(store.get("lastBackup", null)) < 7 || days(store.get("nagSnooze", null)) < 3;
+}
 function renderAll() {
+  renderNag();
   applyLang(); renderQuick(); renderSlots(); renderCart(); renderResult(); renderLog(); renderWeight();
   renderShopList(); renderIdeas(); renderShopResult(); renderTabs();
   if (tab === "set") renderSettings();
@@ -2476,6 +2525,8 @@ $("exportBtn").addEventListener("click", async () => {
   setTimeout(() => { $("exportBtn").textContent = t("export"); }, 2000);
   renderSettings();
 });
+$("nagExport").addEventListener("click", () => { $("exportBtn").click(); $("backupNag").hidden = true; });
+$("nagLater").addEventListener("click", () => { store.set("nagSnooze", dayKey()); renderNag(); });
 $("importBtn").addEventListener("click", () => $("importFile").click());
 $("importFile").addEventListener("change", async (e) => {
   const f = e.target.files[0]; if (!f) return;
@@ -2484,6 +2535,7 @@ $("importFile").addEventListener("change", async (e) => {
     if (data.app === "portion" && data.all) {
       localStorage.clear();
       for (const [k, v] of Object.entries(data.all)) localStorage.setItem(k, v);
+      localStorage.setItem("_alive", "1"); await mirrorNow();
     } else if (data.settings) {
       // Ancien format d'export
       store.set("settings", data.settings);
@@ -2517,13 +2569,13 @@ $("clearLogBtn").addEventListener("click", () => {
   $("clearLogBtn").textContent = t("cleared");
   setTimeout(() => { $("clearLogBtn").textContent = t("clearToday"); }, 2000);
 });
-$("resetBtn").addEventListener("click", () => {
+$("resetBtn").addEventListener("click", async () => {
   if (!resetArmed) {
     resetArmed = true; $("resetBtn").textContent = t("confirm");
     setTimeout(() => { resetArmed = false; $("resetBtn").textContent = t("resetAll"); }, 4000);
     return;
   }
-  try { localStorage.clear(); } catch {}
+  try { localStorage.clear(); const db = await idb(); db.transaction("kv", "readwrite").objectStore("kv").delete("snap"); await new Promise((ok) => setTimeout(ok, 200)); } catch {}
   location.reload();
 });
 
