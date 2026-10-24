@@ -230,6 +230,37 @@ details[open] summary::after { content: "−"; }
   .dose, .item, .shop li { animation: rise .25s ease-out both; }
   @keyframes rise { from { transform: translateY(6px); opacity: .4; } to { transform: none; opacity: 1; } }
 }
+
+/* Réglages */
+.tabs { grid-template-columns: repeat(3, 1fr); }
+.tabs button { font-size: 15px; padding: 10px 4px; gap: 6px; }
+.field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.field > span { font: 800 12px var(--font-body); color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+select {
+  font: 700 16px var(--font-body); padding: 11px 10px; border-radius: 14px; border: 2px solid var(--line);
+  background: var(--bg); color: var(--ink); width: 100%; min-width: 0; -webkit-appearance: none; appearance: none;
+}
+.seg2 { display: flex; flex-wrap: wrap; gap: 6px; }
+.seg2 .chip[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.calc { background: var(--bg); border-radius: 16px; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; font-size: 14px; }
+.calc .line { display: flex; justify-content: space-between; gap: 10px; }
+.calc .line b { font: 600 16px var(--font-display); white-space: nowrap; }
+.calc .total { border-top: 1px dashed var(--line); padding-top: 8px; margin-top: 2px; }
+.calc .total b { font-size: 20px; color: var(--accent); }
+.macro-pills { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; text-align: center; }
+.macro-pills div { border-radius: 12px; padding: 8px 4px; background: var(--surface); }
+.macro-pills b { display: block; font: 600 18px var(--font-display); }
+.macro-pills small { font: 800 11px var(--font-body); color: var(--muted); }
+.switch { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 6px 0; cursor: pointer; }
+.switch input { width: 22px; height: 22px; accent-color: var(--accent); flex: none; padding: 0; }
+.switch span { font-size: 15px; }
+.slotrow { display: grid; grid-template-columns: 60px 1fr 54px 54px 36px; gap: 6px; align-items: center; }
+.slotrow input { padding: 8px 6px; font-size: 15px; }
+.slothead { display: grid; grid-template-columns: 60px 1fr 54px 54px 36px; gap: 6px; font: 800 11px var(--font-body); color: var(--muted); text-transform: uppercase; }
+.warnline { color: var(--warn); font-size: 13px; margin: 0; }
+.danger { background: var(--warn-soft); color: var(--warn); }
 </style>
 </head>
 <body>
@@ -240,17 +271,19 @@ details[open] summary::after { content: "−"; }
       <span class="hello" id="hello"></span>
     </div>
     <div class="tabs" role="tablist">
-      <button type="button" role="tab" id="tabMeal" aria-selected="true" aria-controls="mealView">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 3v7a2 2 0 0 0 2 2h0a2 2 0 0 0 2-2V3M6 12v9M17 21V3c-2 1.5-3 4-3 7h3"/></svg>Repas</button>
-      <button type="button" role="tab" id="tabShop" aria-selected="false" aria-controls="shopView">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h2l2.4 11.2a1 1 0 0 0 1 .8h9.2a1 1 0 0 0 1-.8L20 8H6.2"/><circle cx="9" cy="20" r="1.4"/><circle cx="17" cy="20" r="1.4"/></svg>Courses</button>
+      <button type="button" role="tab" id="tabMeal" aria-controls="mealView">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 3v7a2 2 0 0 0 2 2h0a2 2 0 0 0 2-2V3M6 12v9M17 21V3c-2 1.5-3 4-3 7h3"/></svg><span data-i18n="tabMeal"></span></button>
+      <button type="button" role="tab" id="tabShop" aria-controls="shopView">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h2l2.4 11.2a1 1 0 0 0 1 .8h9.2a1 1 0 0 0 1-.8L20 8H6.2"/><circle cx="9" cy="20" r="1.4"/><circle cx="17" cy="20" r="1.4"/></svg><span data-i18n="tabShop"></span></button>
+      <button type="button" role="tab" id="tabSet" aria-controls="setView">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><span data-i18n="tabSet"></span></button>
     </div>
   </header>
 
   <!-- ================= REPAS ================= -->
   <div class="view" id="mealView" role="tabpanel">
     <section aria-labelledby="s1">
-      <h2 class="step-title" id="s1"><span class="n">1</span>Quel repas ?</h2>
+      <h2 class="step-title" id="s1"><span class="n">1</span><span data-i18n="whichMeal"></span></h2>
       <div class="slots" id="slots"></div>
       <div class="card">
         <div class="targets" id="remaining"></div>
@@ -259,26 +292,26 @@ details[open] summary::after { content: "−"; }
     </section>
 
     <section aria-labelledby="s2" id="buildView">
-      <h2 class="step-title" id="s2"><span class="n">2</span>Ce que tu manges<span class="hint" id="count"></span></h2>
+      <h2 class="step-title" id="s2"><span class="n">2</span><span data-i18n="whatYouEat"></span><span class="hint" id="count"></span></h2>
       <div class="reader" id="mealReader" hidden></div>
       <p class="error" id="mealErr" hidden></p>
       <p class="toast" id="mealToast" hidden></p>
       <div class="card">
         <ul class="items" id="items"></ul>
-        <div class="legend" id="legend" hidden><span><i style="background:var(--p)"></i>Protéines</span><span><i style="background:var(--c)"></i>Glucides</span><span><i style="background:var(--f)"></i>Lipides</span></div>
+        <div class="legend" id="legend" hidden><span><i style="background:var(--p)"></i><span data-i18n="protein"></span></span><span><i style="background:var(--c)"></i><span data-i18n="carbs"></span></span><span><i style="background:var(--f)"></i><span data-i18n="fat"></span></span></div>
       </div>
       <div class="card">
-        <span class="caption">Sans code-barres ? Touche un aliment (poids cru)</span>
+        <span class="caption" data-i18n="noBarcode"></span>
         <div class="quick" id="quick"></div>
         <div class="row">
-          <input id="mealCode" inputmode="numeric" placeholder="Code-barres à la main" aria-label="Code-barres">
-          <button class="btn secondary small" id="mealCodeBtn" type="button" style="flex:0 0 auto">Ajouter</button>
+          <input id="mealCode" inputmode="numeric" data-i18n-ph="manualCode" aria-label="Code">
+          <button class="btn secondary small" id="mealCodeBtn" type="button" style="flex:0 0 auto" data-i18n="add"></button>
         </div>
       </div>
     </section>
 
     <section aria-labelledby="s3" id="resultView" hidden>
-      <h2 class="step-title" id="s3"><span class="n">3</span>Tes doses à peser</h2>
+      <h2 class="step-title" id="s3"><span class="n">3</span><span data-i18n="yourDoses"></span></h2>
       <ul class="doses" id="doses"></ul>
       <div class="card" id="totals"></div>
     </section>
@@ -286,15 +319,8 @@ details[open] summary::after { content: "−"; }
     <section>
       <div class="card">
         <details>
-          <summary id="logh">Mangé aujourd'hui</summary>
+          <summary id="logh"></summary>
           <ul class="log" id="log"></ul>
-        </details>
-      </div>
-      <div class="card">
-        <details>
-          <summary>Mes objectifs par repas</summary>
-          <div class="tgrid" id="tgrid"></div>
-          <p class="caption" style="margin-top:10px">Total jour : <span id="tTotal"></span></p>
         </details>
       </div>
     </section>
@@ -304,32 +330,105 @@ details[open] summary::after { content: "−"; }
   <div class="view" id="shopView" role="tabpanel" hidden>
     <section>
       <div class="card" id="shopIntro">
-        <p class="score-label" style="font-size:19px">Scanne un produit en magasin</p>
-        <p class="caption">Je te dis s'il est bon pour toi et combien en prendre pour la semaine, en tenant compte des autres produits du même rayon que tu vas sûrement acheter aussi.</p>
+        <p class="score-label" style="font-size:19px" data-i18n="shopIntroT"></p>
+        <p class="caption" data-i18n="shopIntroD"></p>
       </div>
       <div class="reader" id="shopReader" hidden></div>
       <p class="error" id="shopErr" hidden></p>
       <p class="toast" id="shopToast" hidden></p>
       <div class="row">
-        <input id="shopCode" inputmode="numeric" placeholder="Code-barres à la main" aria-label="Code-barres">
-        <button class="btn secondary small" id="shopCodeBtn" type="button" style="flex:0 0 auto">Chercher</button>
+        <input id="shopCode" inputmode="numeric" data-i18n-ph="manualCode" aria-label="Code">
+        <button class="btn secondary small" id="shopCodeBtn" type="button" style="flex:0 0 auto" data-i18n="search"></button>
       </div>
     </section>
 
     <section id="shopResult" hidden aria-live="polite"></section>
 
     <section aria-labelledby="listh">
-      <h2 class="step-title" id="listh">Ma liste de la semaine<span class="hint" id="shopCount"></span></h2>
+      <h2 class="step-title" id="listh"><span data-i18n="weekList"></span><span class="hint" id="shopCount"></span></h2>
       <div class="card">
         <ul class="shop" id="shopList"></ul>
-        <button class="btn secondary small" id="clearShop" type="button" hidden style="align-self:flex-start">Vider la liste</button>
+        <button class="btn secondary small" id="clearShop" type="button" hidden style="align-self:flex-start" data-i18n="clearList"></button>
       </div>
     </section>
 
     <section aria-labelledby="ideash">
-      <h2 class="step-title" id="ideash">Bons choix pour toi</h2>
-      <p class="caption">Les aliments qui collent à ton objectif, rayon par rayon, avec la quantité à prévoir pour la semaine.</p>
+      <h2 class="step-title" id="ideash" data-i18n="goodChoices"></h2>
+      <p class="caption" data-i18n="goodChoicesD"></p>
       <div class="card" id="ideas"></div>
+    </section>
+  </div>
+
+  <!-- ================= RÉGLAGES ================= -->
+  <div class="view" id="setView" role="tabpanel" hidden>
+    <section>
+      <h2 class="step-title" data-i18n="setProfile"></h2>
+      <div class="card">
+        <label class="field"><span data-i18n="firstName"></span><input id="pName" autocomplete="given-name" style="font-family:var(--font-body)"></label>
+        <div class="field"><span data-i18n="sex"></span>
+          <div class="seg2" id="pSex"><button class="chip" type="button" data-v="m" data-i18n="male"></button><button class="chip" type="button" data-v="f" data-i18n="female"></button></div>
+        </div>
+        <div class="grid3">
+          <label class="field"><span data-i18n="age"></span><input id="pAge" inputmode="numeric"></label>
+          <label class="field"><span id="pHeightL"></span><input id="pHeight" inputmode="decimal"></label>
+          <label class="field"><span id="pWeightL"></span><input id="pWeight" inputmode="decimal"></label>
+        </div>
+        <label class="field"><span data-i18n="activity"></span><select id="pAct"></select></label>
+        <label class="field"><span data-i18n="goal"></span><select id="pGoal"></select></label>
+        <div class="grid2">
+          <label class="field"><span id="pProtL"></span><input id="pProt" inputmode="decimal"></label>
+          <label class="field"><span id="pFatL"></span><input id="pFat" inputmode="decimal"></label>
+        </div>
+        <div class="calc" id="calc"></div>
+        <label class="switch"><span data-i18n="manualTargets"></span><input type="checkbox" id="manualOn"></label>
+        <div class="grid2" id="manualBox" hidden>
+          <label class="field"><span>kcal</span><input id="mKcal" inputmode="numeric"></label>
+          <label class="field"><span data-i18n="protein"></span><input id="mP" inputmode="numeric"></label>
+          <label class="field"><span data-i18n="carbs"></span><input id="mC" inputmode="numeric"></label>
+          <label class="field"><span data-i18n="fat"></span><input id="mF" inputmode="numeric"></label>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="step-title" data-i18n="setMeals"></h2>
+      <div class="card">
+        <p class="caption" data-i18n="setMealsD"></p>
+        <div class="slothead"><span data-i18n="mealTime"></span><span data-i18n="mealName"></span><span>% kcal</span><span>% prot.</span><span></span></div>
+        <div id="slotRows" style="display:flex;flex-direction:column;gap:6px"></div>
+        <p class="warnline" id="slotWarn" hidden></p>
+        <button class="btn secondary small" type="button" id="addSlot" style="align-self:flex-start" data-i18n="addMeal"></button>
+        <div id="slotPreview" class="calc"></div>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="step-title" data-i18n="setDiet"></h2>
+      <div class="card" id="diet"></div>
+    </section>
+
+    <section>
+      <h2 class="step-title" data-i18n="setDisplay"></h2>
+      <div class="card">
+        <div class="field"><span data-i18n="language"></span>
+          <div class="seg2" id="sLang"><button class="chip" type="button" data-v="fr">Français</button><button class="chip" type="button" data-v="en">English</button></div></div>
+        <div class="field"><span data-i18n="units"></span>
+          <div class="seg2" id="sUnits"><button class="chip" type="button" data-v="metric" data-i18n="metric"></button><button class="chip" type="button" data-v="imperial" data-i18n="imperial"></button></div></div>
+        <div class="field"><span data-i18n="theme"></span>
+          <div class="seg2" id="sTheme"><button class="chip" type="button" data-v="auto" data-i18n="themeAuto"></button><button class="chip" type="button" data-v="light" data-i18n="themeLight"></button><button class="chip" type="button" data-v="dark" data-i18n="themeDark"></button></div></div>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="step-title" data-i18n="setData"></h2>
+      <div class="card">
+        <p class="caption" data-i18n="setDataD"></p>
+        <div class="row" style="flex-wrap:wrap">
+          <button class="btn secondary small" type="button" id="exportBtn" data-i18n="export"></button>
+          <button class="btn secondary small" type="button" id="clearLogBtn" data-i18n="clearToday"></button>
+          <button class="btn small danger" type="button" id="resetBtn" data-i18n="resetAll"></button>
+        </div>
+      </div>
     </section>
   </div>
 </main>
@@ -337,202 +436,419 @@ details[open] summary::after { content: "−"; }
 <div class="dock">
   <div class="inner" id="dockBuild">
     <button class="btn secondary scan-btn" id="mealScanBtn" type="button">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M7 8v8M10 8v8M13 8v8M17 8v8"/></svg>Scanner</button>
-    <button class="btn" id="calcBtn" type="button" disabled>Calculer</button>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M7 8v8M10 8v8M13 8v8M17 8v8"/></svg><span data-i18n="scan"></span></button>
+    <button class="btn" id="calcBtn" type="button" disabled></button>
   </div>
   <div class="inner" id="dockResult" hidden>
-    <button class="btn secondary" id="backBtn" type="button" style="flex:0 0 38%">Modifier</button>
-    <button class="btn" id="ateBtn" type="button">J'ai mangé ça</button>
+    <button class="btn secondary" id="backBtn" type="button" style="flex:0 0 38%" data-i18n="edit"></button>
+    <button class="btn" id="ateBtn" type="button" data-i18n="ateIt"></button>
   </div>
   <div class="inner" id="dockShop" hidden>
     <button class="btn" id="shopScanBtn" type="button">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M7 8v8M10 8v8M13 8v8M17 8v8"/></svg>Scanner un produit</button>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M7 8v8M10 8v8M13 8v8M17 8v8"/></svg><span data-i18n="scanProduct"></span></button>
   </div>
 </div>
 
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script>
-const MACROS = [
-  { k: "kcal", label: "Calories", short: "kcal", unit: "", color: "var(--k)" },
-  { k: "p", label: "Protéines", short: "Prot.", unit: "g", color: "var(--p)" },
-  { k: "c", label: "Glucides", short: "Gluc.", unit: "g", color: "var(--c)" },
-  { k: "f", label: "Lipides", short: "Lip.", unit: "g", color: "var(--f)" },
-];
-// 2 100 kcal, P 180, G 185, L 70 répartis sur 13h / 17h / 20h
-const DEFAULT_SLOTS = [
-  { id: "midi", name: "13h", sub: "Repas", t: { kcal: 900, p: 70, c: 85, f: 30 } },
-  { id: "goûter", name: "17h", sub: "Collation", t: { kcal: 300, p: 40, c: 15, f: 10 } },
-  { id: "soir", name: "20h", sub: "Repas", t: { kcal: 900, p: 70, c: 85, f: 30 } },
-];
-
-/* Rayons et budget hebdo (2 100 kcal × 7, P 1 260 g, G 1 295 g, L 490 g).
-   by : ce qui fixe la quantité ("p" protéines, "c" glucides, "f" lipides en g, "g" poids, "kcal" calories).
-   n : nombre de produits différents qu'on prend en général dans ce rayon. */
-const FAMILIES = {
-  viandes:  { label: "Viandes & volaille", by: "p", budget: 720, n: 2, also: "poulet, dinde, bœuf haché, porc" },
-  oeufs:    { label: "Œufs", by: "g", budget: 660, n: 1, also: "" },
-  laitiers: { label: "Laitiers protéinés", by: "p", budget: 190, n: 1, also: "skyr, yaourt grec, fromage blanc" },
-  fromages: { label: "Fromages", by: "g", budget: 150, n: 1, also: "" },
-  feculents:{ label: "Féculents", by: "c", budget: 1000, n: 3, also: "riz, pâtes, pommes de terre, avoine" },
-  legumes:  { label: "Légumes", by: "g", budget: 2400, n: 3, also: "frais ou surgelés" },
-  fruits:   { label: "Fruits", by: "g", budget: 1200, n: 2, also: "" },
-  graisses: { label: "Huiles & oléagineux", by: "f", budget: 120, n: 1, also: "huile, beurre de cacahuète, amandes" },
-  sauces:   { label: "Sauces & condiments", by: "g", budget: 450, n: 2, also: "" },
-  poudre:   { label: "Protéine en poudre", by: "g", budget: 210, n: 1, also: "" },
-  extras:   { label: "Plaisirs hors plan", by: "kcal", budget: 700, n: 1, also: "" },
+/* ================= Textes FR / EN ================= */
+const STR = {
+  fr: {
+    tabMeal: "Repas", tabShop: "Courses", tabSet: "Réglages",
+    hello: "Bonjour", evening: "Bonsoir",
+    whichMeal: "Quel repas ?", whatYouEat: "Ce que tu manges", yourDoses: "Tes doses à peser",
+    protein: "Protéines", carbs: "Glucides", fat: "Lipides", calories: "Calories",
+    protS: "Prot.", carbS: "Gluc.", fatS: "Lip.",
+    noBarcode: "Sans code-barres ? Touche un aliment (poids cru)", manualCode: "Code-barres à la main", add: "Ajouter", search: "Chercher",
+    scan: "Scanner", scanProduct: "Scanner un produit", calc: "Calculer", edit: "Modifier", ateIt: "J'ai mangé ça",
+    products: (n) => `${n} produit${n > 1 ? "s" : ""}`,
+    emptyMealT: "Qu'est-ce qu'on mange ?", emptyMealD: "Scanne chaque produit avec « Scanner » en bas, ou touche un aliment ci-dessous. Quand tout y est, appuie sur « Calculer ».",
+    per100: "pour 100 g", fixedQty: "Quantité fixe", autoQty: "Quantité auto", remove: "Retirer",
+    leftFor: (slot, kcal) => `Il te reste ça pour ${slot} (déjà ${kcal} kcal notées sur ce créneau).`,
+    goalFor: (sub, time) => `Ton objectif : ${sub.toLowerCase()} de ${time}.`,
+    notNeeded: "Pas besoin : le reste du repas couvre déjà tout", weighedRaw: "pesé cru / sec",
+    gProt: (g) => `${g} g de protéines`,
+    onTarget: "Repas pile dans tes objectifs",
+    missing: (m) => `Il manque des ${m} : ajoute un produit qui en contient plus`,
+    tooMuch: (m) => `Trop de ${m} : retire un produit ou fixe sa quantité plus bas`,
+    eatenToday: (k, p) => `Mangé aujourd'hui · ${k} kcal · ${p} g P`, nothingToday: "Rien de noté aujourd'hui.",
+    addedMeal: (n, g) => `${n} ajouté au repas · note ${g}`, mealSaved: "Repas noté. Bon appétit !",
+    shopIntroT: "Scanne un produit en magasin",
+    shopIntroD: "Je te dis s'il est bon pour toi et combien en prendre pour la semaine, en tenant compte des autres produits du même rayon que tu vas sûrement acheter aussi.",
+    weekList: "Ma liste de la semaine", clearList: "Vider la liste", inCart: (a, b) => `${a}/${b} dans le caddie`,
+    emptyListT: "Liste vide", emptyListD: "Scanne un produit ou pioche dans les bons choix ci-dessous.",
+    goodChoices: "Bons choix pour toi", goodChoicesD: "Les aliments qui collent à ton objectif, rayon par rayon, avec la quantité à prévoir pour la semaine.",
+    perWeek: "/sem.", forWeek: "pour la semaine", rawWeight: "poids cru", maxWeek: "maximum pour la semaine",
+    aisle: "Rayon (touche pour corriger)", howMany: (f) => `Combien de produits différents en ${f} cette semaine ?`,
+    close: "Fermer", addList: "Ajouter à ma liste", addedList: (n, q) => `${n} : ${q} ajouté à ta liste`,
+    packs: (k, w) => `≈ ${k} paquet${k > 1 ? "s" : ""} de ${w}`, eggs: (n) => `${n} œufs`,
+    extrasHow: (b) => `Pas prévu dans ton plan. Si tu en prends, reste sous ${b} kcal pour la semaine, soit environ ${Math.round(b / 7)} kcal par jour.`,
+    planTotalW: (w, f) => `${w} de ${f} par semaine`,
+    planTotalN: (g, m) => `${g} g de ${m} par semaine venant de ce rayon`,
+    splitHow: (t, n, also) => `Ton plan prévoit ${t}. Je les répartis sur ${n} produits différents${also ? ` (${also})` : ""}, donc celui-ci en couvre 1/${n}.`,
+    soloHow: (t) => `Ton plan prévoit ${t}, couverts entièrement par ce produit.`,
+    excludedQty: "tu as exclu ce type de produit dans tes réglages",
+    notInOFF: "Ce produit n'est pas dans Open Food Facts. Choisis un aliment proche dans la liste.",
+    noValues: (n) => `${n} : pas de valeurs nutritionnelles dans Open Food Facts.`,
+    offline: "Pas de connexion à Open Food Facts. Vérifie ton réseau et réessaie.",
+    noScanner: "Le scanner n'a pas chargé. Tape le code à la main.",
+    camDenied: "Caméra refusée. Autorise-la dans Réglages > Safari > Caméra, ou tape le code.",
+    noName: "Produit sans nom",
+    gA: "Excellent pour toi", gB: "Bon choix", gC: "Correct, avec modération", gD: "Pas idéal pour ton objectif", gE: "À éviter",
+    rProt: (p) => `Riche en protéines (${p} % des calories)`, rLowProt: "Presque pas de protéines pour beaucoup de calories",
+    rFiber: (g) => `Bonne source de fibres (${g} g)`, rSugar: (g) => `Sucré (${g} g pour 100 g)`, rVSugar: (g) => `Très sucré (${g} g pour 100 g)`,
+    rSat: (g) => `Riche en graisses saturées (${g} g)`, rSalt: (g) => `Salé (${g} g de sel pour 100 g)`,
+    rRaw: "Aliment brut, pas transformé", rUltra: "Ultra-transformé", rAdd: (n) => `${n} additifs`,
+    rDense: (k) => `Très calorique (${k} kcal pour 100 g) et peu rassasiant`, rSpoon: "Très calorique : à doser à la cuillère",
+    rExcluded: (w) => `Exclu par tes réglages : ${w}`,
+    setProfile: "Mon profil", firstName: "Prénom", sex: "Sexe", male: "Homme", female: "Femme", age: "Âge",
+    activity: "Activité", goal: "Objectif",
+    act: ["Sédentaire (peu de mouvement)", "Légèrement actif (sport 1 à 3 fois par semaine)", "Modérément actif (sport 3 à 5 fois)", "Très actif (sport 6 à 7 fois)"],
+    goals: ["Sèche rapide (−750 kcal)", "Perte de gras (−500 kcal)", "Perte douce (−300 kcal)", "Maintien", "Prise de muscle (+250 kcal)"],
+    protPerKg: "Protéines (g par kg)", fatPerKg: "Lipides min. (g par kg)", protPerLb: "Protéines (g par lb)", fatPerLb: "Lipides min. (g par lb)",
+    height: "Taille", weight: "Poids",
+    bmr: "Métabolisme de base", tdee: "Dépense du jour", target: "Objectif calories", perDay: "par jour",
+    weekLoss: (kg) => `≈ ${kg} par semaine`,
+    manualTargets: "Fixer mes cibles à la main",
+    setMeals: "Mes repas", setMealsD: "Comment tes calories et tes protéines se répartissent dans la journée.",
+    mealTime: "Heure", mealName: "Nom", addMeal: "+ Ajouter un repas", removeMeal: "Supprimer ce repas",
+    sumWarn: (k, p) => `Les parts doivent faire 100 % (calories : ${k} %, protéines : ${p} %). Je normalise automatiquement.`,
+    setDiet: "Mon régime",
+    diet: { seafood: "Pas de produits de la mer", tuna: "…sauf le thon en boîte", veg: "Végétarien", pork: "Sans porc", lactose: "Sans lactose", gluten: "Sans gluten" },
+    dietWord: { seafood: "produit de la mer", veg: "viande ou poisson", pork: "porc", lactose: "lactose", gluten: "gluten" },
+    setDisplay: "Affichage", language: "Langue", units: "Unités", metric: "Métrique (kg, cm)", imperial: "Impérial (lb, in)",
+    theme: "Thème", themeAuto: "Auto", themeLight: "Clair", themeDark: "Sombre",
+    setData: "Mes données", setDataD: "Tout reste sur ton téléphone. Tu peux l'exporter ou repartir de zéro.",
+    export: "Exporter", clearToday: "Effacer aujourd'hui", resetAll: "Tout réinitialiser", confirm: "Sûr ? Touche encore",
+    exported: "Fichier exporté", cleared: "Journal du jour effacé",
+    families: {
+      viandes: "Viandes & volaille", oeufs: "Œufs", laitiers: "Laitiers protéinés", fromages: "Fromages", feculents: "Féculents",
+      legumes: "Légumes", fruits: "Fruits", graisses: "Huiles & oléagineux", sauces: "Sauces & condiments", poudre: "Protéine en poudre", extras: "Plaisirs hors plan",
+    },
+    also: { viandes: "poulet, dinde, bœuf haché, porc", laitiers: "skyr, yaourt grec, fromage blanc", feculents: "riz, pâtes, pommes de terre, avoine", legumes: "frais ou surgelés", graisses: "huile, beurre de cacahuète, amandes" },
+    egg: "œuf", eggsU: "œufs", tbsp: "c. à soupe", collation: "la collation", meal: "le repas",
+  },
+  en: {
+    tabMeal: "Meals", tabShop: "Groceries", tabSet: "Settings",
+    hello: "Hi", evening: "Good evening",
+    whichMeal: "Which meal?", whatYouEat: "What you're eating", yourDoses: "Your portions to weigh",
+    protein: "Protein", carbs: "Carbs", fat: "Fat", calories: "Calories",
+    protS: "Prot.", carbS: "Carbs", fatS: "Fat",
+    noBarcode: "No barcode? Tap a food (raw weight)", manualCode: "Type a barcode", add: "Add", search: "Search",
+    scan: "Scan", scanProduct: "Scan a product", calc: "Calculate", edit: "Edit", ateIt: "I ate this",
+    products: (n) => `${n} item${n > 1 ? "s" : ""}`,
+    emptyMealT: "What's on the plate?", emptyMealD: "Scan each product with \"Scan\" below, or tap a food. When everything is in, tap \"Calculate\".",
+    per100: "per 100 g", fixedQty: "Fixed amount", autoQty: "Auto amount", remove: "Remove",
+    leftFor: (slot, kcal) => `Left for ${slot} (${kcal} kcal already logged in this slot).`,
+    goalFor: (sub, time) => `Your target: ${sub.toLowerCase()} at ${time}.`,
+    notNeeded: "Not needed: the rest of the meal already covers it", weighedRaw: "weighed raw / dry",
+    gProt: (g) => `${g} g protein`,
+    onTarget: "Meal right on target",
+    missing: (m) => `Not enough ${m}: add a product with more of it`,
+    tooMuch: (m) => `Too much ${m}: remove a product or fix its amount lower`,
+    eatenToday: (k, p) => `Eaten today · ${k} kcal · ${p} g P`, nothingToday: "Nothing logged today.",
+    addedMeal: (n, g) => `${n} added to the meal · grade ${g}`, mealSaved: "Meal logged. Enjoy!",
+    shopIntroT: "Scan a product in the store",
+    shopIntroD: "I'll tell you if it's good for you and how much to buy for the week, counting the other products from the same aisle you'll probably buy too.",
+    weekList: "My weekly list", clearList: "Clear list", inCart: (a, b) => `${a}/${b} in the cart`,
+    emptyListT: "Empty list", emptyListD: "Scan a product or pick from the good choices below.",
+    goodChoices: "Good choices for you", goodChoicesD: "Foods that fit your goal, aisle by aisle, with how much to plan for the week.",
+    perWeek: "/wk", forWeek: "for the week", rawWeight: "raw weight", maxWeek: "maximum for the week",
+    aisle: "Aisle (tap to correct)", howMany: (f) => `How many different ${f} products this week?`,
+    close: "Close", addList: "Add to my list", addedList: (n, q) => `${n}: ${q} added to your list`,
+    packs: (k, w) => `≈ ${k} pack${k > 1 ? "s" : ""} of ${w}`, eggs: (n) => `${n} eggs`,
+    extrasHow: (b) => `Not in your plan. If you buy it, stay under ${b} kcal for the week, about ${Math.round(b / 7)} kcal a day.`,
+    planTotalW: (w, f) => `${w} of ${f} a week`,
+    planTotalN: (g, m) => `${g} g of ${m} a week from this aisle`,
+    splitHow: (t, n, also) => `Your plan has ${t}. I split it across ${n} different products${also ? ` (${also})` : ""}, so this one covers 1/${n}.`,
+    soloHow: (t) => `Your plan has ${t}, all covered by this product.`,
+    excludedQty: "you excluded this kind of product in your settings",
+    notInOFF: "This product isn't in Open Food Facts. Pick a similar food from the list.",
+    noValues: (n) => `${n}: no nutrition facts in Open Food Facts.`,
+    offline: "Can't reach Open Food Facts. Check your connection and try again.",
+    noScanner: "The scanner didn't load. Type the barcode instead.",
+    camDenied: "Camera blocked. Allow it in Settings > Safari > Camera, or type the barcode.",
+    noName: "Unnamed product",
+    gA: "Excellent for you", gB: "Good choice", gC: "OK in moderation", gD: "Not ideal for your goal", gE: "Avoid",
+    rProt: (p) => `High in protein (${p} % of calories)`, rLowProt: "Almost no protein for a lot of calories",
+    rFiber: (g) => `Good source of fibre (${g} g)`, rSugar: (g) => `Sugary (${g} g per 100 g)`, rVSugar: (g) => `Very sugary (${g} g per 100 g)`,
+    rSat: (g) => `High in saturated fat (${g} g)`, rSalt: (g) => `Salty (${g} g salt per 100 g)`,
+    rRaw: "Whole food, unprocessed", rUltra: "Ultra-processed", rAdd: (n) => `${n} additives`,
+    rDense: (k) => `Very calorie-dense (${k} kcal per 100 g) and not filling`, rSpoon: "Very calorie-dense: measure by the spoon",
+    rExcluded: (w) => `Excluded by your settings: ${w}`,
+    setProfile: "My profile", firstName: "First name", sex: "Sex", male: "Male", female: "Female", age: "Age",
+    activity: "Activity", goal: "Goal",
+    act: ["Sedentary (little movement)", "Lightly active (training 1–3×/week)", "Moderately active (3–5×/week)", "Very active (6–7×/week)"],
+    goals: ["Fast cut (−750 kcal)", "Fat loss (−500 kcal)", "Slow cut (−300 kcal)", "Maintenance", "Muscle gain (+250 kcal)"],
+    protPerKg: "Protein (g per kg)", fatPerKg: "Min. fat (g per kg)", protPerLb: "Protein (g per lb)", fatPerLb: "Min. fat (g per lb)",
+    height: "Height", weight: "Weight",
+    bmr: "Basal metabolic rate", tdee: "Daily expenditure", target: "Calorie target", perDay: "per day",
+    weekLoss: (kg) => `≈ ${kg} per week`,
+    manualTargets: "Set my targets by hand",
+    setMeals: "My meals", setMealsD: "How your calories and protein are spread across the day.",
+    mealTime: "Time", mealName: "Name", addMeal: "+ Add a meal", removeMeal: "Remove this meal",
+    sumWarn: (k, p) => `Shares should add up to 100 % (calories: ${k} %, protein: ${p} %). I normalise them automatically.`,
+    setDiet: "My diet",
+    diet: { seafood: "No seafood", tuna: "…except canned tuna", veg: "Vegetarian", pork: "No pork", lactose: "Lactose-free", gluten: "Gluten-free" },
+    dietWord: { seafood: "seafood", veg: "meat or fish", pork: "pork", lactose: "lactose", gluten: "gluten" },
+    setDisplay: "Display", language: "Language", units: "Units", metric: "Metric (kg, cm)", imperial: "Imperial (lb, in)",
+    theme: "Theme", themeAuto: "Auto", themeLight: "Light", themeDark: "Dark",
+    setData: "My data", setDataD: "Everything stays on your phone. You can export it or start over.",
+    export: "Export", clearToday: "Clear today", resetAll: "Reset everything", confirm: "Sure? Tap again",
+    exported: "File exported", cleared: "Today's log cleared",
+    families: {
+      viandes: "Meat & poultry", oeufs: "Eggs", laitiers: "High-protein dairy", fromages: "Cheese", feculents: "Starches",
+      legumes: "Vegetables", fruits: "Fruit", graisses: "Oils & nuts", sauces: "Sauces & condiments", poudre: "Protein powder", extras: "Off-plan treats",
+    },
+    also: { viandes: "chicken, turkey, ground beef, pork", laitiers: "skyr, Greek yogurt, cottage cheese", feculents: "rice, pasta, potatoes, oats", legumes: "fresh or frozen", graisses: "oil, peanut butter, almonds" },
+    egg: "egg", eggsU: "eggs", tbsp: "tbsp", collation: "the snack", meal: "the meal",
+  },
 };
 
-/* Aliments bons pour toi (valeurs crues pour 100 g, table CIQUAL arrondie). Aucun produit de la mer sauf le thon en boîte. */
-const FOODS = [
-  { name: "Blanc de poulet", fam: "viandes", n: { kcal: 110, p: 23, c: 0, f: 1.8 } },
-  { name: "Escalope de dinde", fam: "viandes", n: { kcal: 105, p: 23.5, c: 0, f: 1.2 } },
-  { name: "Haut de cuisse de poulet sans peau", fam: "viandes", n: { kcal: 120, p: 19.5, c: 0, f: 4.5 } },
-  { name: "Steak haché 5 %", fam: "viandes", n: { kcal: 125, p: 21, c: 0, f: 5, sat: 2.2 } },
-  { name: "Bœuf haché 10 %", fam: "viandes", n: { kcal: 170, p: 20, c: 0, f: 10, sat: 4.3 } },
-  { name: "Rumsteck", fam: "viandes", n: { kcal: 125, p: 22, c: 0, f: 4, sat: 1.7 } },
-  { name: "Filet mignon de porc", fam: "viandes", n: { kcal: 120, p: 22, c: 0, f: 3.5 } },
-  { name: "Jambon blanc découenné", fam: "viandes", n: { kcal: 110, p: 20, c: 1, f: 3, salt: 1.9 }, nova: 3 },
-  { name: "Thon au naturel", fam: "viandes", n: { kcal: 115, p: 26, c: 0, f: 1, salt: 0.9 }, nova: 3 },
-  { name: "Œufs", fam: "oeufs", n: { kcal: 140, p: 12.5, c: 0.5, f: 10, sat: 2.8 }, unit: { name: "œuf", g: 55, step: 55 } },
-  { name: "Blancs d'œufs liquides", fam: "oeufs", n: { kcal: 48, p: 10.5, c: 0.7, f: 0.2 } },
-  { name: "Skyr nature", fam: "laitiers", n: { kcal: 60, p: 10.5, c: 4, f: 0.2, sugar: 4 } },
-  { name: "Yaourt grec 0 %", fam: "laitiers", n: { kcal: 59, p: 10.3, c: 3.6, f: 0.4, sugar: 3.6 } },
-  { name: "Fromage blanc 0 %", fam: "laitiers", n: { kcal: 47, p: 7.5, c: 4, f: 0.1, sugar: 4 } },
-  { name: "Cottage cheese", fam: "laitiers", n: { kcal: 98, p: 11, c: 3.4, f: 4.3, sugar: 3 } },
-  { name: "Mozzarella allégée", fam: "fromages", n: { kcal: 254, p: 24, c: 2.8, f: 16, sat: 10, salt: 1 } },
-  { name: "Parmesan", fam: "fromages", n: { kcal: 390, p: 33, c: 0, f: 28, sat: 18, salt: 1.6 } },
-  { name: "Riz basmati (cru)", fam: "feculents", n: { kcal: 350, p: 8, c: 77, f: 1 } },
-  { name: "Riz complet (cru)", fam: "feculents", n: { kcal: 350, p: 7.5, c: 74, f: 2.7, fiber: 3.5 } },
-  { name: "Pâtes (crues)", fam: "feculents", n: { kcal: 355, p: 12.5, c: 71, f: 1.5, fiber: 3 } },
-  { name: "Pâtes complètes (crues)", fam: "feculents", n: { kcal: 345, p: 13, c: 64, f: 2.5, fiber: 8 } },
-  { name: "Pommes de terre", fam: "feculents", n: { kcal: 80, p: 2, c: 17, f: 0.1, fiber: 1.5 } },
-  { name: "Patate douce", fam: "feculents", n: { kcal: 86, p: 1.6, c: 20, f: 0.1, fiber: 3 } },
-  { name: "Flocons d'avoine", fam: "feculents", n: { kcal: 370, p: 13.5, c: 59, f: 7, fiber: 10 } },
-  { name: "Semoule (crue)", fam: "feculents", n: { kcal: 360, p: 12, c: 73, f: 1.5 } },
-  { name: "Quinoa (cru)", fam: "feculents", n: { kcal: 365, p: 14, c: 64, f: 6, fiber: 7 } },
-  { name: "Lentilles (sèches)", fam: "feculents", n: { kcal: 330, p: 24, c: 50, f: 1.5, fiber: 11 } },
-  { name: "Pain complet", fam: "feculents", n: { kcal: 240, p: 9, c: 45, f: 2.5, fiber: 7, salt: 1.1 }, nova: 3 },
-  { name: "Brocoli", fam: "legumes", n: { kcal: 34, p: 2.8, c: 4, f: 0.4, fiber: 2.6 } },
-  { name: "Haricots verts", fam: "legumes", n: { kcal: 31, p: 1.8, c: 4.5, f: 0.2, fiber: 3 } },
-  { name: "Légumes surgelés en mélange", fam: "legumes", n: { kcal: 50, p: 2.5, c: 8, f: 0.5, fiber: 3 } },
-  { name: "Courgettes", fam: "legumes", n: { kcal: 17, p: 1.2, c: 2, f: 0.3, fiber: 1 } },
-  { name: "Épinards", fam: "legumes", n: { kcal: 23, p: 2.9, c: 1.4, f: 0.4, fiber: 2.2 } },
-  { name: "Poivrons", fam: "legumes", n: { kcal: 30, p: 1, c: 5, f: 0.3, fiber: 2 } },
-  { name: "Champignons", fam: "legumes", n: { kcal: 22, p: 3, c: 1, f: 0.3, fiber: 1 } },
-  { name: "Bananes", fam: "fruits", n: { kcal: 90, p: 1.1, c: 20, f: 0.3, sugar: 15, fiber: 2.6 } },
-  { name: "Pommes", fam: "fruits", n: { kcal: 52, p: 0.3, c: 12, f: 0.2, sugar: 10, fiber: 2.4 } },
-  { name: "Fruits rouges surgelés", fam: "fruits", n: { kcal: 45, p: 1, c: 8, f: 0.3, sugar: 6, fiber: 4 } },
-  { name: "Kiwis", fam: "fruits", n: { kcal: 61, p: 1.1, c: 11, f: 0.5, sugar: 9, fiber: 3 } },
-  { name: "Huile d'olive", fam: "graisses", n: { kcal: 900, p: 0, c: 0, f: 100, sat: 14 }, unit: { name: "c. à soupe", g: 10, step: 5 }, nova: 2 },
-  { name: "Beurre de cacahuète 100 %", fam: "graisses", n: { kcal: 600, p: 25, c: 15, f: 50, sat: 9, fiber: 6 } },
-  { name: "Amandes", fam: "graisses", n: { kcal: 600, p: 21, c: 7, f: 52, sat: 4, fiber: 12 } },
-  { name: "Avocat", fam: "graisses", n: { kcal: 160, p: 2, c: 2, f: 15, sat: 2, fiber: 7 } },
-  { name: "Sauce tomate sans sucre ajouté", fam: "sauces", n: { kcal: 45, p: 1.5, c: 7, f: 1.5, salt: 0.8 }, nova: 3 },
-  { name: "Moutarde", fam: "sauces", n: { kcal: 150, p: 7, c: 5, f: 10, salt: 5.5 }, nova: 3 },
-  { name: "Salsa", fam: "sauces", n: { kcal: 30, p: 1.5, c: 6, f: 0.2, salt: 1.5 }, nova: 3 },
-  { name: "Whey", fam: "poudre", n: { kcal: 380, p: 78, c: 6, f: 5 }, nova: 4 },
+/* ================= Réglages par défaut (profil de Matthieu) ================= */
+const DEFAULT_SETTINGS = {
+  lang: "fr", units: "metric", theme: "auto",
+  profile: { name: "Matthieu", sex: "m", age: 31, height: 188, weight: 87, act: 1, goal: 1, protKg: 2.07, fatKg: 0.8 },
+  manual: { on: false, kcal: 2100, p: 180, c: 185, f: 70 },
+  slots: [
+    { id: "s1", time: "13h", name: "Repas", pk: 43, pp: 39 },
+    { id: "s2", time: "17h", name: "Collation", pk: 14, pp: 22 },
+    { id: "s3", time: "20h", name: "Repas", pk: 43, pp: 39 },
+  ],
+  diet: { seafood: true, tuna: true, veg: false, pork: false, lactose: false, gluten: false },
+};
+const ACT = [1.2, 1.375, 1.55, 1.725];
+const GOAL = [-750, -500, -300, 0, 250];
+// Référence pour mettre les budgets des courses à l'échelle (cibles de départ de Matthieu)
+const BASE = { kcal: 2100, p: 180, c: 185, f: 70 };
+
+const MACROS = [
+  { k: "kcal", unit: "", color: "var(--k)" },
+  { k: "p", unit: "g", color: "var(--p)" },
+  { k: "c", unit: "g", color: "var(--c)" },
+  { k: "f", unit: "g", color: "var(--f)" },
 ];
-for (const f of FOODS) if (f.nova == null) f.nova = 1;
-const QUICK = ["Blanc de poulet", "Steak haché 5 %", "Riz basmati (cru)", "Pâtes (crues)", "Pommes de terre", "Œufs", "Thon au naturel", "Skyr nature", "Huile d'olive", "Légumes surgelés en mélange"];
+const mLabel = (k) => ({ kcal: t("calories"), p: t("protein"), c: t("carbs"), f: t("fat") }[k]);
+const mShort = (k) => ({ kcal: "kcal", p: t("protS"), c: t("carbS"), f: t("fatS") }[k]);
+
+/* Rayons et budget hebdo pour les cibles de BASE ; mis à l'échelle selon le profil.
+   by : ce qui fixe la quantité ("p", "c", "f" en g de macro, "g" poids, "kcal" calories). n : produits différents par rayon. */
+const FAMILIES = {
+  viandes:  { by: "p", budget: 720, n: 2 },
+  oeufs:    { by: "g", budget: 660, n: 1 },
+  laitiers: { by: "p", budget: 190, n: 1 },
+  fromages: { by: "g", budget: 150, n: 1 },
+  feculents:{ by: "c", budget: 1000, n: 3 },
+  legumes:  { by: "g", budget: 2400, n: 3 },
+  fruits:   { by: "g", budget: 1200, n: 2 },
+  graisses: { by: "f", budget: 120, n: 1 },
+  sauces:   { by: "g", budget: 450, n: 2 },
+  poudre:   { by: "g", budget: 210, n: 1 },
+  extras:   { by: "kcal", budget: 700, n: 1 },
+};
+
+/* Aliments (valeurs crues pour 100 g, table CIQUAL arrondie). tags : meat, pork, tuna, dairy, gluten */
+const FOODS = [
+  { fr: "Blanc de poulet", en: "Chicken breast", fam: "viandes", tags: ["meat"], n: { kcal: 110, p: 23, c: 0, f: 1.8 } },
+  { fr: "Escalope de dinde", en: "Turkey cutlet", fam: "viandes", tags: ["meat"], n: { kcal: 105, p: 23.5, c: 0, f: 1.2 } },
+  { fr: "Haut de cuisse de poulet sans peau", en: "Skinless chicken thigh", fam: "viandes", tags: ["meat"], n: { kcal: 120, p: 19.5, c: 0, f: 4.5 } },
+  { fr: "Steak haché 5 %", en: "Lean ground beef 95/5", fam: "viandes", tags: ["meat"], n: { kcal: 125, p: 21, c: 0, f: 5, sat: 2.2 } },
+  { fr: "Bœuf haché 10 %", en: "Ground beef 90/10", fam: "viandes", tags: ["meat"], n: { kcal: 170, p: 20, c: 0, f: 10, sat: 4.3 } },
+  { fr: "Rumsteck", en: "Sirloin steak", fam: "viandes", tags: ["meat"], n: { kcal: 125, p: 22, c: 0, f: 4, sat: 1.7 } },
+  { fr: "Filet mignon de porc", en: "Pork tenderloin", fam: "viandes", tags: ["meat", "pork"], n: { kcal: 120, p: 22, c: 0, f: 3.5 } },
+  { fr: "Jambon blanc découenné", en: "Lean cooked ham", fam: "viandes", tags: ["meat", "pork"], n: { kcal: 110, p: 20, c: 1, f: 3, salt: 1.9 }, nova: 3 },
+  { fr: "Thon au naturel", en: "Canned tuna in water", fam: "viandes", tags: ["tuna"], n: { kcal: 115, p: 26, c: 0, f: 1, salt: 0.9 }, nova: 3 },
+  { fr: "Tofu ferme", en: "Firm tofu", fam: "viandes", tags: [], n: { kcal: 145, p: 15.5, c: 2, f: 8.5, fiber: 2 }, nova: 3 },
+  { fr: "Œufs", en: "Eggs", fam: "oeufs", tags: [], n: { kcal: 140, p: 12.5, c: 0.5, f: 10, sat: 2.8 }, unit: { k: "egg", g: 55, step: 55 } },
+  { fr: "Blancs d'œufs liquides", en: "Liquid egg whites", fam: "oeufs", tags: [], n: { kcal: 48, p: 10.5, c: 0.7, f: 0.2 } },
+  { fr: "Skyr nature", en: "Plain skyr", fam: "laitiers", tags: ["dairy"], n: { kcal: 60, p: 10.5, c: 4, f: 0.2, sugar: 4 } },
+  { fr: "Yaourt grec 0 %", en: "Nonfat Greek yogurt", fam: "laitiers", tags: ["dairy"], n: { kcal: 59, p: 10.3, c: 3.6, f: 0.4, sugar: 3.6 } },
+  { fr: "Fromage blanc 0 %", en: "Fat-free quark", fam: "laitiers", tags: ["dairy"], n: { kcal: 47, p: 7.5, c: 4, f: 0.1, sugar: 4 } },
+  { fr: "Cottage cheese", en: "Cottage cheese", fam: "laitiers", tags: ["dairy"], n: { kcal: 98, p: 11, c: 3.4, f: 4.3, sugar: 3 } },
+  { fr: "Yaourt de soja nature", en: "Plain soy yogurt", fam: "laitiers", tags: [], n: { kcal: 50, p: 4, c: 2, f: 2.3, sugar: 1 }, nova: 3 },
+  { fr: "Mozzarella allégée", en: "Part-skim mozzarella", fam: "fromages", tags: ["dairy"], n: { kcal: 254, p: 24, c: 2.8, f: 16, sat: 10, salt: 1 } },
+  { fr: "Parmesan", en: "Parmesan", fam: "fromages", tags: ["dairy"], n: { kcal: 390, p: 33, c: 0, f: 28, sat: 18, salt: 1.6 } },
+  { fr: "Riz basmati (cru)", en: "Basmati rice (dry)", fam: "feculents", tags: [], n: { kcal: 350, p: 8, c: 77, f: 1 } },
+  { fr: "Riz complet (cru)", en: "Brown rice (dry)", fam: "feculents", tags: [], n: { kcal: 350, p: 7.5, c: 74, f: 2.7, fiber: 3.5 } },
+  { fr: "Pâtes (crues)", en: "Pasta (dry)", fam: "feculents", tags: ["gluten"], n: { kcal: 355, p: 12.5, c: 71, f: 1.5, fiber: 3 } },
+  { fr: "Pâtes complètes (crues)", en: "Whole-wheat pasta (dry)", fam: "feculents", tags: ["gluten"], n: { kcal: 345, p: 13, c: 64, f: 2.5, fiber: 8 } },
+  { fr: "Pommes de terre", en: "Potatoes", fam: "feculents", tags: [], n: { kcal: 80, p: 2, c: 17, f: 0.1, fiber: 1.5 } },
+  { fr: "Patate douce", en: "Sweet potato", fam: "feculents", tags: [], n: { kcal: 86, p: 1.6, c: 20, f: 0.1, fiber: 3 } },
+  { fr: "Flocons d'avoine", en: "Rolled oats", fam: "feculents", tags: ["gluten"], n: { kcal: 370, p: 13.5, c: 59, f: 7, fiber: 10 } },
+  { fr: "Semoule (crue)", en: "Couscous (dry)", fam: "feculents", tags: ["gluten"], n: { kcal: 360, p: 12, c: 73, f: 1.5 } },
+  { fr: "Quinoa (cru)", en: "Quinoa (dry)", fam: "feculents", tags: [], n: { kcal: 365, p: 14, c: 64, f: 6, fiber: 7 } },
+  { fr: "Lentilles (sèches)", en: "Lentils (dry)", fam: "feculents", tags: [], n: { kcal: 330, p: 24, c: 50, f: 1.5, fiber: 11 } },
+  { fr: "Pain complet", en: "Whole-wheat bread", fam: "feculents", tags: ["gluten"], n: { kcal: 240, p: 9, c: 45, f: 2.5, fiber: 7, salt: 1.1 }, nova: 3 },
+  { fr: "Brocoli", en: "Broccoli", fam: "legumes", tags: [], n: { kcal: 34, p: 2.8, c: 4, f: 0.4, fiber: 2.6 } },
+  { fr: "Haricots verts", en: "Green beans", fam: "legumes", tags: [], n: { kcal: 31, p: 1.8, c: 4.5, f: 0.2, fiber: 3 } },
+  { fr: "Légumes surgelés en mélange", en: "Frozen mixed vegetables", fam: "legumes", tags: [], n: { kcal: 50, p: 2.5, c: 8, f: 0.5, fiber: 3 } },
+  { fr: "Courgettes", en: "Zucchini", fam: "legumes", tags: [], n: { kcal: 17, p: 1.2, c: 2, f: 0.3, fiber: 1 } },
+  { fr: "Épinards", en: "Spinach", fam: "legumes", tags: [], n: { kcal: 23, p: 2.9, c: 1.4, f: 0.4, fiber: 2.2 } },
+  { fr: "Poivrons", en: "Bell peppers", fam: "legumes", tags: [], n: { kcal: 30, p: 1, c: 5, f: 0.3, fiber: 2 } },
+  { fr: "Champignons", en: "Mushrooms", fam: "legumes", tags: [], n: { kcal: 22, p: 3, c: 1, f: 0.3, fiber: 1 } },
+  { fr: "Bananes", en: "Bananas", fam: "fruits", tags: [], n: { kcal: 90, p: 1.1, c: 20, f: 0.3, sugar: 15, fiber: 2.6 } },
+  { fr: "Pommes", en: "Apples", fam: "fruits", tags: [], n: { kcal: 52, p: 0.3, c: 12, f: 0.2, sugar: 10, fiber: 2.4 } },
+  { fr: "Fruits rouges surgelés", en: "Frozen berries", fam: "fruits", tags: [], n: { kcal: 45, p: 1, c: 8, f: 0.3, sugar: 6, fiber: 4 } },
+  { fr: "Kiwis", en: "Kiwis", fam: "fruits", tags: [], n: { kcal: 61, p: 1.1, c: 11, f: 0.5, sugar: 9, fiber: 3 } },
+  { fr: "Huile d'olive", en: "Olive oil", fam: "graisses", tags: [], n: { kcal: 900, p: 0, c: 0, f: 100, sat: 14 }, unit: { k: "tbsp", g: 10, step: 5 }, nova: 2 },
+  { fr: "Beurre de cacahuète 100 %", en: "Natural peanut butter", fam: "graisses", tags: [], n: { kcal: 600, p: 25, c: 15, f: 50, sat: 9, fiber: 6 } },
+  { fr: "Amandes", en: "Almonds", fam: "graisses", tags: [], n: { kcal: 600, p: 21, c: 7, f: 52, sat: 4, fiber: 12 } },
+  { fr: "Avocat", en: "Avocado", fam: "graisses", tags: [], n: { kcal: 160, p: 2, c: 2, f: 15, sat: 2, fiber: 7 } },
+  { fr: "Sauce tomate sans sucre ajouté", en: "No-sugar-added marinara", fam: "sauces", tags: [], n: { kcal: 45, p: 1.5, c: 7, f: 1.5, salt: 0.8 }, nova: 3 },
+  { fr: "Moutarde", en: "Mustard", fam: "sauces", tags: [], n: { kcal: 150, p: 7, c: 5, f: 10, salt: 5.5 }, nova: 3 },
+  { fr: "Salsa", en: "Salsa", fam: "sauces", tags: [], n: { kcal: 30, p: 1.5, c: 6, f: 0.2, salt: 1.5 }, nova: 3 },
+  { fr: "Whey", en: "Whey protein", fam: "poudre", tags: ["dairy"], n: { kcal: 380, p: 78, c: 6, f: 5 }, nova: 4 },
+];
+FOODS.forEach((f, i) => { f.id = "food" + i; if (f.nova == null) f.nova = 1; });
+const QUICK = ["food0", "food3", "food19", "food21", "food23", "food10", "food8", "food12", "food41", "food32"];
 const VEG_FIXED = 150;
 const MAX_G = 600;
 
+/* ================= État ================= */
 const store = {
   get(key, fallback) { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; } catch { return fallback; } },
   set(key, v) { try { localStorage.setItem(key, JSON.stringify(v)); } catch {} },
 };
+const clone = (o) => JSON.parse(JSON.stringify(o));
 const dayKey = () => new Date().toLocaleDateString("fr-CA");
-let slots = store.get("slots", DEFAULT_SLOTS);
+let S = Object.assign(clone(DEFAULT_SETTINGS), store.get("settings", {}));
+S.profile = Object.assign(clone(DEFAULT_SETTINGS.profile), S.profile);
+S.diet = Object.assign(clone(DEFAULT_SETTINGS.diet), S.diet);
 let log = store.get("log-" + dayKey(), []);
 let cart = store.get("cart", []);
 let shopList = store.get("shopList", []);
 let variety = store.get("variety", {});
 let tab = store.get("tab", "meal");
-let slotId = guessSlot();
+let slotId = null;
 let doses = null;
 let shopItem = null;
 let scanner = null;
+let resetArmed = false;
 
 const $ = (id) => document.getElementById(id);
 const r0 = (n) => Math.round(n);
 const r1 = (n) => Math.round(n * 10) / 10;
-const fr = (n) => String(r1(n)).replace(".", ",");
+const fr = (n) => (S.lang === "fr" ? String(r1(n)).replace(".", ",") : String(r1(n)));
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+function t(k, ...a) { const v = STR[S.lang][k] ?? STR.fr[k]; return typeof v === "function" ? v(...a) : v; }
+const famLabel = (k) => t("families")[k];
+const nm = (it) => it.foodId ? (FOODS.find((f) => f.id === it.foodId)?.[S.lang] ?? it.name) : (it[S.lang] || it.name);
+const unitName = (u, plural) => u.k === "egg" ? (plural ? t("eggsU") : t("egg")) : t("tbsp");
+function saveSettings() { store.set("settings", S); }
+
+/* ================= Cibles (Mifflin-St Jeor) ================= */
+function computeTargets() {
+  const p = S.profile;
+  const bmr = 10 * p.weight + 6.25 * p.height - 5 * p.age + (p.sex === "f" ? -161 : 5);
+  const tdee = bmr * ACT[p.act];
+  const kcal = Math.round((tdee + GOAL[p.goal]) / 50) * 50;
+  const prot = Math.round(p.protKg * p.weight);
+  const fat = Math.round(p.fatKg * p.weight);
+  const carbs = Math.max(0, Math.round((kcal - prot * 4 - fat * 9) / 4));
+  return { bmr, tdee, kcal, p: prot, c: carbs, f: fat };
+}
+function dayTargets() {
+  if (S.manual.on) return { kcal: +S.manual.kcal || 0, p: +S.manual.p || 0, c: +S.manual.c || 0, f: +S.manual.f || 0 };
+  const c = computeTargets();
+  return { kcal: c.kcal, p: c.p, c: c.c, f: c.f };
+}
+// Chaque repas reçoit sa part de calories et de protéines ; le reste des calories est partagé glucides / lipides au prorata de la journée
+function slotList() {
+  const T = dayTargets();
+  const sk = S.slots.reduce((a, s) => a + (+s.pk || 0), 0) || 1;
+  const sp = S.slots.reduce((a, s) => a + (+s.pp || 0), 0) || 1;
+  const cK = T.c * 4, fK = T.f * 9, cShare = cK + fK ? cK / (cK + fK) : 0.5;
+  return S.slots.map((s) => {
+    const kcal = T.kcal * (+s.pk || 0) / sk;
+    const p = T.p * (+s.pp || 0) / sp;
+    const rest = Math.max(0, kcal - p * 4);
+    return { id: s.id, name: s.time, sub: s.name, t: { kcal: r0(kcal), p: r0(p), c: r0(rest * cShare / 4), f: r0(rest * (1 - cShare) / 9) } };
+  });
+}
+function scaleFor(by) {
+  const T = dayTargets();
+  return by === "p" ? T.p / BASE.p : by === "c" ? T.c / BASE.c : by === "f" ? T.f / BASE.f : T.kcal / BASE.kcal;
+}
 
 function guessSlot() {
-  const h = new Date().getHours();
-  return h < 15 ? "midi" : h < 18 ? "goûter" : "soir";
+  const list = slotList(), h = new Date().getHours() + new Date().getMinutes() / 60;
+  const hours = list.map((s) => parseFloat(String(s.name).replace(",", ".").replace(/h/i, ".")) || 0);
+  let best = list[0]?.id, bestD = 99;
+  list.forEach((s, i) => { const d = Math.abs(hours[i] - h); if (d < bestD) { bestD = d; best = s.id; } });
+  return best;
 }
-const slot = () => slots.find((s) => s.id === slotId);
+const slot = () => slotList().find((s) => s.id === slotId) || slotList()[0];
 function eaten(filterSlot) {
   const sum = { kcal: 0, p: 0, c: 0, f: 0 };
   for (const e of log) if (!filterSlot || e.slot === filterSlot) for (const m of MACROS) sum[m.k] += e[m.k];
   return sum;
 }
 function remaining(id = slotId) {
-  const t = slots.find((s) => s.id === id).t, e = eaten(id), r = {};
-  for (const m of MACROS) r[m.k] = Math.max(0, t[m.k] - e[m.k]);
+  const s = slotList().find((x) => x.id === id) || slotList()[0];
+  const e = eaten(s.id), r = {};
+  for (const m of MACROS) r[m.k] = Math.max(0, s.t[m.k] - e[m.k]);
   return r;
 }
 
-/* ================= Score nutritionnel ================= */
+/* ================= Exclusions du régime ================= */
 const SEAFOOD = /seafood|fishes|(^|\s|:)fish|shellfish|crustacean|salmon|shrimp|prawn|mussel|sardine|mackerel|(^|\s|:)cod|saumon|crevette|moule|maquereau|cabillaud|surimi|poisson/;
 const TUNA = /tuna|thon/;
-function isSeafood(p) {
-  const hay = (p.cats || []).join(" ") + " " + p.name.toLowerCase();
-  return SEAFOOD.test(hay) && !TUNA.test(hay);
+const MEAT = /meats|poultry|chicken|beef|turkey|hams|sausages|poulet|boeuf|bœuf|dinde|jambon|viande|steak|saucisse|lardon|bacon/;
+const PORK = /pork|hams|bacon|porc|jambon|lardon|saucisson|chorizo/;
+function hayOf(p) { return ((p.cats || []).join(" ") + " " + (p.allergens || []).join(" ") + " " + (p.name || p.fr || "")).toLowerCase(); }
+function excludedBy(p) {
+  const d = S.diet, tags = p.tags || [], hay = hayOf(p);
+  const isTuna = tags.includes("tuna") || (!p.tags && TUNA.test(hay));
+  const isSea = isTuna || (!p.tags && SEAFOOD.test(hay)) || (p.allergens || []).some((a) => /fish|crustacean|mollusc/.test(a));
+  if (d.seafood && isSea && !(d.tuna && isTuna && !(!p.tags && SEAFOOD.test(hay) && !TUNA.test(hay)))) return "seafood";
+  if (d.veg && (tags.includes("meat") || isSea || (!p.tags && MEAT.test(hay)))) return "veg";
+  if (d.pork && (tags.includes("pork") || (!p.tags && PORK.test(hay)))) return "pork";
+  if (d.lactose && (tags.includes("dairy") || (p.allergens || []).includes("en:milk"))) return "lactose";
+  if (d.gluten && (tags.includes("gluten") || (p.allergens || []).includes("en:gluten"))) return "gluten";
+  return null;
 }
-// Score sur 100, pensé pour une sèche : densité en protéines, peu transformé, peu de sucre, de gras saturé et de sel
+
+/* ================= Score nutritionnel ================= */
 function scoreOf(p) {
-  if (isSeafood(p)) return { s: 5, reasons: [{ bad: true, t: "Produit de la mer : tu n'en manges pas (sauf le thon en boîte)" }] };
+  const ex = excludedBy(p);
+  if (ex) return { s: 5, ex, reasons: [{ bad: true, t: t("rExcluded", t("dietWord")[ex]) }] };
   const n = p.n, kcal = Math.max(n.kcal, 1);
   const reasons = [];
   let s = 50;
   const pShare = (n.p * 4) / kcal;
   s += Math.min(30, pShare * 75);
-  if (pShare >= 0.3) reasons.push({ t: `Riche en protéines (${r0(Math.min(100, pShare * 100))} % des calories)` });
-  else if (pShare < 0.08 && n.kcal > 150 && !["feculents", "graisses", "fruits", "legumes"].includes(p.fam)) {
-    s -= 8; reasons.push({ bad: true, t: "Presque pas de protéines pour beaucoup de calories" });
-  }
+  if (pShare >= 0.3) reasons.push({ t: t("rProt", r0(Math.min(100, pShare * 100))) });
+  else if (pShare < 0.08 && n.kcal > 150 && !["feculents", "graisses", "fruits", "legumes"].includes(p.fam)) { s -= 8; reasons.push({ bad: true, t: t("rLowProt") }); }
   const fiber = n.fiber ?? 0;
-  if (fiber >= 5) { s += 8; reasons.push({ t: `Bonne source de fibres (${fr(fiber)} g)` }); }
-  else if (fiber >= 3) s += 4;
+  if (fiber >= 5) { s += 8; reasons.push({ t: t("rFiber", fr(fiber)) }); } else if (fiber >= 3) s += 4;
   const sugar = n.sugar ?? 0;
-  const naturalSugar = ["fruits", "laitiers", "legumes"].includes(p.fam) && sugar <= 15;
-  if (!naturalSugar && sugar > 5) {
-    s -= Math.min(28, (sugar - 5) * 1.2);
-    reasons.push({ bad: true, t: `${sugar >= 12 ? "Très sucré" : "Sucré"} (${fr(sugar)} g pour 100 g)` });
-  }
-  const sat = n.sat ?? 0;
-  const satLimit = p.fam === "graisses" ? 18 : 4;
-  if (sat > satLimit) { s -= Math.min(15, (sat - satLimit) * 1.2); if (sat >= 8 && p.fam !== "graisses") reasons.push({ bad: true, t: `Riche en graisses saturées (${fr(sat)} g)` }); }
+  const natural = ["fruits", "laitiers", "legumes"].includes(p.fam) && sugar <= 15;
+  if (!natural && sugar > 5) { s -= Math.min(28, (sugar - 5) * 1.2); reasons.push({ bad: true, t: t(sugar >= 12 ? "rVSugar" : "rSugar", fr(sugar)) }); }
+  const sat = n.sat ?? 0, satLimit = p.fam === "graisses" ? 18 : 4;
+  if (sat > satLimit) { s -= Math.min(15, (sat - satLimit) * 1.2); if (sat >= 8 && p.fam !== "graisses") reasons.push({ bad: true, t: t("rSat", fr(sat)) }); }
   const salt = n.salt ?? 0;
-  if (salt > 1.2) { s -= Math.min(15, (salt - 1.2) * 6); if (salt >= 1.5) reasons.push({ bad: true, t: `Salé (${fr(salt)} g de sel pour 100 g)` }); }
-  if (p.nova === 1) { s += 12; reasons.push({ t: "Aliment brut, pas transformé" }); }
-  else if (p.nova === 2) s += 6;
-  else if (p.nova === 4) { s -= 12; reasons.push({ bad: true, t: "Ultra-transformé" }); }
-  if ((p.additives ?? 0) >= 4) { s -= 5; reasons.push({ bad: true, t: `${p.additives} additifs` }); }
-  if (n.kcal >= 400 && pShare < 0.15 && fiber < 5 && p.fam !== "graisses" && p.fam !== "feculents") {
-    s -= 10; reasons.push({ bad: true, t: `Très calorique (${r0(n.kcal)} kcal pour 100 g) et peu rassasiant` });
-  }
-  if (p.fam === "graisses") reasons.push({ bad: true, t: "Très calorique : à doser à la cuillère" });
+  if (salt > 1.2) { s -= Math.min(15, (salt - 1.2) * 6); if (salt >= 1.5) reasons.push({ bad: true, t: t("rSalt", fr(salt)) }); }
+  if (p.nova === 1) { s += 12; reasons.push({ t: t("rRaw") }); } else if (p.nova === 2) s += 6;
+  else if (p.nova === 4) { s -= 12; reasons.push({ bad: true, t: t("rUltra") }); }
+  if ((p.additives ?? 0) >= 4) { s -= 5; reasons.push({ bad: true, t: t("rAdd", p.additives) }); }
+  if (n.kcal >= 400 && pShare < 0.15 && fiber < 5 && p.fam !== "graisses" && p.fam !== "feculents") { s -= 10; reasons.push({ bad: true, t: t("rDense", r0(n.kcal)) }); }
+  if (p.fam === "graisses") reasons.push({ bad: true, t: t("rSpoon") });
   s = Math.max(0, Math.min(100, Math.round(s)));
   reasons.sort((a, b) => (!!a.bad === !!b.bad ? 0 : a.bad ? 1 : -1));
   return { s, reasons: reasons.slice(0, 4) };
 }
 function grade(s) {
-  if (s >= 80) return { l: "A", c: "var(--sA)", t: "Excellent pour toi" };
-  if (s >= 65) return { l: "B", c: "var(--sB)", t: "Bon choix" };
-  if (s >= 45) return { l: "C", c: "var(--sC)", t: "Correct, avec modération" };
-  if (s >= 25) return { l: "D", c: "var(--sD)", t: "Pas idéal pour ta sèche" };
-  return { l: "E", c: "var(--sE)", t: "À éviter" };
+  if (s >= 80) return { l: "A", c: "var(--sA)", t: t("gA") };
+  if (s >= 65) return { l: "B", c: "var(--sB)", t: t("gB") };
+  if (s >= 45) return { l: "C", c: "var(--sC)", t: t("gC") };
+  if (s >= 25) return { l: "D", c: "var(--sD)", t: t("gD") };
+  return { l: "E", c: "var(--sE)", t: t("gE") };
 }
-const badge = (p) => { const g = grade(scoreOf(p).s); return `<span class="score" style="background:${g.c}" title="${g.t}">${g.l}</span>`; };
+const badge = (p) => { const g = grade(scoreOf(p).s); return `<span class="score" style="background:${g.c}" title="${esc(g.t)}">${g.l}</span>`; };
 
 /* ================= Rayon d'un produit scanné ================= */
 function familyOf(p) {
-  const hay = (p.cats || []).join(" ") + " " + p.name.toLowerCase();
-  const n = p.n, sugar = n.sugar ?? 0;
+  const hay = hayOf(p), n = p.n, sugar = n.sugar ?? 0;
   if (/alcoholic|beers|wines|spirits|sodas|soft-drinks|sweetened-beverages|energy-drinks|confectioner|chocolate|candies|biscuits|cookies|cakes|pastries|ice-cream|sweet-snacks|salty-snacks|crisps|desserts|pizzas|bonbon|gâteau|biscuit|chips|soda/.test(hay)) {
     if (/greek|skyr|fromage-blanc|cottage/.test(hay) && sugar < 6) return "laitiers";
     return "extras";
@@ -542,7 +858,7 @@ function familyOf(p) {
   if (/(^|\s|:)eggs|œuf|oeuf/.test(hay)) return "oeufs";
   if (/yogurt|yoghurt|skyr|fromages-blancs|fromage blanc|cottage|quark|(^|:)milks|lait /.test(hay)) return sugar > 9 ? "extras" : "laitiers";
   if (/cheeses|fromage|mozzarella|parmesan|emmental|cheddar/.test(hay)) return "fromages";
-  if (/meats|poultry|chicken|beef|pork|turkey|hams|ground-meat|poulet|boeuf|bœuf|dinde|porc|jambon|viande|steak/.test(hay)) return "viandes";
+  if (MEAT.test(hay) || PORK.test(hay) || /tofu|tempeh|seitan/.test(hay)) return "viandes";
   if (/olive-oils|vegetable-oils|(^|:)fats|butters|nuts|peanut|almond|huile|beurre|amande|cacahu|noix|avocado/.test(hay)) return "graisses";
   if (/sauces|condiments|mustards|ketchup|spices|salsa|sauce|moutarde|épice/.test(hay)) return "sauces";
   if (/breakfast-cereals/.test(hay) && sugar > 12) return "extras";
@@ -559,35 +875,37 @@ function familyOf(p) {
 }
 
 /* ================= Quantité pour la semaine ================= */
+function famBudget(fam) { const F = FAMILIES[fam]; return F.budget * scaleFor(F.by); }
 function weeklyQty(p, fam) {
   const F = FAMILIES[fam];
   const n = Math.max(1, variety[fam] ?? F.n);
-  const share = F.budget / n;
+  const budget = famBudget(fam), share = budget / n;
   if (fam === "extras") {
     const g = p.n.kcal > 0 ? (share / p.n.kcal) * 100 : 0;
-    return { g, n, how: `Pas prévu dans ton plan. Si tu en prends, reste sous ${F.budget} kcal pour la semaine, soit environ 100 kcal par jour.` };
+    return { g, n, how: t("extrasHow", r0(budget / 50) * 50) };
   }
   let g;
   if (F.by === "g") g = share;
   else { const per = p.n[F.by]; g = per > 0 ? (share / per) * 100 : share; }
-  const total = F.by === "g"
-    ? `${fmtWeight(F.budget)} de ${F.label.toLowerCase()} par semaine`
-    : `${F.budget} g de ${{ p: "protéines", c: "glucides", f: "lipides" }[F.by]} par semaine venant de ce rayon`;
-  const how = n > 1
-    ? `Ton plan prévoit ${total}. Je les répartis sur ${n} produits différents${F.also ? ` (${F.also})` : ""}, donc celui-ci en couvre 1/${n}.`
-    : `Ton plan prévoit ${total}, couverts entièrement par ce produit.`;
-  return { g, n, how };
+  const total = F.by === "g" ? t("planTotalW", fmtWeight(budget), famLabel(fam).toLowerCase())
+    : t("planTotalN", r0(budget), mLabel(F.by).toLowerCase());
+  const also = t("also")[fam] || "";
+  return { g, n, how: n > 1 ? t("splitHow", total, n, also) : t("soloHow", total) };
 }
 function fmtWeight(g) {
+  if (S.units === "imperial") {
+    const oz = g / 28.35;
+    return oz >= 16 ? `${fr(g / 453.6)} lb` : `${fr(oz)} oz`;
+  }
   if (g >= 1000) return `${fr(g / 1000)} kg`;
   if (g >= 100) return `${Math.round(g / 10) * 10} g`;
   return `${Math.round(g)} g`;
 }
-const fmtLb = (g) => `${fr(g / 453.6)} lb`;
+const fmtAlt = (g) => S.units === "imperial" ? fmtMetric(g) : `${fr(g / 453.6)} lb`;
+const fmtMetric = (g) => g >= 1000 ? `${fr(g / 1000)} kg` : `${Math.round(g / 10) * 10} g`;
 function packsText(g, packG) {
   if (!packG) return "";
-  const k = Math.max(1, Math.round(g / packG));
-  return `≈ ${k} paquet${k > 1 ? "s" : ""} de ${fmtWeight(packG)}`;
+  return t("packs", Math.max(1, Math.round(g / packG)), fmtWeight(packG));
 }
 
 /* ================= Calcul des doses (Repas) =================
@@ -597,13 +915,13 @@ function packsText(g, packG) {
 function solve(items, target, round = false) {
   const keys = ["kcal", "p", "c", "f"];
   const w = { kcal: 1, p: 2, c: 1, f: 1 };
-  const t = { ...target };
-  for (const it of items) if (it.fixed != null) for (const k of keys) t[k] -= it.n[k] * it.fixed / 100;
+  const tg = { ...target };
+  for (const it of items) if (it.fixed != null) for (const k of keys) tg[k] -= it.n[k] * it.fixed / 100;
   const free = items.map((it, i) => ({ it, i })).filter((x) => x.it.fixed == null);
   const scale = {};
   for (const k of keys) scale[k] = Math.max(Math.abs(target[k]), k === "kcal" ? 100 : 5);
   const A = free.map(({ it }) => keys.map((k) => (it.n[k] / 100) * Math.sqrt(w[k]) / scale[k]));
-  const b = keys.map((k) => t[k] * Math.sqrt(w[k]) / scale[k]);
+  const b = keys.map((k) => tg[k] * Math.sqrt(w[k]) / scale[k]);
   const g = free.map(() => 0);
   for (let iter = 0; iter < 4000; iter++) {
     let moved = 0;
@@ -644,7 +962,8 @@ function mixHTML(n) {
   return `<div class="mix" aria-hidden="true"><span style="width:${kp / sum * 100}%;background:var(--p)"></span><span style="width:${kc / sum * 100}%;background:var(--c)"></span><span style="width:${kf / sum * 100}%;background:var(--f)"></span></div>`;
 }
 function thumbHTML(it, withScore = true) {
-  const inner = it.img ? `<img src="${esc(it.img)}" alt="" loading="lazy">` : esc((it.name.trim()[0] || "?").toUpperCase());
+  const name = nm(it);
+  const inner = it.img ? `<img src="${esc(it.img)}" alt="" loading="lazy">` : esc((name.trim()[0] || "?").toUpperCase());
   return `<div class="thumb">${inner}${withScore ? badge(it) : ""}</div>`;
 }
 const X_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>`;
@@ -653,53 +972,56 @@ function flash(id, msg) {
   clearTimeout(flash[id]); flash[id] = setTimeout(() => { $(id).hidden = true; }, 2400);
 }
 function showErr(id, msg) { $(id).textContent = msg; $(id).hidden = !msg; }
-const RAW = /riz|rice|pâtes|pasta|spaghetti|penne|fusilli|coquillettes|semoule|quinoa|lentilles|avoine|cru/i;
+const RAW = /riz|rice|pâtes|pasta|spaghetti|penne|fusilli|coquillettes|semoule|couscous|quinoa|lentil|avoine|oats|cru|dry/i;
+const macroLine = (n) => `${r0(n.kcal)} kcal · P ${fr(n.p)} · ${S.lang === "fr" ? "G" : "C"} ${fr(n.c)} · ${S.lang === "fr" ? "L" : "F"} ${fr(n.f)} ${t("per100")}`;
 
 /* ================= Repas ================= */
-function gaugeHTML(m, value, total) {
+function gaugeHTML(k, value, total, color, unit) {
   const pct = total ? Math.min(100, (value / total) * 100) : 0;
-  return `<div class="gauge"><span class="v">${r0(value)}<small>${m.unit}</small></span>
-    <div class="track"><div class="fill" style="width:${pct}%;background:${m.color}"></div></div>
-    <span class="l">${m.short}</span></div>`;
+  return `<div class="gauge"><span class="v">${r0(value)}<small>${unit}</small></span>
+    <div class="track"><div class="fill" style="width:${pct}%;background:${color}"></div></div>
+    <span class="l">${mShort(k)}</span></div>`;
 }
 function renderSlots() {
-  $("slots").innerHTML = slots.map((s) =>
-    `<button type="button" data-id="${s.id}" aria-pressed="${s.id === slotId}">${s.name}<small>${s.sub}</small><span class="left">${r0(remaining(s.id).kcal)} kcal</span></button>`).join("");
-  const rem = remaining(), t = slot().t;
-  $("remaining").innerHTML = MACROS.map((m) => gaugeHTML(m, rem[m.k], t[m.k])).join("");
+  const list = slotList();
+  if (!list.find((s) => s.id === slotId)) slotId = guessSlot();
+  $("slots").style.gridTemplateColumns = `repeat(${Math.min(list.length, 4)}, 1fr)`;
+  $("slots").innerHTML = list.map((s) =>
+    `<button type="button" data-id="${s.id}" aria-pressed="${s.id === slotId}">${esc(s.name)}<small>${esc(s.sub)}</small><span class="left">${r0(remaining(s.id).kcal)} kcal</span></button>`).join("");
+  const rem = remaining(), s = slot();
+  $("remaining").innerHTML = MACROS.map((m) => gaugeHTML(m.k, rem[m.k], s.t[m.k], m.color, m.unit)).join("");
   const done = eaten(slotId).kcal;
-  $("remainingCaption").textContent = done > 0
-    ? `Il te reste ça pour ${slot().name} (déjà ${r0(done)} kcal notées sur ce créneau).`
-    : `Ton objectif pour ${slot().sub === "Collation" ? "la collation" : "le repas"} de ${slot().name}.`;
+  $("remainingCaption").textContent = done > 0 ? t("leftFor", s.name, r0(done)) : t("goalFor", s.sub, s.name);
 }
 function renderCart() {
-  $("count").textContent = cart.length ? `${cart.length} produit${cart.length > 1 ? "s" : ""}` : "";
+  $("count").textContent = cart.length ? t("products", cart.length) : "";
   $("legend").hidden = !cart.length;
   $("items").innerHTML = cart.length ? cart.map((it, i) => `<li class="item">
       ${thumbHTML(it)}
       <div class="info">
-        <span class="name">${esc(it.name)}</span>
+        <span class="name">${esc(nm(it))}</span>
         ${mixHTML(it.n)}
-        <span class="sub">${r0(it.n.kcal)} kcal · P ${fr(it.n.p)} · G ${fr(it.n.c)} · L ${fr(it.n.f)} pour 100 g</span>
+        <span class="sub">${macroLine(it.n)}</span>
         <span class="row">
-          <button class="fix" type="button" data-fix="${i}" aria-pressed="${it.fixed != null}">${it.fixed != null ? "Quantité fixe" : "Quantité auto"}</button>
-          ${it.fixed != null ? `<input class="fix-input" data-fixval="${i}" inputmode="numeric" value="${it.fixed}" aria-label="Grammes fixes"><span class="sub" style="flex:0 0 auto">g</span>` : ""}
+          <button class="fix" type="button" data-fix="${i}" aria-pressed="${it.fixed != null}">${it.fixed != null ? t("fixedQty") : t("autoQty")}</button>
+          ${it.fixed != null ? `<input class="fix-input" data-fixval="${i}" inputmode="numeric" value="${it.fixed}" aria-label="g"><span class="sub" style="flex:0 0 auto">g</span>` : ""}
         </span>
       </div>
-      <button class="icon-btn" type="button" data-del="${i}" aria-label="Retirer ${esc(it.name)}">${X_ICON}</button>
+      <button class="icon-btn" type="button" data-del="${i}" aria-label="${t("remove")}">${X_ICON}</button>
     </li>`).join("")
-    : `<li><p class="empty"><b>Qu'est-ce qu'on mange ?</b>Scanne chaque produit avec « Scanner » en bas, ou touche un aliment ci-dessous. Quand tout y est, appuie sur « Calculer ».</p></li>`;
+    : `<li><p class="empty"><b>${t("emptyMealT")}</b>${t("emptyMealD")}</p></li>`;
   $("calcBtn").disabled = !cart.length;
-  $("calcBtn").textContent = cart.length ? `Calculer (${cart.length})` : "Calculer";
+  $("calcBtn").textContent = cart.length ? `${t("calc")} (${cart.length})` : t("calc");
   store.set("cart", cart);
 }
 function renderQuick() {
-  $("quick").innerHTML = QUICK.map((name) => `<button class="chip" type="button" data-q="${esc(name)}">+ ${esc(name.replace(/ \(crue?s?\)| en mélange/g, ""))}</button>`).join("");
+  $("quick").innerHTML = QUICK.map((id) => FOODS.find((f) => f.id === id)).filter((f) => !excludedBy(f))
+    .map((f) => `<button class="chip" type="button" data-q="${f.id}">+ ${esc(f[S.lang].replace(/ \((crue?s?|dry)\)| en mélange/g, "").trim())}</button>`).join("");
 }
 function totalsOf(gs) {
-  const t = { kcal: 0, p: 0, c: 0, f: 0 };
-  cart.forEach((it, i) => { for (const m of MACROS) t[m.k] += it.n[m.k] * gs[i] / 100; });
-  return t;
+  const tt = { kcal: 0, p: 0, c: 0, f: 0 };
+  cart.forEach((it, i) => { for (const m of MACROS) tt[m.k] += it.n[m.k] * gs[i] / 100; });
+  return tt;
 }
 function renderResult() {
   const show = !!doses;
@@ -708,13 +1030,12 @@ function renderResult() {
   if (!show) return;
   $("doses").innerHTML = cart.map((it, i) => {
     const g = doses[i];
-    const u = it.unit && g > 0 ? `${fr(g / it.unit.g)} ${it.unit.name}${g / it.unit.g > 1 && !it.unit.name.includes(" ") ? "s" : ""}` : "";
-    const note = g === 0 ? "Pas besoin : le reste du repas couvre déjà tout"
-      : [u, RAW.test(it.name) ? "pesé cru / sec" : "", it.fixed != null ? "quantité fixe" : ""].filter(Boolean).join(" · ");
+    const u = it.unit && g > 0 ? `${fr(g / it.unit.g)} ${unitName(it.unit, g / it.unit.g > 1)}` : "";
+    const note = g === 0 ? t("notNeeded") : [u, RAW.test(nm(it)) ? t("weighedRaw") : "", it.fixed != null ? t("fixedQty").toLowerCase() : ""].filter(Boolean).join(" · ");
     return `<li class="dose">${thumbHTML(it)}
       <div class="info">
-        <span class="name">${esc(it.name)}</span>
-        <span class="note">${r0(it.n.kcal * g / 100)} kcal · ${fr(it.n.p * g / 100)} g de protéines</span>
+        <span class="name">${esc(nm(it))}</span>
+        <span class="note">${r0(it.n.kcal * g / 100)} kcal · ${t("gProt", fr(it.n.p * g / 100))}</span>
         ${note ? `<span class="note">${esc(note)}</span>` : ""}
       </div>
       <div class="screen ${g === 0 ? "zero" : ""}"><b>${g}</b><span>g</span></div></li>`;
@@ -722,46 +1043,35 @@ function renderResult() {
   const tot = totalsOf(doses), target = remaining();
   const worst = MACROS.reduce((acc, m) => {
     const d = target[m.k] ? (tot[m.k] - target[m.k]) / target[m.k] : 0;
-    return Math.abs(d) > Math.abs(acc.d) ? { m, d } : acc;
-  }, { m: null, d: 0 });
+    return Math.abs(d) > Math.abs(acc.d) ? { k: m.k, d } : acc;
+  }, { k: null, d: 0 });
   let verdict, color;
-  if (Math.abs(worst.d) <= 0.1) { verdict = "Repas pile dans tes objectifs"; color = "var(--herb)"; }
-  else {
-    const what = worst.m.label.toLowerCase();
-    verdict = worst.d < 0 ? `Il manque des ${what} : ajoute un produit qui en contient plus` : `Trop de ${what} : retire un produit ou fixe sa quantité plus bas`;
-    color = "var(--warn)";
-  }
+  if (Math.abs(worst.d) <= 0.1) { verdict = t("onTarget"); color = "var(--herb)"; }
+  else { verdict = t(worst.d < 0 ? "missing" : "tooMuch", mLabel(worst.k).toLowerCase()); color = "var(--warn)"; }
   $("totals").innerHTML = `<p class="verdict"><span class="dot" style="background:${color}"></span>${verdict}</p>` +
     MACROS.map((m) => {
       const pct = target[m.k] ? Math.min(100, tot[m.k] / target[m.k] * 100) : 0;
-      return `<div class="tot"><span>${m.label}</span>
+      return `<div class="tot"><span>${mLabel(m.k)}</span>
         <div class="track"><div class="fill" style="width:${pct}%;background:${m.color}"></div></div>
         <span class="val">${r0(tot[m.k])} <small>/ ${r0(target[m.k])}${m.unit ? " g" : ""}</small></span></div>`;
     }).join("");
 }
 function renderLog() {
+  const list = slotList();
   $("log").innerHTML = log.length ? log.map((e, i) => `<li>
-      <span>${esc(e.name)}<br><span class="note">${slots.find((s) => s.id === e.slot)?.name ?? ""} · ${r0(e.kcal)} kcal · P ${fr(e.p)}</span></span>
+      <span>${esc(e.name)}<br><span class="note">${esc(list.find((s) => s.id === e.slot)?.name ?? "")} · ${r0(e.kcal)} kcal · P ${fr(e.p)}</span></span>
       <span style="font-family:var(--font-display)">${e.g} g</span>
-      <button class="icon-btn" type="button" data-logdel="${i}" aria-label="Supprimer">${X_ICON}</button></li>`).join("")
-    : `<li class="note" style="display:block">Rien de noté aujourd'hui.</li>`;
+      <button class="icon-btn" type="button" data-logdel="${i}" aria-label="${t("remove")}">${X_ICON}</button></li>`).join("")
+    : `<li class="note" style="display:block">${t("nothingToday")}</li>`;
   const tot = eaten();
-  $("logh").textContent = `Mangé aujourd'hui · ${r0(tot.kcal)} kcal · ${r0(tot.p)} g P`;
-}
-function renderTargets() {
-  $("tgrid").innerHTML = `<span></span>${MACROS.map((m) => `<span style="text-align:center">${m.short}</span>`).join("")}` +
-    slots.map((s, i) => `<span>${s.name}</span>${MACROS.map((m) => `<input inputmode="numeric" data-s="${i}" data-m="${m.k}" value="${s.t[m.k]}" aria-label="${s.name} ${m.label}">`).join("")}`).join("");
-  const tot = { kcal: 0, p: 0, c: 0, f: 0 };
-  for (const s of slots) for (const m of MACROS) tot[m.k] += s.t[m.k];
-  $("tTotal").textContent = `${tot.kcal} kcal · P ${tot.p} g · G ${tot.c} g · L ${tot.f} g`;
+  $("logh").textContent = t("eatenToday", r0(tot.kcal), r0(tot.p));
 }
 function addToCart(item) {
   doses = null;
   const fam = item.fam || familyOf(item);
   cart.push({ ...item, fam, fixed: item.fixed ?? (fam === "legumes" ? VEG_FIXED : null) });
   renderCart(); renderResult();
-  const g = grade(scoreOf({ ...item, fam }).s);
-  flash("mealToast", `${item.name} ajouté au repas · note ${g.l}`);
+  flash("mealToast", t("addedMeal", nm(item), grade(scoreOf({ ...item, fam }).s).l));
 }
 
 /* ================= Courses ================= */
@@ -769,22 +1079,21 @@ function renderShopResult() {
   const box = $("shopResult");
   if (!shopItem) { box.hidden = true; $("shopIntro").hidden = false; return; }
   box.hidden = false; $("shopIntro").hidden = true;
-  const p = shopItem, fam = p.fam, F = FAMILIES[fam];
-  const { s, reasons } = scoreOf(p), g = grade(s);
+  const p = shopItem, fam = p.fam;
+  const { s, reasons, ex } = scoreOf(p), g = grade(s);
   const q = weeklyQty(p, fam);
-  const eggs = p.unit && p.unit.name === "œuf" ? ` · ${Math.round(q.g / p.unit.g)} œufs` : "";
-  const seafood = isSeafood(p);
-  const qtyHTML = seafood
-    ? `<div class="big-qty extra"><b>0 g</b><span>tu ne manges pas de produits de la mer, sauf le thon en boîte</span></div>`
+  const eggs = p.unit && p.unit.k === "egg" ? ` · ${t("eggs", Math.round(q.g / p.unit.g))}` : "";
+  const qtyHTML = ex
+    ? `<div class="big-qty extra"><b>0 g</b><span>${t("excludedQty")}</span></div>`
     : fam === "extras"
-    ? `<div class="big-qty extra"><b>${q.g > 0 ? "≤ " + fmtWeight(q.g) : "0 g"}</b><span>maximum pour la semaine</span></div>`
-    : `<div class="big-qty"><b>${fmtWeight(q.g)}</b><span>pour la semaine · ${fmtLb(q.g)}${eggs}${RAW.test(p.name) ? " · poids cru" : ""}</span></div>`;
-  const packs = fam === "extras" || seafood ? "" : packsText(q.g, p.packG);
+      ? `<div class="big-qty extra"><b>${q.g > 0 ? "≤ " + fmtWeight(q.g) : "0 g"}</b><span>${t("maxWeek")}</span></div>`
+      : `<div class="big-qty"><b>${fmtWeight(q.g)}</b><span>${t("forWeek")} · ${fmtAlt(q.g)}${eggs}${RAW.test(nm(p)) ? " · " + t("rawWeight") : ""}</span></div>`;
+  const packs = fam === "extras" || ex ? "" : packsText(q.g, p.packG);
   box.innerHTML = `
     <div class="card">
       <div class="item" style="grid-template-columns:54px 1fr">
         ${thumbHTML(p, false)}
-        <div class="info"><span class="name" style="font-size:18px">${esc(p.name)}</span>
+        <div class="info"><span class="name" style="font-size:18px">${esc(nm(p))}</span>
           <span class="sub">${[p.brand, p.packG ? fmtWeight(p.packG) : ""].filter(Boolean).map(esc).join(" · ")}</span></div>
       </div>
       <div class="score-card">
@@ -793,66 +1102,153 @@ function renderShopResult() {
         </div>
         <div class="info">
           <p class="score-label" style="color:${g.c}">${g.t}</p>
-          <span class="sub">${r0(p.n.kcal)} kcal · P ${fr(p.n.p)} · G ${fr(p.n.c)} · L ${fr(p.n.f)} pour 100 g</span>
+          <span class="sub">${macroLine(p.n)}</span>
         </div>
       </div>
       ${reasons.length ? `<ul class="reasons">${reasons.map((r) => `<li class="${r.bad ? "bad" : "good"}">${esc(r.t)}</li>`).join("")}</ul>` : ""}
     </div>
     <div class="card">
-      <span class="caption">Rayon (touche pour corriger)</span>
-      <div class="family-chips">${Object.entries(FAMILIES).map(([k, f]) => `<button class="chip" type="button" data-fam="${k}" aria-pressed="${k === fam}">${f.label}</button>`).join("")}</div>
+      <span class="caption">${t("aisle")}</span>
+      <div class="family-chips">${Object.keys(FAMILIES).map((k) => `<button class="chip" type="button" data-fam="${k}" aria-pressed="${k === fam}">${famLabel(k)}</button>`).join("")}</div>
       ${qtyHTML}
       ${packs ? `<p class="caption" style="text-align:center">${packs}</p>` : ""}
-      ${fam !== "extras" && !seafood ? `<div class="stepper">
-        <p>Combien de produits différents en ${esc(F.label.toLowerCase())} cette semaine ?</p>
-        <button type="button" data-var="-1" aria-label="Moins">−</button><output>${q.n}</output><button type="button" data-var="1" aria-label="Plus">+</button>
+      ${fam !== "extras" && !ex ? `<div class="stepper">
+        <p>${t("howMany", famLabel(fam).toLowerCase())}</p>
+        <button type="button" data-var="-1" aria-label="−">−</button><output>${q.n}</output><button type="button" data-var="1" aria-label="+">+</button>
       </div>` : ""}
-      ${seafood ? "" : `<p class="caption">${esc(q.how)}</p>`}
+      ${ex ? "" : `<p class="caption">${esc(q.how)}</p>`}
       <div class="row">
-        <button class="btn secondary" type="button" id="shopCancel" style="flex:0 0 34%">Fermer</button>
-        ${seafood ? "" : `<button class="btn" type="button" id="shopAdd">Ajouter à ma liste</button>`}
+        <button class="btn secondary" type="button" id="shopCancel" style="flex:0 0 34%">${t("close")}</button>
+        ${ex ? "" : `<button class="btn" type="button" id="shopAdd">${t("addList")}</button>`}
       </div>
     </div>`;
 }
 function renderShopList() {
-  $("shopCount").textContent = shopList.length ? `${shopList.filter((x) => x.done).length}/${shopList.length} dans le caddie` : "";
+  $("shopCount").textContent = shopList.length ? t("inCart", shopList.filter((x) => x.done).length, shopList.length) : "";
   $("clearShop").hidden = !shopList.length;
-  $("shopList").innerHTML = shopList.length ? shopList.map((x, i) => `<li class="${x.done ? "done" : ""}">
-      <input type="checkbox" data-done="${i}" ${x.done ? "checked" : ""} aria-label="Dans le caddie">
-      <span class="info"><span class="name">${esc(x.name)}</span><span class="note">${esc(FAMILIES[x.fam].label)}${x.packs ? " · " + esc(x.packs) : ""}</span></span>
-      <span class="q">${x.fam === "extras" ? "≤ " : ""}${fmtWeight(x.g)}</span>
-      <button class="icon-btn" type="button" data-shopdel="${i}" aria-label="Retirer">${X_ICON}</button></li>`).join("")
-    : `<li class="solo"><p class="empty"><b>Liste vide</b>Scanne un produit ou pioche dans les bons choix ci-dessous.</p></li>`;
+  $("shopList").innerHTML = shopList.length ? shopList.map((x, i) => {
+    const q = x.ref ? weeklyQty(x.ref, x.fam).g : x.g;
+    const packs = x.fam === "extras" || !x.ref ? "" : packsText(q, x.ref.packG);
+    return `<li class="${x.done ? "done" : ""}">
+      <input type="checkbox" data-done="${i}" ${x.done ? "checked" : ""} aria-label="✓">
+      <span class="info"><span class="name">${esc(x.ref ? nm(x.ref) : x.name)}</span><span class="note">${esc(famLabel(x.fam))}${packs ? " · " + esc(packs) : ""}</span></span>
+      <span class="q">${x.fam === "extras" ? "≤ " : ""}${fmtWeight(q)}</span>
+      <button class="icon-btn" type="button" data-shopdel="${i}" aria-label="${t("remove")}">${X_ICON}</button></li>`;
+  }).join("")
+    : `<li class="solo"><p class="empty"><b>${t("emptyListT")}</b>${t("emptyListD")}</p></li>`;
   store.set("shopList", shopList);
 }
 function renderIdeas() {
   const order = ["viandes", "oeufs", "laitiers", "feculents", "legumes", "fruits", "fromages", "graisses", "sauces", "poudre"];
+  const open = new Set([...document.querySelectorAll("#ideas details[open]")].map((d) => d.dataset.fam));
+  if (!open.size && !renderIdeas.done) open.add(order.find((f) => FOODS.some((x) => x.fam === f && !excludedBy(x))));
+  renderIdeas.done = true;
   $("ideas").innerHTML = order.map((fam) => {
-    const foods = FOODS.filter((f) => f.fam === fam).sort((a, b) => scoreOf(b).s - scoreOf(a).s);
-    return `<details ${fam === "viandes" ? "open" : ""}><summary>${FAMILIES[fam].label}</summary>
-      <ul class="ideas">${foods.map((f) => `<li>${badge(f)}<span class="name" style="font-size:15px">${esc(f.name)}</span>
-        <span class="q">${fmtWeight(weeklyQty(f, fam).g)}/sem.</span>
-        <button class="add-mini" type="button" data-idea="${esc(f.name)}" aria-label="Ajouter ${esc(f.name)} à ma liste">+</button></li>`).join("")}</ul></details>`;
+    const foods = FOODS.filter((f) => f.fam === fam && !excludedBy(f)).sort((a, b) => scoreOf(b).s - scoreOf(a).s);
+    if (!foods.length) return "";
+    return `<details data-fam="${fam}" ${open.has(fam) ? "open" : ""}><summary>${famLabel(fam)}</summary>
+      <ul class="ideas">${foods.map((f) => `<li>${badge(f)}<span class="name" style="font-size:15px">${esc(f[S.lang])}</span>
+        <span class="q">${fmtWeight(weeklyQty(f, fam).g)}${t("perWeek")}</span>
+        <button class="add-mini" type="button" data-idea="${f.id}" aria-label="${t("addList")}">+</button></li>`).join("")}</ul></details>`;
   }).join("");
 }
 function addShop(p, fam) {
+  const ref = { foodId: p.id && p.id.startsWith("food") ? p.id : undefined, name: nm(p), fr: p.fr, en: p.en, n: p.n, packG: p.packG || 0, unit: p.unit };
   const q = weeklyQty(p, fam);
-  const row = { name: p.name, fam, g: q.g, packs: fam === "extras" ? "" : packsText(q.g, p.packG), done: false };
-  const i = shopList.findIndex((x) => x.name === p.name);
+  const i = shopList.findIndex((x) => (x.ref ? nm(x.ref) : x.name) === nm(p));
+  const row = { fam, ref, done: false };
   if (i >= 0) shopList[i] = row; else shopList.push(row);
   renderShopList();
-  flash("shopToast", `${p.name} : ${fmtWeight(q.g)} ajouté à ta liste`);
+  flash("shopToast", t("addedList", nm(p), fmtWeight(q.g)));
+}
+
+/* ================= Réglages ================= */
+const isImp = () => S.units === "imperial";
+function renderSettings() {
+  const p = S.profile;
+  $("pName").value = p.name || "";
+  for (const b of $("pSex").children) b.setAttribute("aria-pressed", b.dataset.v === p.sex);
+  $("pAge").value = p.age;
+  $("pHeightL").textContent = `${t("height")} (${isImp() ? "in" : "cm"})`;
+  $("pWeightL").textContent = `${t("weight")} (${isImp() ? "lb" : "kg"})`;
+  $("pHeight").value = isImp() ? r1(p.height / 2.54) : r1(p.height);
+  $("pWeight").value = isImp() ? r1(p.weight * 2.2046) : r1(p.weight);
+  $("pProtL").textContent = t(isImp() ? "protPerLb" : "protPerKg");
+  $("pFatL").textContent = t(isImp() ? "fatPerLb" : "fatPerKg");
+  $("pProt").value = isImp() ? Math.round(p.protKg / 2.2046 * 100) / 100 : p.protKg;
+  $("pFat").value = isImp() ? Math.round(p.fatKg / 2.2046 * 100) / 100 : p.fatKg;
+  $("pAct").innerHTML = t("act").map((l, i) => `<option value="${i}" ${i === p.act ? "selected" : ""}>${l}</option>`).join("");
+  $("pGoal").innerHTML = t("goals").map((l, i) => `<option value="${i}" ${i === p.goal ? "selected" : ""}>${l}</option>`).join("");
+  $("manualOn").checked = S.manual.on;
+  $("manualBox").hidden = !S.manual.on;
+  $("mKcal").value = S.manual.kcal; $("mP").value = S.manual.p; $("mC").value = S.manual.c; $("mF").value = S.manual.f;
+  for (const b of $("sLang").children) b.setAttribute("aria-pressed", b.dataset.v === S.lang);
+  for (const b of $("sUnits").children) b.setAttribute("aria-pressed", b.dataset.v === S.units);
+  for (const b of $("sTheme").children) b.setAttribute("aria-pressed", b.dataset.v === S.theme);
+  $("diet").innerHTML = ["seafood", "tuna", "veg", "pork", "lactose", "gluten"].map((k) =>
+    `<label class="switch" ${k === "tuna" && !S.diet.seafood ? "hidden" : ""} ${k === "tuna" ? 'style="padding-left:18px"' : ""}><span>${t("diet")[k]}</span><input type="checkbox" data-diet="${k}" ${S.diet[k] ? "checked" : ""}></label>`).join("");
+  renderCalc(); renderSlotEditor();
+}
+function renderCalc() {
+  const c = computeTargets(), T = dayTargets();
+  const lossKg = Math.max(0, (c.tdee - T.kcal) * 7 / 7700);
+  $("calc").innerHTML = `
+    ${S.manual.on ? "" : `<div class="line"><span>${t("bmr")}</span><b>${r0(c.bmr)} kcal</b></div>
+    <div class="line"><span>${t("tdee")}</span><b>${r0(c.tdee)} kcal</b></div>`}
+    <div class="line total"><span>${t("target")}<br><span class="note">${lossKg > 0.05 ? t("weekLoss", isImp() ? `${fr(lossKg * 2.2046)} lb` : `${fr(lossKg)} kg`) : t("perDay")}</span></span><b>${r0(T.kcal)} kcal</b></div>
+    <div class="macro-pills">
+      <div><b style="color:var(--p)">${T.p} g</b><small>${t("protS")}</small></div>
+      <div><b style="color:var(--c)">${T.c} g</b><small>${t("carbS")}</small></div>
+      <div><b style="color:var(--f)">${T.f} g</b><small>${t("fatS")}</small></div>
+      <div><b>${slotList().length}</b><small>${t("tabMeal").toLowerCase()}</small></div>
+    </div>`;
+}
+function renderSlotEditor() {
+  $("slotRows").innerHTML = S.slots.map((s, i) => `<div class="slotrow">
+      <input data-slot="${i}" data-k="time" value="${esc(s.time)}" aria-label="${t("mealTime")}">
+      <input data-slot="${i}" data-k="name" value="${esc(s.name)}" aria-label="${t("mealName")}" style="font-family:var(--font-body)">
+      <input data-slot="${i}" data-k="pk" inputmode="numeric" value="${s.pk}" aria-label="% kcal">
+      <input data-slot="${i}" data-k="pp" inputmode="numeric" value="${s.pp}" aria-label="% prot">
+      <button class="icon-btn" type="button" data-slotdel="${i}" aria-label="${t("removeMeal")}" ${S.slots.length < 2 ? "disabled" : ""}>${X_ICON}</button>
+    </div>`).join("");
+  renderSlotPreview();
+}
+function renderSlotPreview() {
+  const sk = S.slots.reduce((a, s) => a + (+s.pk || 0), 0), sp = S.slots.reduce((a, s) => a + (+s.pp || 0), 0);
+  $("slotWarn").hidden = sk === 100 && sp === 100;
+  $("slotWarn").textContent = t("sumWarn", sk, sp);
+  $("slotPreview").innerHTML = slotList().map((s) =>
+    `<div class="line"><span>${esc(s.name)} · ${esc(s.sub)}</span><b>${s.t.kcal} kcal · P ${s.t.p} · ${S.lang === "fr" ? "G" : "C"} ${s.t.c} · ${S.lang === "fr" ? "L" : "F"} ${s.t.f}</b></div>`).join("");
+}
+function applyTheme() {
+  if (S.theme === "auto") document.documentElement.removeAttribute("data-theme");
+  else document.documentElement.setAttribute("data-theme", S.theme);
+  const bg = getComputedStyle(document.documentElement).getPropertyValue("--bg").trim();
+  document.querySelector('meta[name="theme-color"]').setAttribute("content", bg || "#fbf3ea");
+}
+function applyLang() {
+  document.documentElement.lang = S.lang;
+  for (const el of document.querySelectorAll("[data-i18n]")) el.textContent = t(el.dataset.i18n);
+  for (const el of document.querySelectorAll("[data-i18n-ph]")) el.placeholder = t(el.dataset.i18nPh);
+  const hour = new Date().getHours();
+  $("hello").textContent = `${t(hour < 5 || hour >= 18 ? "evening" : "hello")}${S.profile.name ? " " + S.profile.name : ""}`;
+}
+// Tout ce qui dépend des cibles ou de la langue est redessiné
+function renderAll() {
+  applyLang(); renderQuick(); renderSlots(); renderCart(); renderResult(); renderLog();
+  renderShopList(); renderIdeas(); renderShopResult(); renderTabs();
+  if (tab === "set") renderSettings();
 }
 
 /* ================= Onglets & barre d'action ================= */
 function renderTabs() {
-  $("tabMeal").setAttribute("aria-selected", tab === "meal");
-  $("tabShop").setAttribute("aria-selected", tab === "shop");
-  $("mealView").hidden = tab !== "meal"; $("shopView").hidden = tab !== "shop";
+  for (const [id, k] of [["tabMeal", "meal"], ["tabShop", "shop"], ["tabSet", "set"]]) $(id).setAttribute("aria-selected", tab === k);
+  $("mealView").hidden = tab !== "meal"; $("shopView").hidden = tab !== "shop"; $("setView").hidden = tab !== "set";
   renderDock();
   store.set("tab", tab);
 }
 function renderDock() {
+  document.querySelector(".dock").hidden = tab === "set";
   $("dockShop").hidden = tab !== "shop";
   $("dockBuild").hidden = tab !== "meal" || !!doses;
   $("dockResult").hidden = tab !== "meal" || !doses;
@@ -860,15 +1256,16 @@ function renderDock() {
 
 /* ================= Open Food Facts ================= */
 async function fetchProduct(code) {
-  const res = await fetch(`https://world.openfoodfacts.org/api/v2/product/${code}.json?fields=product_name,product_name_fr,brands,nutriments,image_front_small_url,nova_group,additives_n,categories_tags,product_quantity`);
+  const res = await fetch(`https://world.openfoodfacts.org/api/v2/product/${code}.json?fields=product_name,product_name_fr,product_name_en,brands,nutriments,image_front_small_url,nova_group,additives_n,categories_tags,allergens_tags,product_quantity`);
   const data = await res.json();
   const p = data.product, nu = p?.nutriments;
   const kcal = nu?.["energy-kcal_100g"] ?? (nu?.["energy_100g"] ? nu["energy_100g"] / 4.184 : undefined);
-  if (data.status !== 1 || kcal == null) return { missing: true, name: p?.product_name_fr || p?.product_name || "" };
+  const local = S.lang === "fr" ? p?.product_name_fr : p?.product_name_en;
+  if (data.status !== 1 || kcal == null) return { missing: true, name: local || p?.product_name || "" };
   const item = {
-    code, name: p.product_name_fr || p.product_name || "Produit sans nom", brand: (p.brands || "").split(",")[0].trim(),
+    code, name: local || p.product_name || p.product_name_fr || t("noName"), brand: (p.brands || "").split(",")[0].trim(),
     img: p.image_front_small_url || "", nova: p.nova_group ?? null, additives: p.additives_n ?? 0,
-    cats: p.categories_tags || [], packG: +p.product_quantity || 0,
+    cats: p.categories_tags || [], allergens: p.allergens_tags || [], packG: +p.product_quantity || 0,
     n: { kcal: +kcal, p: +(nu.proteins_100g ?? 0), c: +(nu.carbohydrates_100g ?? 0), f: +(nu.fat_100g ?? 0),
       sugar: +(nu.sugars_100g ?? 0), sat: +(nu["saturated-fat_100g"] ?? 0), salt: +(nu.salt_100g ?? 0), fiber: +(nu.fiber_100g ?? 0) },
   };
@@ -882,14 +1279,11 @@ async function lookup(code, where) {
   showErr(err, "");
   try {
     const item = await fetchProduct(code);
-    if (item.missing) {
-      showErr(err, item.name ? `${item.name} : pas de valeurs nutritionnelles dans Open Food Facts.` : "Ce produit n'est pas dans Open Food Facts. Choisis un aliment proche dans la liste.");
-      return;
-    }
+    if (item.missing) return showErr(err, item.name ? t("noValues", item.name) : t("notInOFF"));
     if (where === "meal") { addToCart(item); $("mealCode").value = ""; }
     else { shopItem = item; renderShopResult(); $("shopCode").value = ""; $("shopResult").scrollIntoView({ behavior: "smooth", block: "start" }); }
   } catch {
-    showErr(err, "Pas de connexion à Open Food Facts. Vérifie ton réseau et réessaie.");
+    showErr(err, t("offline"));
   }
 }
 
@@ -898,7 +1292,7 @@ async function startScan(where) {
   if (scanner) { const same = scanner.where === where; await stopScan(); if (same) return; }
   const readerId = where === "meal" ? "mealReader" : "shopReader";
   const err = where === "meal" ? "mealErr" : "shopErr";
-  if (!window.Html5Qrcode) return showErr(err, "Le scanner n'a pas chargé. Tape le code à la main.");
+  if (!window.Html5Qrcode) return showErr(err, t("noScanner"));
   showErr(err, "");
   if (where === "meal") { doses = null; renderResult(); } else { shopItem = null; renderShopResult(); }
   $(readerId).hidden = false;
@@ -915,7 +1309,7 @@ async function startScan(where) {
     });
   } catch {
     await stopScan();
-    showErr(err, "Caméra refusée. Autorise-la dans Réglages > Safari > Caméra, ou tape le code.");
+    showErr(err, t("camDenied"));
   }
 }
 async function stopScan() {
@@ -926,9 +1320,10 @@ async function stopScan() {
   $(id).hidden = true;
 }
 
-/* ================= Événements ================= */
-$("tabMeal").addEventListener("click", async () => { await stopScan(); tab = "meal"; renderTabs(); });
-$("tabShop").addEventListener("click", async () => { await stopScan(); tab = "shop"; renderTabs(); });
+/* ================= Événements : Repas & Courses ================= */
+for (const [id, k] of [["tabMeal", "meal"], ["tabShop", "shop"], ["tabSet", "set"]]) {
+  $(id).addEventListener("click", async () => { await stopScan(); tab = k; renderTabs(); if (k === "set") renderSettings(); window.scrollTo({ top: 0 }); });
+}
 $("slots").addEventListener("click", (e) => {
   const b = e.target.closest("button"); if (!b) return;
   slotId = b.dataset.id;
@@ -937,8 +1332,8 @@ $("slots").addEventListener("click", (e) => {
 });
 $("quick").addEventListener("click", (e) => {
   const b = e.target.closest("button"); if (!b) return;
-  const f = FOODS.find((x) => x.name === b.dataset.q);
-  addToCart({ ...f, n: { ...f.n } });
+  const f = FOODS.find((x) => x.id === b.dataset.q);
+  addToCart({ foodId: f.id, name: f[S.lang], fr: f.fr, en: f.en, fam: f.fam, tags: f.tags, nova: f.nova, unit: f.unit, n: { ...f.n } });
 });
 $("items").addEventListener("click", (e) => {
   const del = e.target.closest("[data-del]");
@@ -971,22 +1366,17 @@ $("backBtn").addEventListener("click", () => { doses = null; renderResult(); });
 $("ateBtn").addEventListener("click", () => {
   cart.forEach((it, i) => {
     const g = doses[i]; if (!(g > 0)) return;
-    log.push({ name: it.name, slot: slotId, g, kcal: it.n.kcal * g / 100, p: it.n.p * g / 100, c: it.n.c * g / 100, f: it.n.f * g / 100 });
+    log.push({ name: nm(it), slot: slotId, g, kcal: it.n.kcal * g / 100, p: it.n.p * g / 100, c: it.n.c * g / 100, f: it.n.f * g / 100 });
   });
   store.set("log-" + dayKey(), log);
   cart = []; doses = null;
   renderSlots(); renderCart(); renderResult(); renderLog();
   window.scrollTo({ top: 0, behavior: "smooth" });
-  flash("mealToast", "Repas noté. Bon appétit !");
+  flash("mealToast", t("mealSaved"));
 });
 $("log").addEventListener("click", (e) => {
   const b = e.target.closest("[data-logdel]"); if (!b) return;
   log.splice(+b.dataset.logdel, 1); store.set("log-" + dayKey(), log); renderSlots(); renderLog();
-});
-$("tgrid").addEventListener("change", (e) => {
-  const i = e.target.dataset.s, m = e.target.dataset.m; if (i == null) return;
-  const val = parseFloat(e.target.value); if (!(val >= 0)) return;
-  slots[i].t[m] = val; store.set("slots", slots); renderTargets(); renderSlots(); renderResult();
 });
 $("shopResult").addEventListener("click", (e) => {
   const fam = e.target.closest("[data-fam]");
@@ -995,7 +1385,7 @@ $("shopResult").addEventListener("click", (e) => {
   if (v) {
     const F = FAMILIES[shopItem.fam];
     variety[shopItem.fam] = Math.min(8, Math.max(1, (variety[shopItem.fam] ?? F.n) + +v.dataset.var));
-    store.set("variety", variety); renderShopResult(); renderIdeas(); return;
+    store.set("variety", variety); renderShopResult(); renderIdeas(); renderShopList(); return;
   }
   if (e.target.closest("#shopAdd")) { addShop(shopItem, shopItem.fam); shopItem = null; renderShopResult(); return; }
   if (e.target.closest("#shopCancel")) { shopItem = null; renderShopResult(); }
@@ -1011,14 +1401,91 @@ $("shopList").addEventListener("click", (e) => {
 $("clearShop").addEventListener("click", () => { shopList = []; renderShopList(); });
 $("ideas").addEventListener("click", (e) => {
   const b = e.target.closest("[data-idea]"); if (!b) return;
-  const f = FOODS.find((x) => x.name === b.dataset.idea);
-  addShop(f, f.fam);
+  addShop(FOODS.find((x) => x.id === b.dataset.idea), FOODS.find((x) => x.id === b.dataset.idea).fam);
 });
 
-const hour = new Date().getHours();
-$("hello").textContent = `${hour < 5 || hour >= 18 ? "Bonsoir" : "Bonjour"} Matthieu`;
-renderQuick(); renderTargets(); renderSlots(); renderCart(); renderResult(); renderLog();
-renderShopList(); renderIdeas(); renderShopResult(); renderTabs();
+/* ================= Événements : Réglages ================= */
+const num = (v) => parseFloat(String(v).replace(",", "."));
+function onTargetsChanged() { saveSettings(); renderCalc(); renderSlotPreview(); renderSlots(); renderIdeas(); renderShopList(); if (doses) { doses = solve(cart, remaining()); renderResult(); } }
+$("pName").addEventListener("input", (e) => { S.profile.name = e.target.value.trim(); saveSettings(); applyLang(); });
+$("pSex").addEventListener("click", (e) => {
+  const b = e.target.closest("[data-v]"); if (!b) return;
+  S.profile.sex = b.dataset.v; for (const x of $("pSex").children) x.setAttribute("aria-pressed", x === b); onTargetsChanged();
+});
+for (const id of ["pAge", "pHeight", "pWeight", "pProt", "pFat"]) {
+  $(id).addEventListener("input", (e) => {
+    const v = num(e.target.value); if (!(v > 0)) return;
+    const p = S.profile;
+    if (id === "pAge") p.age = v;
+    if (id === "pHeight") p.height = isImp() ? v * 2.54 : v;
+    if (id === "pWeight") p.weight = isImp() ? v / 2.2046 : v;
+    if (id === "pProt") p.protKg = isImp() ? v * 2.2046 : v;
+    if (id === "pFat") p.fatKg = isImp() ? v * 2.2046 : v;
+    onTargetsChanged();
+  });
+}
+$("pAct").addEventListener("change", (e) => { S.profile.act = +e.target.value; onTargetsChanged(); });
+$("pGoal").addEventListener("change", (e) => { S.profile.goal = +e.target.value; onTargetsChanged(); });
+$("manualOn").addEventListener("change", (e) => {
+  S.manual.on = e.target.checked;
+  if (S.manual.on) { const c = computeTargets(); Object.assign(S.manual, { kcal: c.kcal, p: c.p, c: c.c, f: c.f }); renderSettings(); }
+  $("manualBox").hidden = !S.manual.on; onTargetsChanged();
+});
+for (const [id, k] of [["mKcal", "kcal"], ["mP", "p"], ["mC", "c"], ["mF", "f"]]) {
+  $(id).addEventListener("input", (e) => { const v = num(e.target.value); if (v >= 0) { S.manual[k] = v; onTargetsChanged(); } });
+}
+$("slotRows").addEventListener("input", (e) => {
+  const i = e.target.dataset.slot; if (i == null) return;
+  const k = e.target.dataset.k;
+  S.slots[+i][k] = k === "pk" || k === "pp" ? (num(e.target.value) || 0) : e.target.value;
+  saveSettings(); renderSlotPreview(); renderSlots(); renderCalc();
+});
+$("slotRows").addEventListener("click", (e) => {
+  const b = e.target.closest("[data-slotdel]"); if (!b || S.slots.length < 2) return;
+  S.slots.splice(+b.dataset.slotdel, 1); saveSettings(); renderSlotEditor(); renderSlots(); renderCalc();
+});
+$("addSlot").addEventListener("click", () => {
+  S.slots.push({ id: "s" + Date.now(), time: "10h", name: S.lang === "fr" ? "Collation" : "Snack", pk: 10, pp: 10 });
+  saveSettings(); renderSlotEditor(); renderSlots(); renderCalc();
+});
+$("diet").addEventListener("change", (e) => {
+  const k = e.target.dataset.diet; if (!k) return;
+  S.diet[k] = e.target.checked; saveSettings(); renderSettings(); renderQuick(); renderIdeas(); renderCart();
+});
+$("sLang").addEventListener("click", (e) => { const b = e.target.closest("[data-v]"); if (!b) return; S.lang = b.dataset.v; saveSettings(); renderAll(); });
+$("sUnits").addEventListener("click", (e) => { const b = e.target.closest("[data-v]"); if (!b) return; S.units = b.dataset.v; saveSettings(); renderAll(); });
+$("sTheme").addEventListener("click", (e) => { const b = e.target.closest("[data-v]"); if (!b) return; S.theme = b.dataset.v; saveSettings(); applyTheme(); renderSettings(); });
+$("exportBtn").addEventListener("click", () => {
+  const data = { settings: S, shopList, variety, logs: {} };
+  try { for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k.startsWith("log-")) data.logs[k.slice(4)] = JSON.parse(localStorage.getItem(k)); } } catch {}
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }));
+  a.download = `portion-${dayKey()}.json`;
+  document.body.appendChild(a); a.click(); a.remove();
+  $("exportBtn").textContent = t("exported");
+  setTimeout(() => { $("exportBtn").textContent = t("export"); }, 2000);
+});
+$("clearLogBtn").addEventListener("click", () => {
+  log = []; store.set("log-" + dayKey(), log); renderSlots(); renderLog();
+  $("clearLogBtn").textContent = t("cleared");
+  setTimeout(() => { $("clearLogBtn").textContent = t("clearToday"); }, 2000);
+});
+$("resetBtn").addEventListener("click", () => {
+  if (!resetArmed) {
+    resetArmed = true; $("resetBtn").textContent = t("confirm");
+    setTimeout(() => { resetArmed = false; $("resetBtn").textContent = t("resetAll"); }, 4000);
+    return;
+  }
+  try { localStorage.clear(); } catch {}
+  location.reload();
+});
+
+/* ================= Démarrage ================= */
+// Anciennes versions : la liste de courses stockait juste un nom et un poids
+shopList = shopList.map((x) => (x.ref || !x.name ? x : { fam: x.fam, done: x.done, name: x.name, g: x.g }));
+applyTheme();
+slotId = guessSlot();
+renderAll();
 </script>
 </body>
 </html>
