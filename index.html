@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -50,6 +50,9 @@
   --shadow: 0 1px 0 rgba(0, 0, 0, .3); color-scheme: dark;
 }
 * { box-sizing: border-box; }
+/* iPhone : pas de zoom au double-tap sur les boutons, ni au focus d'un champ */
+button, a, input, select, label, .chip, .stepper { touch-action: manipulation; }
+@supports (-webkit-touch-callout: none) { input, select, textarea { font-size: 16px !important; } }
 [hidden] { display: none !important; }
 html, body { margin: 0; }
 body {
@@ -239,6 +242,9 @@ details[open] summary::after { content: "−"; }
 .recipe { gap: 12px; }
 .rec-head { display: flex; align-items: center; gap: 10px; }
 .rec-head h3 { margin: 0; font: 600 20px/1.15 var(--font-display); text-wrap: balance; }
+.rec-qty { display: flex; align-items: center; gap: 4px; margin-left: auto; flex: none; }
+.rec-qty button { width: 34px; height: 34px; border-radius: 10px; border: 2px solid var(--line); background: var(--surface); color: var(--ink); font: 600 18px var(--font-display); cursor: pointer; }
+.rec-qty output { font: 600 17px var(--font-display); min-width: 30px; text-align: center; }
 .rec-n { width: 30px; height: 30px; border-radius: 10px; background: var(--accent-soft); color: var(--accent); display: grid; place-items: center; font: 600 15px var(--font-display); flex: none; }
 .rec-macros { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 14px; color: var(--muted); }
 .rec-macros b { font: 600 17px var(--font-display); }
@@ -538,7 +544,7 @@ const STR = {
     tabMeal: "Repas", tabShop: "Courses", tabRec: "Recettes", tabSet: "Réglages",
     recHowMany: "Combien de recettes ?", recGo: (n) => `Proposer ${n} recette${n > 1 ? "s" : ""}`,
     mtypes: { breakfast: "Petit-déjeuner", meal: "Repas", snack: "Collation" },
-    recSumT: (n) => `Les courses pour tes ${n} recettes`, recSumD: "Quand plusieurs recettes utilisent le même produit, les quantités sont additionnées.",
+    recSumT: (n) => `Les courses pour tes ${n} portions`, portions: "Portions", perPortion: (n) => `Quantités pour 1 portion · à faire ${n} fois (les courses comptent les ${n}).`, recSumD: "Quand plusieurs recettes utilisent le même produit, les quantités sont additionnées.",
     inRecipes: (k) => `dans ${k} recettes`, recSent: (n) => `${n} produits envoyés à ta liste de courses`,
     forList: "Sur ta liste de courses", matchFor: "C'est pour :", noListRow: "Rien de ma liste",
     listNeed: (need, got) => `Il en faut ${need} · ${got} déjà dans le caddie`, leftToTake: "encore à prendre", enough: "Tu as déjà tout ce qu'il faut",
@@ -636,7 +642,7 @@ const STR = {
     tabMeal: "Meals", tabShop: "Groceries", tabRec: "Recipes", tabSet: "Settings",
     recHowMany: "How many recipes?", recGo: (n) => `Suggest ${n} recipe${n > 1 ? "s" : ""}`,
     mtypes: { breakfast: "Breakfast", meal: "Meal", snack: "Snack" },
-    recSumT: (n) => `Groceries for your ${n} recipes`, recSumD: "When several recipes use the same product, amounts are added up.",
+    recSumT: (n) => `Groceries for your ${n} servings`, portions: "Servings", perPortion: (n) => `Amounts for 1 serving · make it ${n} times (groceries count all ${n}).`, recSumD: "When several recipes use the same product, amounts are added up.",
     inRecipes: (k) => `in ${k} recipes`, recSent: (n) => `${n} products sent to your grocery list`,
     forList: "On your grocery list", matchFor: "This is for:", noListRow: "Nothing on my list",
     listNeed: (need, got) => `You need ${need} · ${got} already in the cart`, leftToTake: "still to get", enough: "You already have enough",
@@ -1558,6 +1564,55 @@ const RECIPES = [
     sfr: "Fais cuire {P} au plat ou mollets. Écrase {X} sur {C} grillé, ajoute {P} et {V}.", sen: "Fry or soft-boil the {P}. Mash the {X} on toasted {C}, top with the {P} and {V}." },
   { kinds: ["breakfast"], fr: "Muffins œufs-jambon", en: "Egg and ham muffins", parts: [{ r: "P", o: [10, 11] }, { r: "X", o: [7, 53], g: 50 }, { r: "V", o: [35, 36, 80], g: 80 }, { r: "X", o: [68, 17], g: 20 }, { r: "C", o: [29, 73] }],
     sfr: "Bats {P}, ajoute {X} en dés et {V}. Verse dans des moules et enfourne 15 min à 190 °C. Sers avec {C}.", sen: "Whisk the {P}, add the diced {X} and {V}. Pour into muffin tins and bake 15 min at 190 °C. Serve with the {C}." },
+  // Encore plus de recettes healthy
+  { fr: "Bowl poulet, quinoa et légumes rôtis", en: "Chicken quinoa bowl with roasted veg", parts: [{ r: "P", o: [0, 1] }, { r: "C", o: [27, 20] }, { r: "V", o: [35, 84] }, { r: "V", o: [79, 36] }, { r: "F", o: [41] }],
+    sfr: "Fais rôtir {V} 20 min à 200 °C avec {F}. Cuis {C} et saisis {P}. Assemble en bol.", sen: "Roast the {V} for 20 min at 200 °C with the {F}. Cook the {C} and sear the {P}. Build a bowl." },
+  { fr: "Poulet citron, riz complet et haricots verts", en: "Lemon chicken, brown rice and green beans", parts: [{ r: "P", o: [0, 2] }, { r: "C", o: [20, 19] }, { r: "V", o: [31] }, { r: "F", o: [41] }],
+    sfr: "Saisis {P} dans {F} avec le jus d'un citron et de l'ail. Sers avec {C} et {V} à la vapeur.", sen: "Sear the {P} in the {F} with lemon juice and garlic. Serve with the {C} and steamed {V}." },
+  { fr: "Salade tiède de lentilles et dinde", en: "Warm lentil and turkey salad", parts: [{ r: "P", o: [1, 0] }, { r: "C", o: [28] }, { r: "V", o: [80, 81] }, { r: "V", o: [79, 84] }, { r: "X", o: [46], g: 10 }, { r: "F", o: [41] }],
+    sfr: "Cuis {C} 20 min. Mélange-les tièdes avec {V}, {P} grillée en dés et une vinaigrette {X} + {F}.", sen: "Cook the {C} for 20 min. Toss warm with the {V}, the grilled diced {P} and a {X} + {F} dressing." },
+  { fr: "Chili maigre aux haricots rouges", en: "Lean chili with kidney beans", parts: [{ r: "P", o: [3, 1] }, { r: "C", o: [77] }, { r: "C", o: [19, 20] }, { r: "V", o: [35, 84] }, { r: "X", o: [45], g: 150 }],
+    sfr: "Fais revenir {P} avec {V}, cumin et paprika. Ajoute {X} et {C}, mijote 20 min. Sers sur le riz.", sen: "Brown the {P} with the {V}, cumin and paprika. Add the {X} and beans, simmer 20 min. Serve over the rice." },
+  { fr: "Wok de dinde aux légumes", en: "Turkey vegetable stir-fry", parts: [{ r: "P", o: [1, 0] }, { r: "C", o: [19, 20] }, { r: "V", o: [32, 35] }, { r: "X", o: [99], g: 15 }, { r: "F", o: [41, 98] }],
+    sfr: "Saisis {P} en lanières dans {F} bien chaude, ajoute {V} puis {X}. Sers avec {C}.", sen: "Stir-fry the {P} strips in hot {F}, add the {V} then the {X}. Serve with the {C}." },
+  { fr: "Steak, pommes vapeur et haricots verts", en: "Steak, steamed potatoes and green beans", parts: [{ r: "P", o: [3, 5] }, { r: "C", o: [23] }, { r: "V", o: [31] }, { r: "F", o: [41] }],
+    sfr: "Cuis {C} et {V} à la vapeur. Saisis {P} à la poêle et arrose de {F} et d'herbes.", sen: "Steam the {C} and {V}. Pan-sear the {P} and drizzle with the {F} and herbs." },
+  { fr: "Taboulé au poulet", en: "Chicken tabbouleh", parts: [{ r: "P", o: [0, 1] }, { r: "C", o: [71, 26] }, { r: "V", o: [80, 81] }, { r: "F", o: [41] }],
+    sfr: "Réhydrate {C} à l'eau bouillante, mélange avec {V} en dés, menthe, citron et {F}. Ajoute {P} grillé.", sen: "Soak the {C} in boiling water, mix with the diced {V}, mint, lemon and the {F}. Top with the grilled {P}." },
+  { fr: "Bœuf sauté aux champignons et riz", en: "Beef and mushroom stir-fry with rice", parts: [{ r: "P", o: [5, 3] }, { r: "C", o: [19] }, { r: "V", o: [36, 84] }, { r: "X", o: [99], g: 15 }, { r: "F", o: [41] }],
+    sfr: "Saisis {P} en lamelles dans {F}, ajoute {V} et {X}. Sers avec {C}.", sen: "Sear the sliced {P} in the {F}, add the {V} and the {X}. Serve with the {C}." },
+  { fr: "Poulet tandoori léger", en: "Light tandoori chicken", parts: [{ r: "P", o: [0, 2] }, { r: "C", o: [19] }, { r: "V", o: [84, 35] }, { r: "X", o: [13, 65], g: 80 }],
+    sfr: "Mélange {P} avec {X} et des épices tandoori, laisse mariner 15 min. Fais cuire avec {V} et sers avec {C}.", sen: "Coat the {P} in the {X} and tandoori spices, marinate 15 min. Cook with the {V} and serve with the {C}." },
+  { fr: "Salade de pâtes complètes au thon", en: "Whole-wheat tuna pasta salad", parts: [{ r: "P", o: [8, 0] }, { r: "C", o: [22, 21] }, { r: "V", o: [80, 75] }, { r: "V", o: [81, 35] }, { r: "F", o: [41] }],
+    sfr: "Cuis {C} et refroidis-les. Mélange avec {P}, {V} et {F}.", sen: "Cook and cool the {C}. Toss with the {P}, the {V} and the {F}." },
+  { fr: "Agneau, semoule et légumes", en: "Lamb with couscous and vegetables", parts: [{ r: "P", o: [49, 50] }, { r: "C", o: [26] }, { r: "V", o: [79, 35] }, { r: "V", o: [84] }, { r: "F", o: [41] }],
+    sfr: "Fais dorer {P} en cubes dans {F} avec cumin et ras el-hanout, ajoute {V} et un verre d'eau, mijote 20 min. Sers avec {C}.", sen: "Brown the cubed {P} in the {F} with cumin and ras el hanout, add the {V} and a glass of water, simmer 20 min. Serve with the {C}." },
+  { fr: "Escalope de veau, purée et petits pois", en: "Veal escalope, mash and peas", parts: [{ r: "P", o: [50, 1] }, { r: "C", o: [23] }, { r: "V", o: [87] }, { r: "X", o: [63, 64], g: 50 }],
+    sfr: "Écrase {C} cuites avec {X}. Poêle {P} 3 min par face. Sers avec {V}.", sen: "Mash the cooked {C} with the {X}. Pan-fry the {P} 3 min per side. Serve with the {V}." },
+  { fr: "Burrito bowl au poulet", en: "Chicken burrito bowl", parts: [{ r: "P", o: [0, 3] }, { r: "C", o: [19, 20] }, { r: "C", o: [77] }, { r: "V", o: [75] }, { r: "V", o: [80, 35] }, { r: "X", o: [47], g: 40 }],
+    sfr: "Assemble {C}, {P} grillé aux épices mexicaines, {V} et {X}.", sen: "Build a bowl with the {C}, the spiced grilled {P}, the {V} and the {X}." },
+  { fr: "Brochettes de poulet et quinoa", en: "Chicken skewers with quinoa", parts: [{ r: "P", o: [0, 1] }, { r: "V", o: [35, 36] }, { r: "V", o: [84] }, { r: "C", o: [27, 71] }, { r: "F", o: [41] }],
+    sfr: "Enfile {P} et {V} sur des pics, badigeonne de {F} et grille 12 min. Sers avec {C}.", sen: "Thread the {P} and {V} on skewers, brush with the {F} and grill 12 min. Serve with the {C}." },
+  { fr: "Soupe de poulet aux légumes et pâtes", en: "Chicken vegetable noodle soup", parts: [{ r: "P", o: [0, 2] }, { r: "C", o: [21, 22] }, { r: "V", o: [79, 32] }, { r: "V", o: [84] }, { r: "F", o: [41] }],
+    sfr: "Fais suer {V} dans {F}, ajoute 1 L de bouillon et {P} en dés, puis {C} 10 min avant la fin.", sen: "Soften the {V} in the {F}, add 1 L of stock and the diced {P}, then the {C} 10 min before the end." },
+  { fr: "Omelette aux champignons et salade", en: "Mushroom omelette with salad", parts: [{ r: "P", o: [10, 11] }, { r: "V", o: [36] }, { r: "V", o: [82] }, { r: "C", o: [29] }, { r: "F", o: [41] }],
+    sfr: "Fais revenir {V} dans {F}, verse {P} battus et cuis à feu doux. Sers avec {C}.", sen: "Sauté the {V} in the {F}, pour in the beaten {P} and cook gently. Serve with the {C}." },
+  { fr: "Curry de poulet et pois chiches", en: "Chicken and chickpea curry", parts: [{ r: "P", o: [0, 1] }, { r: "C", o: [76] }, { r: "C", o: [19] }, { r: "V", o: [80, 84] }, { r: "X", o: [45], g: 100 }],
+    sfr: "Saisis {P} avec curry et {V}, ajoute {X} et les pois chiches, mijote 15 min. Sers avec le riz.", sen: "Sear the {P} with curry powder and the {V}, add the {X} and chickpeas, simmer 15 min. Serve with the rice." },
+  { fr: "Saucisses de volaille et lentilles", en: "Chicken sausages with lentils", parts: [{ r: "P", o: [52, 1] }, { r: "C", o: [28] }, { r: "V", o: [79] }, { r: "V", o: [84] }, { r: "X", o: [46], g: 10 }],
+    sfr: "Fais mijoter {C} 25 min avec {V}. Dore {P} à la poêle et sers avec {X}.", sen: "Simmer the {C} for 25 min with the {V}. Brown the {P} and serve with the {X}." },
+  { snack: true, fr: "Skyr, pomme et amandes", en: "Skyr, apple and almonds", parts: [{ r: "P", o: [12, 13, 14] }, { r: "R", o: [38, 40] }, { r: "X", o: [43], g: 15 }],
+    sfr: "Coupe {R} en dés sur {P} et parsème de {X}.", sen: "Dice the {R} over the {P} and sprinkle with the {X}." },
+  { snack: true, fr: "Tartine cottage et concombre", en: "Cottage cheese and cucumber toast", parts: [{ r: "P", o: [15, 14] }, { r: "C", o: [29] }, { r: "V", o: [81, 80], g: 80 }],
+    sfr: "Étale {P} sur {C} et ajoute {V} en rondelles, poivre et herbes.", sen: "Spread the {P} on the {C} and top with sliced {V}, pepper and herbs." },
+  { snack: true, fr: "Smoothie protéiné aux fruits rouges", en: "Berry protein smoothie", parts: [{ r: "P", o: [48, 12] }, { r: "R", o: [39, 92] }, { r: "X", o: [63, 64], g: 200 }],
+    sfr: "Mixe {P}, {R} et {X}.", sen: "Blend the {P}, the {R} and the {X}." },
+  { kinds: ["breakfast", "snack"], fr: "Yaourt grec, kiwi et chia", en: "Greek yogurt with kiwi and chia", parts: [{ r: "P", o: [13, 12] }, { r: "C", o: [25] }, { r: "R", o: [40, 89] }, { r: "X", o: [97], g: 10 }],
+    sfr: "Verse {P} dans un bol, ajoute {C}, {R} en morceaux et {X}.", sen: "Spoon the {P} into a bowl, add the {C}, the chopped {R} and the {X}." },
+  { kinds: ["breakfast"], fr: "Omelette blanche, jambon et pain complet", en: "Egg-white omelette, ham and toast", parts: [{ r: "P", o: [11, 10] }, { r: "X", o: [7], g: 40 }, { r: "V", o: [80, 36], g: 80 }, { r: "C", o: [29, 73] }],
+    sfr: "Cuis {P} à la poêle avec {X} et {V}. Sers avec {C}.", sen: "Cook the {P} in a pan with the {X} and {V}. Serve with the {C}." },
+  { kinds: ["breakfast"], fr: "Crêpes d'avoine aux fruits", en: "Oat crêpes with fruit", parts: [{ r: "P", o: [12, 14, 48] }, { r: "C", o: [25] }, { r: "X", o: [10], g: 55 }, { r: "R", o: [89, 92, 37] }],
+    sfr: "Mixe {C}, {X} et un peu de lait, cuis 2 crêpes fines. Garnis de {P} et {R}.", sen: "Blend the {C}, the {X} and a splash of milk, cook 2 thin crêpes. Fill with the {P} and {R}." },
 ];
 // Collations qui font aussi un bon petit-déjeuner
 for (const i of [26, 27, 28, 30, 32, 39]) RECIPES[i].kinds = ["snack", "breakfast"];
@@ -1568,7 +1623,10 @@ const RMETA = [["hbw", 20], ["gb", 25], ["gbw", 30], ["gq", 15], ["hb", 40], ["g
   ["hb", 30], ["gq", 15], ["h", 30], ["qw", 15], ["hqw", 15], ["hb", 30],
   ["hq", 2], ["q", 2], ["q", 5], ["h", 10], ["hq", 2], ["q", 5], ["gq", 2], ["hq", 5],
   ["gq", 15], ["gq", 10], ["gb", 35], ["gqw", 20], ["g", 30], ["gq", 10],
-  ["hq", 5], ["gq", 10], ["hb", 5], ["hq", 10], ["hb", 20]];
+  ["hq", 5], ["gq", 10], ["hb", 5], ["hq", 10], ["hb", 20],
+  ["hb", 30], ["hb", 25], ["hb", 25], ["hbw", 35], ["hqw", 20], ["hq", 25], ["hbw", 20], ["hqw", 20], ["hw", 30],
+  ["hqb", 15], ["hw", 35], ["h", 30], ["hbw", 25], ["hw", 30], ["hb", 30], ["hq", 15], ["hbw", 30], ["hb", 35],
+  ["hq", 2], ["hq", 5], ["hq", 5], ["hq", 5], ["hq", 10], ["hq", 15]];
 RECIPES.forEach((r, i) => { r.tags = (RMETA[i] || [""])[0].split(""); r.min = (RMETA[i] || [0, 0])[1]; });
 RECIPES.forEach((r, i) => { r.id = "r" + i; });
 const ROLE_DEFAULT_G = { V: 100, R: 100 };
@@ -1656,7 +1714,8 @@ function recipeCard(rec, gi, idx, n, slotT) {
   const { tpl, items, tot, steps } = buildRecipe(rec, slotT);
   const editing = recipeEdit === gi + ":" + idx;
   return `<article class="card recipe">
-      <div class="rec-head"><span class="rec-n">${n}</span><h3>${esc(tpl[S.lang])}</h3></div>
+      <div class="rec-head"><span class="rec-n">${n}</span><h3>${esc(tpl[S.lang])}</h3>
+        <div class="rec-qty" aria-label="${t("portions")}"><button type="button" data-g="${gi}" data-rqty="${idx}" data-d="-1" aria-label="−">−</button><output>×${rec.n || 1}</output><button type="button" data-g="${gi}" data-rqty="${idx}" data-d="1" aria-label="+">+</button></div></div>
       <div class="rec-tags"><span class="rec-time">${tpl.min} min</span>${tpl.tags.map((k) => `<span class="rec-tag t-${k}">${t("styles")[k]}</span>`).join("")}</div>
       <div class="rec-macros"><span><b>${r0(tot.kcal)}</b> kcal</span><span style="color:var(--p)"><b>${r0(tot.p)}</b> g P</span><span style="color:var(--c)"><b>${r0(tot.c)}</b> g ${S.lang === "fr" ? "G" : "C"}</span><span style="color:var(--f)"><b>${r0(tot.f)}</b> g ${S.lang === "fr" ? "L" : "F"}</span></div>
       <ul class="rec-ing">${items.filter((it) => it.g > 0 || editing).map((it) => {
@@ -1667,6 +1726,7 @@ function recipeCard(rec, gi, idx, n, slotT) {
           : `<span class="name" style="font-size:15px">${esc(it.food[S.lang])}${pref(it.food) === 1 ? '<span class="heart">♥</span>' : ""}</span>`;
         return `<li>${badge(it.food)}<span class="info">${name}</span><span class="rec-g">${it.g} g${u}</span></li>`;
       }).join("")}</ul>
+      ${(rec.n || 1) > 1 ? `<p class="caption">${t("perPortion", rec.n)}</p>` : ""}
       <p class="rec-steps">${esc(steps)}</p>
       <div class="row rec-actions">
         <button class="btn secondary small" type="button" data-g="${gi}" data-rchange="${idx}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>${t("change")}</button>
@@ -1683,7 +1743,7 @@ function recipeTotals(R) {
     for (const rec of G.items) for (const it of buildRecipe(rec, slotT).items) {
       if (!(it.g > 0)) continue;
       const x = sum.get(it.food.id) || { food: it.food, g: 0, k: 0 };
-      x.g += it.g; x.k++; sum.set(it.food.id, x);
+      x.g += it.g * (rec.n || 1); x.k++; sum.set(it.food.id, x);
     }
   }
   return [...sum.values()].sort((a, b) => FAM_ORDER.indexOf(a.food.fam) - FAM_ORDER.indexOf(b.food.fam) || b.g - a.g);
@@ -1710,7 +1770,8 @@ function renderRecipes() {
       ${G.items.map((rec, idx) => recipeCard(rec, gi, idx, ++n, typeTarget(G.type))).join("")}</div>`).join("");
   const tot = recipeTotals(R);
   $("recSum").hidden = false;
-  $("recSum").innerHTML = `<h2 class="step-title">${t("recSumT", nRec)}</h2><p class="caption">${t("recSumD")}</p>
+  const nPor = R.groups.reduce((a, G) => a + G.items.reduce((b, r) => b + (r.n || 1), 0), 0);
+  $("recSum").innerHTML = `<h2 class="step-title">${t("recSumT", nPor)}</h2><p class="caption">${t("recSumD")}</p>
     <div class="card rec-sum"><ul>${tot.map((x) => `<li>${badge(x.food)}<span class="info"><span class="name" style="font-size:15px">${esc(x.food[S.lang])}</span>${x.k > 1 ? `<span class="note">${t("inRecipes", x.k)}</span>` : ""}</span><span class="q">${fmtWeight(x.g)}</span></li>`).join("")}</ul></div>`;
   $("recShop").hidden = false;
   store.set("recipes", R);
@@ -2035,8 +2096,13 @@ $("recList").addEventListener("click", (e) => {
   if (b.dataset.rchange != null) {
     const i = +b.dataset.rchange;
     const fresh = drawRecipes(1, G.type, G.items.map((x) => x.tpl))[0];
-    if (fresh) G.items[i] = fresh;
+    if (fresh) { fresh.n = G.items[i].n; G.items[i] = fresh; }
     store.set("recipes", R); recipeEdit = null; renderRecipes(); return;
+  }
+  if (b.dataset.rqty != null) {
+    const r = G.items[+b.dataset.rqty];
+    r.n = Math.min(14, Math.max(1, (r.n || 1) + +b.dataset.d));
+    store.set("recipes", R); renderRecipes(); return;
   }
   if (b.dataset.redit != null) { const key = b.dataset.g + ":" + b.dataset.redit; recipeEdit = recipeEdit === key ? null : key; renderRecipes(); return; }
   if (b.dataset.rcook != null) {
