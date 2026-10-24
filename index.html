@@ -261,6 +261,20 @@ select {
 .slothead { display: grid; grid-template-columns: 60px 1fr 54px 54px 36px; gap: 6px; font: 800 11px var(--font-body); color: var(--muted); text-transform: uppercase; }
 .warnline { color: var(--warn); font-size: 13px; margin: 0; }
 .danger { background: var(--warn-soft); color: var(--warn); }
+.diet-types { display: grid; grid-template-columns: 1fr; gap: 6px; }
+.diet-types button { text-align: left; border: 2px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 16px; padding: 10px 14px; cursor: pointer; display: flex; flex-direction: column; gap: 1px; font: 600 16px var(--font-display); }
+.diet-types button small { font: 600 13px var(--font-body); color: var(--muted); }
+.diet-types button[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
+.tastes { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.tastes li { display: grid; grid-template-columns: 1fr auto auto; gap: 6px; align-items: center; padding: 8px 0; border-top: 1px dashed var(--line); }
+.tastes li:first-child { border-top: 0; }
+.tastes li.head { display: block; border-top: 0; padding: 8px 0 2px; font: 800 12px var(--font-body); color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+.taste-btn { border: 2px solid var(--line); background: var(--surface); color: var(--muted); border-radius: 999px; padding: 6px 10px; font: 800 13px var(--font-body); cursor: pointer; display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
+.taste-btn svg { width: 16px; height: 16px; }
+.taste-btn.yes[aria-pressed="true"] { background: var(--herb-soft); border-color: var(--herb); color: var(--herb); }
+.taste-btn.no[aria-pressed="true"] { background: var(--warn-soft); border-color: var(--warn); color: var(--warn); }
+.heart { color: var(--accent); font-size: 13px; margin-left: 4px; }
+input[type="search"]::-webkit-search-cancel-button { cursor: pointer; }
 </style>
 </head>
 <body>
@@ -408,6 +422,16 @@ select {
     </section>
 
     <section>
+      <h2 class="step-title" data-i18n="setTastes"></h2>
+      <div class="card">
+        <p class="caption" data-i18n="setTastesD"></p>
+        <input id="tasteSearch" type="search" data-i18n-ph="searchFood" autocomplete="off" style="font-family:var(--font-body)">
+        <ul class="tastes" id="tastes"></ul>
+        <button class="btn secondary small" type="button" id="copyTastes" style="align-self:flex-start" data-i18n="copyTastes"></button>
+      </div>
+    </section>
+
+    <section>
       <h2 class="step-title" data-i18n="setDisplay"></h2>
       <div class="card">
         <div class="field"><span data-i18n="language"></span>
@@ -514,8 +538,16 @@ const STR = {
     mealTime: "Heure", mealName: "Nom", addMeal: "+ Ajouter un repas", removeMeal: "Supprimer ce repas",
     sumWarn: (k, p) => `Les parts doivent faire 100 % (calories : ${k} %, protéines : ${p} %). Je normalise automatiquement.`,
     setDiet: "Mon régime",
-    diet: { seafood: "Pas de produits de la mer", tuna: "…sauf le thon en boîte", veg: "Végétarien", pork: "Sans porc", lactose: "Sans lactose", gluten: "Sans gluten" },
-    dietWord: { seafood: "produit de la mer", veg: "viande ou poisson", pork: "porc", lactose: "lactose", gluten: "gluten" },
+    dietTypes: { omni: "Omnivore", pesc: "Pescétarien", veg: "Végétarien", vegan: "Végan", nopork: "Sans porc" },
+    dietTypesD: { omni: "Tu manges de tout.", pesc: "Pas de viande, mais poisson et fruits de mer.", veg: "Ni viande ni poisson.", vegan: "Aucun produit animal.", nopork: "Tout sauf le porc." },
+    diet: { seafood: "Sans produits de la mer", tuna: "…sauf le thon en boîte" },
+    dietWord: { seafood: "produit de la mer", meat: "viande", fish: "poisson", pork: "porc", dairy: "produit laitier", egg: "œuf", animal: "produit animal" },
+    setTastes: "Mes goûts", setTastesD: "Cherche un aliment et dis-moi si tu l'aimes. Ceux que tu n'aimes pas disparaissent des suggestions, ceux que tu aimes passent en premier. Je m'en sers aussi pour te proposer des recettes.",
+    searchFood: "Chercher un aliment…", like: "J'aime", dislike: "J'aime pas",
+    liked: "Tu aimes", disliked: "Tu n'aimes pas", noTastes: "Rien de noté pour l'instant. Tape un aliment ci-dessus.", noMatch: "Aucun aliment trouvé.",
+    copyTastes: "Copier mes goûts pour Claude", copied: "Copié ! Colle-le dans la conversation avec Claude.",
+    tastesText: (d, l, n) => `Mon régime : ${d}\nJ'aime : ${l || "—"}\nJe n'aime pas : ${n || "—"}`,
+    youDislike: "Tu n'aimes pas cet aliment",
     setDisplay: "Affichage", language: "Langue", units: "Unités", metric: "Métrique (kg, cm)", imperial: "Impérial (lb, in)",
     theme: "Thème", themeAuto: "Auto", themeLight: "Clair", themeDark: "Sombre",
     setData: "Mes données", setDataD: "Tout reste sur ton téléphone. Tu peux l'exporter ou repartir de zéro.",
@@ -589,8 +621,16 @@ const STR = {
     mealTime: "Time", mealName: "Name", addMeal: "+ Add a meal", removeMeal: "Remove this meal",
     sumWarn: (k, p) => `Shares should add up to 100 % (calories: ${k} %, protein: ${p} %). I normalise them automatically.`,
     setDiet: "My diet",
-    diet: { seafood: "No seafood", tuna: "…except canned tuna", veg: "Vegetarian", pork: "No pork", lactose: "Lactose-free", gluten: "Gluten-free" },
-    dietWord: { seafood: "seafood", veg: "meat or fish", pork: "pork", lactose: "lactose", gluten: "gluten" },
+    dietTypes: { omni: "Omnivore", pesc: "Pescatarian", veg: "Vegetarian", vegan: "Vegan", nopork: "No pork" },
+    dietTypesD: { omni: "You eat everything.", pesc: "No meat, but fish and seafood.", veg: "No meat or fish.", vegan: "No animal products.", nopork: "Everything except pork." },
+    diet: { seafood: "No seafood", tuna: "…except canned tuna" },
+    dietWord: { seafood: "seafood", meat: "meat", fish: "fish", pork: "pork", dairy: "dairy", egg: "egg", animal: "animal product" },
+    setTastes: "My tastes", setTastesD: "Search a food and tell me if you like it. Foods you dislike disappear from suggestions, foods you like come first. I also use this to suggest recipes.",
+    searchFood: "Search a food…", like: "Like", dislike: "Dislike",
+    liked: "You like", disliked: "You dislike", noTastes: "Nothing yet. Type a food above.", noMatch: "No food found.",
+    copyTastes: "Copy my tastes for Claude", copied: "Copied! Paste it in your chat with Claude.",
+    tastesText: (d, l, n) => `My diet: ${d}\nI like: ${l || "—"}\nI dislike: ${n || "—"}`,
+    youDislike: "You dislike this food",
     setDisplay: "Display", language: "Language", units: "Units", metric: "Metric (kg, cm)", imperial: "Imperial (lb, in)",
     theme: "Theme", themeAuto: "Auto", themeLight: "Light", themeDark: "Dark",
     setData: "My data", setDataD: "Everything stays on your phone. You can export it or start over.",
@@ -615,7 +655,8 @@ const DEFAULT_SETTINGS = {
     { id: "s2", time: "17h", name: "Collation", pk: 14, pp: 22 },
     { id: "s3", time: "20h", name: "Repas", pk: 43, pp: 39 },
   ],
-  diet: { seafood: true, tuna: true, veg: false, pork: false, lactose: false, gluten: false },
+  diet: { type: "omni", seafood: true, tuna: true },
+  prefs: {},
 };
 const ACT = [1.2, 1.375, 1.55, 1.725];
 const GOAL = [-750, -500, -300, 0, 250];
@@ -657,10 +698,10 @@ const FOODS = [
   { fr: "Rumsteck", en: "Sirloin steak", fam: "viandes", tags: ["meat"], n: { kcal: 125, p: 22, c: 0, f: 4, sat: 1.7 } },
   { fr: "Filet mignon de porc", en: "Pork tenderloin", fam: "viandes", tags: ["meat", "pork"], n: { kcal: 120, p: 22, c: 0, f: 3.5 } },
   { fr: "Jambon blanc découenné", en: "Lean cooked ham", fam: "viandes", tags: ["meat", "pork"], n: { kcal: 110, p: 20, c: 1, f: 3, salt: 1.9 }, nova: 3 },
-  { fr: "Thon au naturel", en: "Canned tuna in water", fam: "viandes", tags: ["tuna"], n: { kcal: 115, p: 26, c: 0, f: 1, salt: 0.9 }, nova: 3 },
+  { fr: "Thon au naturel", en: "Canned tuna in water", fam: "viandes", tags: ["tuna", "fish"], n: { kcal: 115, p: 26, c: 0, f: 1, salt: 0.9 }, nova: 3 },
   { fr: "Tofu ferme", en: "Firm tofu", fam: "viandes", tags: [], n: { kcal: 145, p: 15.5, c: 2, f: 8.5, fiber: 2 }, nova: 3 },
-  { fr: "Œufs", en: "Eggs", fam: "oeufs", tags: [], n: { kcal: 140, p: 12.5, c: 0.5, f: 10, sat: 2.8 }, unit: { k: "egg", g: 55, step: 55 } },
-  { fr: "Blancs d'œufs liquides", en: "Liquid egg whites", fam: "oeufs", tags: [], n: { kcal: 48, p: 10.5, c: 0.7, f: 0.2 } },
+  { fr: "Œufs", en: "Eggs", fam: "oeufs", tags: ["egg"], n: { kcal: 140, p: 12.5, c: 0.5, f: 10, sat: 2.8 }, unit: { k: "egg", g: 55, step: 55 } },
+  { fr: "Blancs d'œufs liquides", en: "Liquid egg whites", fam: "oeufs", tags: ["egg"], n: { kcal: 48, p: 10.5, c: 0.7, f: 0.2 } },
   { fr: "Skyr nature", en: "Plain skyr", fam: "laitiers", tags: ["dairy"], n: { kcal: 60, p: 10.5, c: 4, f: 0.2, sugar: 4 } },
   { fr: "Yaourt grec 0 %", en: "Nonfat Greek yogurt", fam: "laitiers", tags: ["dairy"], n: { kcal: 59, p: 10.3, c: 3.6, f: 0.4, sugar: 3.6 } },
   { fr: "Fromage blanc 0 %", en: "Fat-free quark", fam: "laitiers", tags: ["dairy"], n: { kcal: 47, p: 7.5, c: 4, f: 0.1, sugar: 4 } },
@@ -698,6 +739,65 @@ const FOODS = [
   { fr: "Moutarde", en: "Mustard", fam: "sauces", tags: [], n: { kcal: 150, p: 7, c: 5, f: 10, salt: 5.5 }, nova: 3 },
   { fr: "Salsa", en: "Salsa", fam: "sauces", tags: [], n: { kcal: 30, p: 1.5, c: 6, f: 0.2, salt: 1.5 }, nova: 3 },
   { fr: "Whey", en: "Whey protein", fam: "poudre", tags: ["dairy"], n: { kcal: 380, p: 78, c: 6, f: 5 }, nova: 4 },
+  // Ajouts (toujours en fin de liste : les goûts sont rangés par position)
+  { fr: "Gigot d'agneau", en: "Leg of lamb", fam: "viandes", tags: ["meat"], n: { kcal: 200, p: 20, c: 0, f: 13, sat: 6 } },
+  { fr: "Escalope de veau", en: "Veal cutlet", fam: "viandes", tags: ["meat"], n: { kcal: 110, p: 22, c: 0, f: 2.5 } },
+  { fr: "Magret de canard sans peau", en: "Skinless duck breast", fam: "viandes", tags: ["meat"], n: { kcal: 135, p: 22, c: 0, f: 5, sat: 1.6 } },
+  { fr: "Saucisses de volaille", en: "Chicken sausages", fam: "viandes", tags: ["meat"], n: { kcal: 190, p: 14, c: 2, f: 14, sat: 4, salt: 1.8 }, nova: 4 },
+  { fr: "Bacon de dinde", en: "Turkey bacon", fam: "viandes", tags: ["meat"], n: { kcal: 120, p: 20, c: 1, f: 4, salt: 2.5 }, nova: 4 },
+  { fr: "Steak haché 15 %", en: "Ground beef 85/15", fam: "viandes", tags: ["meat"], n: { kcal: 215, p: 18, c: 0, f: 15, sat: 6.5 } },
+  { fr: "Côtes de porc", en: "Pork chops", fam: "viandes", tags: ["meat", "pork"], n: { kcal: 180, p: 20, c: 0, f: 11, sat: 4 } },
+  { fr: "Lardons", en: "Bacon lardons", fam: "viandes", tags: ["meat", "pork"], n: { kcal: 270, p: 15, c: 0, f: 23, sat: 8.5, salt: 2.4 }, nova: 3 },
+  { fr: "Thon à l'huile égoutté", en: "Canned tuna in oil, drained", fam: "viandes", tags: ["tuna", "fish"], n: { kcal: 190, p: 27, c: 0, f: 9, salt: 0.9 }, nova: 3 },
+  { fr: "Saumon", en: "Salmon", fam: "viandes", tags: ["fish", "seafood"], n: { kcal: 200, p: 20, c: 0, f: 13, sat: 2.5 } },
+  { fr: "Cabillaud", en: "Cod", fam: "viandes", tags: ["fish", "seafood"], n: { kcal: 80, p: 18, c: 0, f: 0.7 } },
+  { fr: "Crevettes", en: "Shrimp", fam: "viandes", tags: ["fish", "seafood"], n: { kcal: 90, p: 20, c: 0, f: 1, salt: 1 } },
+  { fr: "Tempeh", en: "Tempeh", fam: "viandes", tags: [], n: { kcal: 190, p: 19, c: 9, f: 11, fiber: 5 }, nova: 3 },
+  { fr: "Seitan", en: "Seitan", fam: "viandes", tags: ["gluten"], n: { kcal: 120, p: 24, c: 4, f: 1.5 }, nova: 3 },
+  { fr: "Lait demi-écrémé", en: "2% milk", fam: "laitiers", tags: ["dairy"], n: { kcal: 46, p: 3.3, c: 4.8, f: 1.6, sugar: 4.8 } },
+  { fr: "Lait de soja", en: "Soy milk", fam: "laitiers", tags: [], n: { kcal: 40, p: 3.3, c: 2, f: 1.8, sugar: 1.5 }, nova: 3 },
+  { fr: "Yaourt nature", en: "Plain yogurt", fam: "laitiers", tags: ["dairy"], n: { kcal: 50, p: 4, c: 5, f: 1.5, sugar: 5 } },
+  { fr: "Ricotta", en: "Ricotta", fam: "fromages", tags: ["dairy"], n: { kcal: 140, p: 9, c: 3, f: 10, sat: 6.5 } },
+  { fr: "Feta", en: "Feta", fam: "fromages", tags: ["dairy"], n: { kcal: 265, p: 17, c: 0.5, f: 21, sat: 14, salt: 2.7 } },
+  { fr: "Emmental", en: "Swiss cheese", fam: "fromages", tags: ["dairy"], n: { kcal: 370, p: 28, c: 0, f: 29, sat: 18, salt: 0.6 } },
+  { fr: "Cheddar", en: "Cheddar", fam: "fromages", tags: ["dairy"], n: { kcal: 400, p: 25, c: 0.5, f: 33, sat: 21, salt: 1.8 } },
+  { fr: "Fromage frais léger", en: "Light cream cheese", fam: "fromages", tags: ["dairy"], n: { kcal: 150, p: 7, c: 5, f: 11, sat: 7, salt: 0.8 }, nova: 3 },
+  { fr: "Boulgour (cru)", en: "Bulgur (dry)", fam: "feculents", tags: ["gluten"], n: { kcal: 345, p: 12, c: 69, f: 1.5, fiber: 8 } },
+  { fr: "Tortillas de blé", en: "Flour tortillas", fam: "feculents", tags: ["gluten"], n: { kcal: 300, p: 8, c: 50, f: 7, salt: 1.2 }, nova: 4 },
+  { fr: "Pain de mie complet", en: "Whole-wheat sandwich bread", fam: "feculents", tags: ["gluten"], n: { kcal: 250, p: 9, c: 43, f: 4, sugar: 5, fiber: 6, salt: 1 }, nova: 4 },
+  { fr: "Nouilles de riz (crues)", en: "Rice noodles (dry)", fam: "feculents", tags: [], n: { kcal: 360, p: 6, c: 80, f: 0.6 } },
+  { fr: "Maïs doux", en: "Sweet corn", fam: "feculents", tags: [], n: { kcal: 80, p: 3, c: 14, f: 1.5, fiber: 3 }, nova: 3 },
+  { fr: "Pois chiches (conserve)", en: "Chickpeas (canned)", fam: "feculents", tags: [], n: { kcal: 120, p: 7, c: 16, f: 2.5, fiber: 6 }, nova: 3 },
+  { fr: "Haricots rouges (conserve)", en: "Kidney beans (canned)", fam: "feculents", tags: [], n: { kcal: 100, p: 7, c: 14, f: 0.5, fiber: 6 }, nova: 3 },
+  { fr: "Galettes de riz", en: "Rice cakes", fam: "feculents", tags: [], n: { kcal: 380, p: 8, c: 80, f: 3 }, nova: 3 },
+  { fr: "Carottes", en: "Carrots", fam: "legumes", tags: [], n: { kcal: 36, p: 0.8, c: 7, f: 0.3, sugar: 5, fiber: 2.7 } },
+  { fr: "Tomates", en: "Tomatoes", fam: "legumes", tags: [], n: { kcal: 18, p: 0.9, c: 3, f: 0.2, sugar: 2.6, fiber: 1.2 } },
+  { fr: "Concombre", en: "Cucumber", fam: "legumes", tags: [], n: { kcal: 12, p: 0.6, c: 2, f: 0.1 } },
+  { fr: "Salade verte", en: "Lettuce", fam: "legumes", tags: [], n: { kcal: 15, p: 1.3, c: 1.5, f: 0.2, fiber: 1.3 } },
+  { fr: "Chou-fleur", en: "Cauliflower", fam: "legumes", tags: [], n: { kcal: 25, p: 2, c: 3, f: 0.3, fiber: 2.5 } },
+  { fr: "Oignons", en: "Onions", fam: "legumes", tags: [], n: { kcal: 40, p: 1.2, c: 8, f: 0.1, sugar: 4, fiber: 1.7 } },
+  { fr: "Asperges", en: "Asparagus", fam: "legumes", tags: [], n: { kcal: 22, p: 2.2, c: 2, f: 0.1, fiber: 2 } },
+  { fr: "Aubergine", en: "Eggplant", fam: "legumes", tags: [], n: { kcal: 20, p: 1, c: 3, f: 0.2, fiber: 2.5 } },
+  { fr: "Petits pois surgelés", en: "Frozen peas", fam: "legumes", tags: [], n: { kcal: 70, p: 5, c: 10, f: 0.5, fiber: 5 } },
+  { fr: "Oranges", en: "Oranges", fam: "fruits", tags: [], n: { kcal: 47, p: 0.9, c: 9, f: 0.1, sugar: 9, fiber: 2.2 } },
+  { fr: "Fraises", en: "Strawberries", fam: "fruits", tags: [], n: { kcal: 32, p: 0.7, c: 6, f: 0.3, sugar: 5, fiber: 2 } },
+  { fr: "Ananas", en: "Pineapple", fam: "fruits", tags: [], n: { kcal: 50, p: 0.5, c: 11, f: 0.1, sugar: 10, fiber: 1.4 } },
+  { fr: "Mangue", en: "Mango", fam: "fruits", tags: [], n: { kcal: 65, p: 0.8, c: 14, f: 0.4, sugar: 13, fiber: 1.6 } },
+  { fr: "Myrtilles", en: "Blueberries", fam: "fruits", tags: [], n: { kcal: 57, p: 0.7, c: 12, f: 0.3, sugar: 10, fiber: 2.4 } },
+  { fr: "Raisin", en: "Grapes", fam: "fruits", tags: [], n: { kcal: 70, p: 0.6, c: 16, f: 0.2, sugar: 15, fiber: 0.9 } },
+  { fr: "Beurre", en: "Butter", fam: "graisses", tags: ["dairy"], n: { kcal: 745, p: 0.7, c: 0.6, f: 82, sat: 52 }, nova: 2 },
+  { fr: "Noix", en: "Walnuts", fam: "graisses", tags: [], n: { kcal: 690, p: 15, c: 7, f: 65, sat: 6, fiber: 6.5 } },
+  { fr: "Noix de cajou", en: "Cashews", fam: "graisses", tags: [], n: { kcal: 590, p: 18, c: 27, f: 46, sat: 8, fiber: 3.3 } },
+  { fr: "Graines de chia", en: "Chia seeds", fam: "graisses", tags: [], n: { kcal: 490, p: 17, c: 8, f: 31, sat: 3.3, fiber: 34 } },
+  { fr: "Huile de colza", en: "Canola oil", fam: "graisses", tags: [], n: { kcal: 900, p: 0, c: 0, f: 100, sat: 7 }, unit: { k: "tbsp", g: 10, step: 5 }, nova: 2 },
+  { fr: "Sauce soja", en: "Soy sauce", fam: "sauces", tags: ["gluten"], n: { kcal: 60, p: 8, c: 6, f: 0, salt: 14 }, nova: 3 },
+  { fr: "Ketchup", en: "Ketchup", fam: "sauces", tags: [], n: { kcal: 110, p: 1.2, c: 25, f: 0.1, sugar: 22, salt: 1.8 }, nova: 4 },
+  { fr: "Pesto", en: "Pesto", fam: "sauces", tags: ["dairy"], n: { kcal: 450, p: 5, c: 6, f: 45, sat: 6, salt: 2.5 }, nova: 3 },
+  { fr: "Mayonnaise allégée", en: "Light mayonnaise", fam: "sauces", tags: ["egg"], n: { kcal: 280, p: 1, c: 8, f: 27, sat: 2.5, salt: 1.5 }, nova: 4 },
+  { fr: "Sriracha", en: "Sriracha", fam: "sauces", tags: [], n: { kcal: 95, p: 2, c: 19, f: 1, sugar: 15, salt: 5 }, nova: 4 },
+  { fr: "Vinaigre balsamique", en: "Balsamic vinegar", fam: "sauces", tags: [], n: { kcal: 90, p: 0.5, c: 17, f: 0, sugar: 15 }, nova: 2 },
+  { fr: "Houmous", en: "Hummus", fam: "sauces", tags: [], n: { kcal: 300, p: 7, c: 12, f: 24, sat: 3, fiber: 6, salt: 1.2 }, nova: 3 },
+  { fr: "Protéine végétale (pois)", en: "Pea protein powder", fam: "poudre", tags: [], n: { kcal: 380, p: 80, c: 3, f: 6 }, nova: 4 },
 ];
 FOODS.forEach((f, i) => { f.id = "food" + i; if (f.nova == null) f.nova = 1; });
 const QUICK = ["food0", "food3", "food19", "food21", "food23", "food10", "food8", "food12", "food41", "food32"];
@@ -713,7 +813,10 @@ const clone = (o) => JSON.parse(JSON.stringify(o));
 const dayKey = () => new Date().toLocaleDateString("fr-CA");
 let S = Object.assign(clone(DEFAULT_SETTINGS), store.get("settings", {}));
 S.profile = Object.assign(clone(DEFAULT_SETTINGS.profile), S.profile);
+// Ancien format du régime (cases à cocher) → type de régime
+if (S.diet && !S.diet.type) S.diet = { type: S.diet.veg ? "veg" : S.diet.pork ? "nopork" : "omni", seafood: S.diet.seafood ?? true, tuna: S.diet.tuna ?? true };
 S.diet = Object.assign(clone(DEFAULT_SETTINGS.diet), S.diet);
+S.prefs = S.prefs || {};
 let log = store.get("log-" + dayKey(), []);
 let cart = store.get("cart", []);
 let shopList = store.get("shopList", []);
@@ -796,15 +899,24 @@ const TUNA = /tuna|thon/;
 const MEAT = /meats|poultry|chicken|beef|turkey|hams|sausages|poulet|boeuf|bœuf|dinde|jambon|viande|steak|saucisse|lardon|bacon/;
 const PORK = /pork|hams|bacon|porc|jambon|lardon|saucisson|chorizo/;
 function hayOf(p) { return ((p.cats || []).join(" ") + " " + (p.allergens || []).join(" ") + " " + (p.name || p.fr || "")).toLowerCase(); }
+const pref = (f) => (f && f.id ? S.prefs[f.id] || 0 : 0);
+const has = (p, re) => re.test(hayOf(p));
 function excludedBy(p) {
-  const d = S.diet, tags = p.tags || [], hay = hayOf(p);
-  const isTuna = tags.includes("tuna") || (!p.tags && TUNA.test(hay));
-  const isSea = isTuna || (!p.tags && SEAFOOD.test(hay)) || (p.allergens || []).some((a) => /fish|crustacean|mollusc/.test(a));
-  if (d.seafood && isSea && !(d.tuna && isTuna && !(!p.tags && SEAFOOD.test(hay) && !TUNA.test(hay)))) return "seafood";
-  if (d.veg && (tags.includes("meat") || isSea || (!p.tags && MEAT.test(hay)))) return "veg";
-  if (d.pork && (tags.includes("pork") || (!p.tags && PORK.test(hay)))) return "pork";
-  if (d.lactose && (tags.includes("dairy") || (p.allergens || []).includes("en:milk"))) return "lactose";
-  if (d.gluten && (tags.includes("gluten") || (p.allergens || []).includes("en:gluten"))) return "gluten";
+  const d = S.diet, tags = p.tags, al = p.allergens || [];
+  // Aliment de la base : on lit ses tags ; produit scanné : catégories, allergènes et analyse des ingrédients
+  const isTuna = tags ? tags.includes("tuna") : has(p, TUNA);
+  const isSea = tags ? tags.includes("seafood") : (has(p, SEAFOOD) && !has(p, TUNA)) || al.some((a) => /crustacean|mollusc/.test(a));
+  const isFish = tags ? tags.includes("fish") : isTuna || isSea || al.includes("en:fish");
+  const isMeat = tags ? tags.includes("meat") : has(p, MEAT) || has(p, PORK);
+  const isPork = tags ? tags.includes("pork") : has(p, PORK);
+  const isDairy = tags ? tags.includes("dairy") : al.includes("en:milk") || has(p, /dairies|cheeses|yogurt|milks/);
+  const isEgg = tags ? tags.includes("egg") : al.includes("en:eggs") || has(p, /(^|\s|:)eggs/);
+  const nonVegan = (p.analysis || []).includes("en:non-vegan");
+  if (d.type === "vegan") { if (isMeat) return "meat"; if (isFish) return "fish"; if (isDairy) return "dairy"; if (isEgg) return "egg"; if (nonVegan) return "animal"; }
+  if (d.type === "veg") { if (isMeat) return "meat"; if (isFish) return "fish"; }
+  if (d.type === "pesc" && isMeat) return "meat";
+  if (d.type === "nopork" && isPork) return "pork";
+  if (d.seafood && (isSea || (isFish && !(d.tuna && isTuna)))) return "seafood";
   return null;
 }
 
@@ -812,6 +924,7 @@ function excludedBy(p) {
 function scoreOf(p) {
   const ex = excludedBy(p);
   if (ex) return { s: 5, ex, reasons: [{ bad: true, t: t("rExcluded", t("dietWord")[ex]) }] };
+  if (pref(p) === -1 && !scoreOf.inner) { scoreOf.inner = true; const r = scoreOf(p); scoreOf.inner = false; r.reasons = [{ bad: true, t: t("youDislike") }, ...r.reasons].slice(0, 4); return r; }
   const n = p.n, kcal = Math.max(n.kcal, 1);
   const reasons = [];
   let s = 50;
@@ -1015,7 +1128,8 @@ function renderCart() {
   store.set("cart", cart);
 }
 function renderQuick() {
-  $("quick").innerHTML = QUICK.map((id) => FOODS.find((f) => f.id === id)).filter((f) => !excludedBy(f))
+  const liked = FOODS.filter((f) => pref(f) === 1 && !QUICK.includes(f.id)).map((f) => f.id);
+  $("quick").innerHTML = [...QUICK, ...liked].map((id) => FOODS.find((f) => f.id === id)).filter((f) => !excludedBy(f) && pref(f) !== -1)
     .map((f) => `<button class="chip" type="button" data-q="${f.id}">+ ${esc(f[S.lang].replace(/ \((crue?s?|dry)\)| en mélange/g, "").trim())}</button>`).join("");
 }
 function totalsOf(gs) {
@@ -1144,10 +1258,10 @@ function renderIdeas() {
   if (!open.size && !renderIdeas.done) open.add(order.find((f) => FOODS.some((x) => x.fam === f && !excludedBy(x))));
   renderIdeas.done = true;
   $("ideas").innerHTML = order.map((fam) => {
-    const foods = FOODS.filter((f) => f.fam === fam && !excludedBy(f)).sort((a, b) => scoreOf(b).s - scoreOf(a).s);
+    const foods = FOODS.filter((f) => f.fam === fam && !excludedBy(f) && pref(f) !== -1).sort((a, b) => pref(b) - pref(a) || scoreOf(b).s - scoreOf(a).s);
     if (!foods.length) return "";
     return `<details data-fam="${fam}" ${open.has(fam) ? "open" : ""}><summary>${famLabel(fam)}</summary>
-      <ul class="ideas">${foods.map((f) => `<li>${badge(f)}<span class="name" style="font-size:15px">${esc(f[S.lang])}</span>
+      <ul class="ideas">${foods.map((f) => `<li>${badge(f)}<span class="name" style="font-size:15px">${esc(f[S.lang])}${pref(f) === 1 ? '<span class="heart" aria-label="♥">♥</span>' : ""}</span>
         <span class="q">${fmtWeight(weeklyQty(f, fam).g)}${t("perWeek")}</span>
         <button class="add-mini" type="button" data-idea="${f.id}" aria-label="${t("addList")}">+</button></li>`).join("")}</ul></details>`;
   }).join("");
@@ -1185,9 +1299,12 @@ function renderSettings() {
   for (const b of $("sLang").children) b.setAttribute("aria-pressed", b.dataset.v === S.lang);
   for (const b of $("sUnits").children) b.setAttribute("aria-pressed", b.dataset.v === S.units);
   for (const b of $("sTheme").children) b.setAttribute("aria-pressed", b.dataset.v === S.theme);
-  $("diet").innerHTML = ["seafood", "tuna", "veg", "pork", "lactose", "gluten"].map((k) =>
-    `<label class="switch" ${k === "tuna" && !S.diet.seafood ? "hidden" : ""} ${k === "tuna" ? 'style="padding-left:18px"' : ""}><span>${t("diet")[k]}</span><input type="checkbox" data-diet="${k}" ${S.diet[k] ? "checked" : ""}></label>`).join("");
-  renderCalc(); renderSlotEditor();
+  const fishOk = !["veg", "vegan"].includes(S.diet.type);
+  $("diet").innerHTML = `<div class="diet-types">${Object.keys(t("dietTypes")).map((k) =>
+      `<button type="button" data-dtype="${k}" aria-pressed="${S.diet.type === k}">${t("dietTypes")[k]}<small>${t("dietTypesD")[k]}</small></button>`).join("")}</div>` +
+    (fishOk ? ["seafood", "tuna"].map((k) =>
+      `<label class="switch" ${k === "tuna" && !S.diet.seafood ? "hidden" : ""} ${k === "tuna" ? 'style="padding-left:18px"' : ""}><span>${t("diet")[k]}</span><input type="checkbox" data-diet="${k}" ${S.diet[k] ? "checked" : ""}></label>`).join("") : "");
+  renderCalc(); renderSlotEditor(); renderTastes();
 }
 function renderCalc() {
   const c = computeTargets(), T = dayTargets();
@@ -1219,6 +1336,33 @@ function renderSlotPreview() {
   $("slotWarn").textContent = t("sumWarn", sk, sp);
   $("slotPreview").innerHTML = slotList().map((s) =>
     `<div class="line"><span>${esc(s.name)} · ${esc(s.sub)}</span><b>${s.t.kcal} kcal · P ${s.t.p} · ${S.lang === "fr" ? "G" : "C"} ${s.t.c} · ${S.lang === "fr" ? "L" : "F"} ${s.t.f}</b></div>`).join("");
+}
+const THUMB_UP = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 11v9H4v-9h3zM7 11l4-8a2 2 0 0 1 2 2v4h5.5a2 2 0 0 1 2 2.3l-1.3 7A2 2 0 0 1 17.2 20H7"/></svg>`;
+const THUMB_DOWN = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="transform:rotate(180deg)"><path d="M7 11v9H4v-9h3zM7 11l4-8a2 2 0 0 1 2 2v4h5.5a2 2 0 0 1 2 2.3l-1.3 7A2 2 0 0 1 17.2 20H7"/></svg>`;
+const norm = (x) => x.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+function tasteRow(f) {
+  const v = pref(f);
+  return `<li><span class="info"><span class="name" style="font-size:15px">${esc(f[S.lang])}</span><span class="note">${esc(famLabel(f.fam))}</span></span>
+    <button class="taste-btn yes" type="button" data-taste="${f.id}" data-v="1" aria-pressed="${v === 1}">${THUMB_UP}${t("like")}</button>
+    <button class="taste-btn no" type="button" data-taste="${f.id}" data-v="-1" aria-pressed="${v === -1}">${THUMB_DOWN}${t("dislike")}</button></li>`;
+}
+function renderTastes() {
+  const q = norm($("tasteSearch").value.trim());
+  const visible = FOODS.filter((f) => !excludedBy(f));
+  if (q) {
+    const hits = visible.filter((f) => norm(f.fr).includes(q) || norm(f.en).includes(q) || norm(famLabel(f.fam)).includes(q)).slice(0, 25);
+    $("tastes").innerHTML = hits.length ? hits.map(tasteRow).join("") : `<li class="head">${t("noMatch")}</li>`;
+    return;
+  }
+  const likes = visible.filter((f) => pref(f) === 1), dislikes = visible.filter((f) => pref(f) === -1);
+  $("tastes").innerHTML = !likes.length && !dislikes.length ? `<li class="head" style="text-transform:none;letter-spacing:0;font-weight:600">${t("noTastes")}</li>`
+    : (likes.length ? `<li class="head">${t("liked")}</li>` + likes.map(tasteRow).join("") : "") +
+      (dislikes.length ? `<li class="head">${t("disliked")}</li>` + dislikes.map(tasteRow).join("") : "");
+}
+function tastesText() {
+  const names = (v) => FOODS.filter((f) => pref(f) === v).map((f) => f[S.lang]).join(", ");
+  const d = t("dietTypes")[S.diet.type] + (S.diet.seafood && !["veg", "vegan"].includes(S.diet.type) ? `, ${t("diet").seafood.toLowerCase()}${S.diet.tuna ? " " + t("diet").tuna.replace("…", "") : ""}` : "");
+  return t("tastesText", d, names(1), names(-1));
 }
 function applyTheme() {
   if (S.theme === "auto") document.documentElement.removeAttribute("data-theme");
@@ -1256,7 +1400,7 @@ function renderDock() {
 
 /* ================= Open Food Facts ================= */
 async function fetchProduct(code) {
-  const res = await fetch(`https://world.openfoodfacts.org/api/v2/product/${code}.json?fields=product_name,product_name_fr,product_name_en,brands,nutriments,image_front_small_url,nova_group,additives_n,categories_tags,allergens_tags,product_quantity`);
+  const res = await fetch(`https://world.openfoodfacts.org/api/v2/product/${code}.json?fields=product_name,product_name_fr,product_name_en,brands,nutriments,image_front_small_url,nova_group,additives_n,categories_tags,allergens_tags,ingredients_analysis_tags,product_quantity`);
   const data = await res.json();
   const p = data.product, nu = p?.nutriments;
   const kcal = nu?.["energy-kcal_100g"] ?? (nu?.["energy_100g"] ? nu["energy_100g"] / 4.184 : undefined);
@@ -1265,7 +1409,7 @@ async function fetchProduct(code) {
   const item = {
     code, name: local || p.product_name || p.product_name_fr || t("noName"), brand: (p.brands || "").split(",")[0].trim(),
     img: p.image_front_small_url || "", nova: p.nova_group ?? null, additives: p.additives_n ?? 0,
-    cats: p.categories_tags || [], allergens: p.allergens_tags || [], packG: +p.product_quantity || 0,
+    cats: p.categories_tags || [], allergens: p.allergens_tags || [], analysis: p.ingredients_analysis_tags || [], packG: +p.product_quantity || 0,
     n: { kcal: +kcal, p: +(nu.proteins_100g ?? 0), c: +(nu.carbohydrates_100g ?? 0), f: +(nu.fat_100g ?? 0),
       sugar: +(nu.sugars_100g ?? 0), sat: +(nu["saturated-fat_100g"] ?? 0), salt: +(nu.salt_100g ?? 0), fiber: +(nu.fiber_100g ?? 0) },
   };
@@ -1448,9 +1592,32 @@ $("addSlot").addEventListener("click", () => {
   S.slots.push({ id: "s" + Date.now(), time: "10h", name: S.lang === "fr" ? "Collation" : "Snack", pk: 10, pp: 10 });
   saveSettings(); renderSlotEditor(); renderSlots(); renderCalc();
 });
+function onDietChanged() { saveSettings(); renderSettings(); renderQuick(); renderIdeas(); renderCart(); renderShopResult(); }
 $("diet").addEventListener("change", (e) => {
   const k = e.target.dataset.diet; if (!k) return;
-  S.diet[k] = e.target.checked; saveSettings(); renderSettings(); renderQuick(); renderIdeas(); renderCart();
+  S.diet[k] = e.target.checked; onDietChanged();
+});
+$("diet").addEventListener("click", (e) => {
+  const b = e.target.closest("[data-dtype]"); if (!b) return;
+  S.diet.type = b.dataset.dtype; onDietChanged();
+});
+$("tasteSearch").addEventListener("input", renderTastes);
+$("tastes").addEventListener("click", (e) => {
+  const b = e.target.closest("[data-taste]"); if (!b) return;
+  const id = b.dataset.taste, v = +b.dataset.v;
+  if (S.prefs[id] === v) delete S.prefs[id]; else S.prefs[id] = v;
+  saveSettings();
+  for (const x of $("tastes").querySelectorAll(`[data-taste="${id}"]`)) x.setAttribute("aria-pressed", S.prefs[id] === +x.dataset.v);
+  renderQuick(); renderIdeas();
+});
+$("copyTastes").addEventListener("click", async () => {
+  const text = tastesText();
+  try { await navigator.clipboard.writeText(text); } catch {
+    const ta = document.createElement("textarea"); ta.value = text; document.body.appendChild(ta); ta.select();
+    try { document.execCommand("copy"); } catch {} ta.remove();
+  }
+  $("copyTastes").textContent = t("copied");
+  setTimeout(() => { $("copyTastes").textContent = t("copyTastes"); }, 2500);
 });
 $("sLang").addEventListener("click", (e) => { const b = e.target.closest("[data-v]"); if (!b) return; S.lang = b.dataset.v; saveSettings(); renderAll(); });
 $("sUnits").addEventListener("click", (e) => { const b = e.target.closest("[data-v]"); if (!b) return; S.units = b.dataset.v; saveSettings(); renderAll(); });
