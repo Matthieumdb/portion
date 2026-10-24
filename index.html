@@ -281,9 +281,9 @@ select {
 .switch { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 6px 0; cursor: pointer; }
 .switch input { width: 22px; height: 22px; accent-color: var(--accent); flex: none; padding: 0; }
 .switch span { font-size: 15px; }
-.slotrow { display: grid; grid-template-columns: 60px 1fr 54px 54px 36px; gap: 6px; align-items: center; }
-.slotrow input { padding: 8px 6px; font-size: 15px; }
-.slothead { display: grid; grid-template-columns: 60px 1fr 54px 54px 36px; gap: 6px; font: 800 11px var(--font-body); color: var(--muted); text-transform: uppercase; }
+.slotrow { display: grid; grid-template-columns: 1fr 58px 58px 36px; gap: 6px; align-items: center; }
+.slotrow input, .slotrow select { padding: 8px 6px; font-size: 15px; }
+.slothead { display: grid; grid-template-columns: 1fr 58px 58px 36px; gap: 6px; font: 800 11px var(--font-body); color: var(--muted); text-transform: uppercase; }
 .warnline { color: var(--warn); font-size: 13px; margin: 0; }
 .danger { background: var(--warn-soft); color: var(--warn); }
 .diet-types { display: grid; grid-template-columns: 1fr; gap: 6px; }
@@ -300,6 +300,19 @@ select {
 .taste-btn.no[aria-pressed="true"] { background: var(--warn-soft); border-color: var(--warn); color: var(--warn); }
 .heart { color: var(--accent); font-size: 13px; margin-left: 4px; }
 input[type="search"]::-webkit-search-cancel-button { cursor: pointer; }
+.rtypes { display: flex; flex-direction: column; gap: 8px; }
+.rtypes .stepper p { font: 700 16px var(--font-body); }
+.rec-group { margin-top: 6px; }
+.rec-sum ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.rec-sum li { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center; padding: 8px 0; border-top: 1px dashed var(--line); }
+.rec-sum li:first-child { border-top: 0; }
+.rec-sum .q { font: 600 17px var(--font-display); }
+.prog { grid-column: 2 / 4; height: 6px; border-radius: 6px; background: var(--line); overflow: hidden; }
+.prog i { display: block; height: 100%; background: var(--ok, #3a9d5d); border-radius: 6px; }
+.match-box { display: flex; flex-direction: column; gap: 10px; }
+.match-box select { width: 100%; }
+.take { display: flex; align-items: center; gap: 10px; }
+.take input { width: 110px; text-align: center; font: 600 20px var(--font-display); }
 </style>
 </head>
 <body>
@@ -404,18 +417,16 @@ input[type="search"]::-webkit-search-cancel-button { cursor: pointer; }
   <div class="view" id="recView" role="tabpanel" hidden>
     <section>
       <div class="card">
-        <div class="stepper" style="background:transparent;padding:0">
-          <p class="score-label" style="font-size:18px" data-i18n="recHowMany"></p>
-          <button type="button" id="recMinus" aria-label="−">−</button><output id="recN"></output><button type="button" id="recPlus" aria-label="+">+</button>
-        </div>
-        <div class="field"><span data-i18n="recFor"></span><div class="seg2" id="recSlots"></div></div>
+        <p class="score-label" style="font-size:18px" data-i18n="recHowMany"></p>
+        <div class="rtypes" id="recTypes"></div>
         <div class="field"><span data-i18n="recStyle"></span><div class="seg2" id="recStyles"></div></div>
         <button class="btn" type="button" id="recGo"></button>
         <p class="caption" data-i18n="recHint"></p>
       </div>
     </section>
     <section id="recList"></section>
-    <button class="btn secondary" type="button" id="recShop" hidden data-i18n="recToShop"></button>
+    <section id="recSum" hidden></section>
+    <button class="btn" type="button" id="recShop" hidden data-i18n="recToShop"></button>
     <p class="toast" id="recToast" hidden></p>
   </div>
 
@@ -454,7 +465,7 @@ input[type="search"]::-webkit-search-cancel-button { cursor: pointer; }
       <h2 class="step-title" data-i18n="setMeals"></h2>
       <div class="card">
         <p class="caption" data-i18n="setMealsD"></p>
-        <div class="slothead"><span data-i18n="mealTime"></span><span data-i18n="mealName"></span><span>% kcal</span><span>% prot.</span><span></span></div>
+        <div class="slothead"><span data-i18n="mealTime"></span><span>% kcal</span><span>% prot.</span><span></span></div>
         <div id="slotRows" style="display:flex;flex-direction:column;gap:6px"></div>
         <p class="warnline" id="slotWarn" hidden></p>
         <button class="btn secondary small" type="button" id="addSlot" style="align-self:flex-start" data-i18n="addMeal"></button>
@@ -525,14 +536,21 @@ input[type="search"]::-webkit-search-cancel-button { cursor: pointer; }
 const STR = {
   fr: {
     tabMeal: "Repas", tabShop: "Courses", tabRec: "Recettes", tabSet: "Réglages",
-    recHowMany: "Combien de repas ?", recFor: "Pour quel repas", recGo: (n) => `Proposer ${n} recette${n > 1 ? "s" : ""}`,
+    recHowMany: "Combien de recettes ?", recGo: (n) => `Proposer ${n} recette${n > 1 ? "s" : ""}`,
+    mtypes: { breakfast: "Petit-déjeuner", meal: "Repas", snack: "Collation" },
+    recSumT: (n) => `Les courses pour tes ${n} recettes`, recSumD: "Quand plusieurs recettes utilisent le même produit, les quantités sont additionnées.",
+    inRecipes: (k) => `dans ${k} recettes`, recSent: (n) => `${n} produits envoyés à ta liste de courses`,
+    forList: "Sur ta liste de courses", matchFor: "C'est pour :", noListRow: "Rien de ma liste",
+    listNeed: (need, got) => `Il en faut ${need} · ${got} déjà dans le caddie`, leftToTake: "encore à prendre", enough: "Tu as déjà tout ce qu'il faut",
+    takeQty: "Je prends", putCart: "Mettre dans le caddie", packsW: "paquet(s)",
+    struck: (n) => `${n} : quantité atteinte, rayé de ta liste ✓`, stillNeed: (n, q) => `${n} : encore ${q} à prendre`,
     recHint: "Les recettes suivent ton régime et tes goûts (onglet Réglages), et les quantités collent aux macros du repas choisi.",
-    recEmptyT: "Pas encore de recettes", recEmptyD: "Choisis le nombre de repas et appuie sur « Proposer ».",
+    recEmptyT: "Pas encore de recettes", recEmptyD: "Choisis combien de petits-déjeuners, repas et collations, puis appuie sur « Proposer ».",
     change: "Changer", modify: "Modifier", done: "Terminé", cook: "Je cuisine ça", swap: "Changer d'ingrédient",
     recStyle: "Style", styleAll: "Tout",
     styles: { h: "Healthy", g: "Gourmand", q: "Rapide", b: "Batch cooking", w: "Saveurs du monde" },
     recNoneT: "Aucune recette pour ces styles", recNoneD: "Retire un style ou change de repas, puis relance.",
-    recToShop: "Ajouter tous les ingrédients à ma liste de courses", recAdded: (n) => `${n} ingrédients ajoutés à ta liste`,
+    recToShop: "Tout envoyer à ma liste de courses", recAdded: (n) => `${n} ingrédients ajoutés à ta liste`,
     hello: "Bonjour", evening: "Bonsoir",
     whichMeal: "Quel repas ?", whatYouEat: "Ce que tu manges", yourDoses: "Tes doses à peser",
     protein: "Protéines", carbs: "Glucides", fat: "Lipides", calories: "Calories",
@@ -543,7 +561,7 @@ const STR = {
     emptyMealT: "Qu'est-ce qu'on mange ?", emptyMealD: "Scanne chaque produit avec « Scanner » en bas, ou touche un aliment ci-dessous. Quand tout y est, appuie sur « Calculer ».",
     per100: "pour 100 g", fixedQty: "Quantité fixe", autoQty: "Quantité auto", remove: "Retirer",
     leftFor: (slot, kcal) => `Il te reste ça pour ${slot} (déjà ${kcal} kcal notées sur ce créneau).`,
-    goalFor: (sub, time) => `Ton objectif : ${sub.toLowerCase()} de ${time}.`,
+    goalFor: (l) => `Ton objectif pour ce créneau : ${l}.`,
     notNeeded: "Pas besoin : le reste du repas couvre déjà tout", weighedRaw: "pesé cru / sec",
     gProt: (g) => `${g} g de protéines`,
     onTarget: "Repas pile dans tes objectifs",
@@ -589,7 +607,7 @@ const STR = {
     weekLoss: (kg) => `≈ ${kg} par semaine`,
     manualTargets: "Fixer mes cibles à la main",
     setMeals: "Mes repas", setMealsD: "Comment tes calories et tes protéines se répartissent dans la journée.",
-    mealTime: "Heure", mealName: "Nom", addMeal: "+ Ajouter un repas", removeMeal: "Supprimer ce repas",
+    mealTime: "Type", mealName: "Nom", addMeal: "+ Ajouter un repas", removeMeal: "Supprimer ce repas",
     sumWarn: (k, p) => `Les parts doivent faire 100 % (calories : ${k} %, protéines : ${p} %). Je normalise automatiquement.`,
     setDiet: "Mon régime",
     dietTypes: { omni: "Omnivore", pesc: "Pescétarien", veg: "Végétarien", vegan: "Végan", nopork: "Sans porc" },
@@ -616,14 +634,21 @@ const STR = {
   },
   en: {
     tabMeal: "Meals", tabShop: "Groceries", tabRec: "Recipes", tabSet: "Settings",
-    recHowMany: "How many meals?", recFor: "For which meal", recGo: (n) => `Suggest ${n} recipe${n > 1 ? "s" : ""}`,
+    recHowMany: "How many recipes?", recGo: (n) => `Suggest ${n} recipe${n > 1 ? "s" : ""}`,
+    mtypes: { breakfast: "Breakfast", meal: "Meal", snack: "Snack" },
+    recSumT: (n) => `Groceries for your ${n} recipes`, recSumD: "When several recipes use the same product, amounts are added up.",
+    inRecipes: (k) => `in ${k} recipes`, recSent: (n) => `${n} products sent to your grocery list`,
+    forList: "On your grocery list", matchFor: "This is for:", noListRow: "Nothing on my list",
+    listNeed: (need, got) => `You need ${need} · ${got} already in the cart`, leftToTake: "still to get", enough: "You already have enough",
+    takeQty: "I'm taking", putCart: "Put in the cart", packsW: "pack(s)",
+    struck: (n) => `${n}: amount reached, crossed off ✓`, stillNeed: (n, q) => `${n}: ${q} still to get`,
     recHint: "Recipes follow your diet and tastes (Settings tab), and amounts fit the macros of the chosen meal.",
-    recEmptyT: "No recipes yet", recEmptyD: "Pick how many meals and tap \"Suggest\".",
+    recEmptyT: "No recipes yet", recEmptyD: "Pick how many breakfasts, meals and snacks, then tap \"Suggest\".",
     change: "Change", modify: "Edit", done: "Done", cook: "Cook this", swap: "Swap ingredient",
     recStyle: "Style", styleAll: "All",
     styles: { h: "Healthy", g: "Comfort food", q: "Quick", b: "Batch cooking", w: "World flavours" },
     recNoneT: "No recipe for these styles", recNoneD: "Remove a style or pick another meal, then try again.",
-    recToShop: "Add all ingredients to my grocery list", recAdded: (n) => `${n} ingredients added to your list`,
+    recToShop: "Send everything to my grocery list", recAdded: (n) => `${n} ingredients added to your list`,
     hello: "Hi", evening: "Good evening",
     whichMeal: "Which meal?", whatYouEat: "What you're eating", yourDoses: "Your portions to weigh",
     protein: "Protein", carbs: "Carbs", fat: "Fat", calories: "Calories",
@@ -634,7 +659,7 @@ const STR = {
     emptyMealT: "What's on the plate?", emptyMealD: "Scan each product with \"Scan\" below, or tap a food. When everything is in, tap \"Calculate\".",
     per100: "per 100 g", fixedQty: "Fixed amount", autoQty: "Auto amount", remove: "Remove",
     leftFor: (slot, kcal) => `Left for ${slot} (${kcal} kcal already logged in this slot).`,
-    goalFor: (sub, time) => `Your target: ${sub.toLowerCase()} at ${time}.`,
+    goalFor: (l) => `Your target for this slot: ${l}.`,
     notNeeded: "Not needed: the rest of the meal already covers it", weighedRaw: "weighed raw / dry",
     gProt: (g) => `${g} g protein`,
     onTarget: "Meal right on target",
@@ -680,7 +705,7 @@ const STR = {
     weekLoss: (kg) => `≈ ${kg} per week`,
     manualTargets: "Set my targets by hand",
     setMeals: "My meals", setMealsD: "How your calories and protein are spread across the day.",
-    mealTime: "Time", mealName: "Name", addMeal: "+ Add a meal", removeMeal: "Remove this meal",
+    mealTime: "Type", mealName: "Name", addMeal: "+ Add a meal", removeMeal: "Remove this meal",
     sumWarn: (k, p) => `Shares should add up to 100 % (calories: ${k} %, protein: ${p} %). I normalise them automatically.`,
     setDiet: "My diet",
     dietTypes: { omni: "Omnivore", pesc: "Pescatarian", veg: "Vegetarian", vegan: "Vegan", nopork: "No pork" },
@@ -713,9 +738,9 @@ const DEFAULT_SETTINGS = {
   profile: { name: "Matthieu", sex: "m", age: 31, height: 188, weight: 87, act: 1, goal: 1, protKg: 2.07, fatKg: 0.8 },
   manual: { on: false, kcal: 2100, p: 180, c: 185, f: 70 },
   slots: [
-    { id: "s1", time: "13h", name: "Repas", pk: 43, pp: 39 },
-    { id: "s2", time: "17h", name: "Collation", pk: 14, pp: 22 },
-    { id: "s3", time: "20h", name: "Repas", pk: 43, pp: 39 },
+    { id: "s1", type: "meal", pk: 43, pp: 39 },
+    { id: "s2", type: "snack", pk: 14, pp: 22 },
+    { id: "s3", type: "meal", pk: 43, pp: 39 },
   ],
   diet: { type: "omni", seafood: true, tuna: true },
   prefs: {},
@@ -878,6 +903,8 @@ S.profile = Object.assign(clone(DEFAULT_SETTINGS.profile), S.profile);
 // Ancien format du régime (cases à cocher) → type de régime
 if (S.diet && !S.diet.type) S.diet = { type: S.diet.veg ? "veg" : S.diet.pork ? "nopork" : "omni", seafood: S.diet.seafood ?? true, tuna: S.diet.tuna ?? true };
 S.diet = Object.assign(clone(DEFAULT_SETTINGS.diet), S.diet);
+// Anciennes versions : créneaux à l'heure → type de repas
+S.slots = S.slots.map((s) => s.type ? s : { id: s.id, pk: s.pk, pp: s.pp, type: /collation|snack|go[uû]ter/i.test(s.name || "") ? "snack" : /petit|breakfast|matin/i.test(s.name || "") ? "breakfast" : "meal" });
 S.prefs = S.prefs || {};
 let log = store.get("log-" + dayKey(), []);
 let cart = store.get("cart", []);
@@ -923,24 +950,45 @@ function slotList() {
   const sk = S.slots.reduce((a, s) => a + (+s.pk || 0), 0) || 1;
   const sp = S.slots.reduce((a, s) => a + (+s.pp || 0), 0) || 1;
   const cK = T.c * 4, fK = T.f * 9, cShare = cK + fK ? cK / (cK + fK) : 0.5;
+  const nb = {}, seen = {};
+  for (const s of S.slots) nb[s.type] = (nb[s.type] || 0) + 1;
   return S.slots.map((s) => {
     const kcal = T.kcal * (+s.pk || 0) / sk;
     const p = T.p * (+s.pp || 0) / sp;
     const rest = Math.max(0, kcal - p * 4);
-    return { id: s.id, name: s.time, sub: s.name, t: { kcal: r0(kcal), p: r0(p), c: r0(rest * cShare / 4), f: r0(rest * (1 - cShare) / 9) } };
+    seen[s.type] = (seen[s.type] || 0) + 1;
+    return { id: s.id, type: s.type, name: t("mtypes")[s.type], sub: nb[s.type] > 1 ? `${seen[s.type]}/${nb[s.type]}` : "",
+      t: { kcal: r0(kcal), p: r0(p), c: r0(rest * cShare / 4), f: r0(rest * (1 - cShare) / 9) } };
   });
+}
+const slotLabel = (s) => s.name + (s.sub ? " " + s.sub : "");
+// Cible d'un type de repas : moyenne des créneaux de ce type, sinon une part par défaut de la journée
+const TYPE_SHARE = { breakfast: [25, 25], meal: [43, 39], snack: [14, 22] };
+function typeTarget(type) {
+  const list = slotList().filter((s) => s.type === type);
+  if (list.length) {
+    const t0 = { kcal: 0, p: 0, c: 0, f: 0 };
+    for (const s of list) for (const k in t0) t0[k] += s.t[k] / list.length;
+    return t0;
+  }
+  const T = dayTargets(), [pk, pp] = TYPE_SHARE[type];
+  const cK = T.c * 4, fK = T.f * 9, cShare = cK + fK ? cK / (cK + fK) : 0.5;
+  const kcal = T.kcal * pk / 100, p = T.p * pp / 100, rest = Math.max(0, kcal - p * 4);
+  return { kcal, p, c: rest * cShare / 4, f: rest * (1 - cShare) / 9 };
 }
 function scaleFor(by) {
   const T = dayTargets();
   return by === "p" ? T.p / BASE.p : by === "c" ? T.c / BASE.c : by === "f" ? T.f / BASE.f : T.kcal / BASE.kcal;
 }
 
+// Créneau probable selon l'heure : petit-déjeuner le matin, collation l'après-midi, sinon le repas de midi ou du soir
 function guessSlot() {
   const list = slotList(), h = new Date().getHours() + new Date().getMinutes() / 60;
-  const hours = list.map((s) => parseFloat(String(s.name).replace(",", ".").replace(/h/i, ".")) || 0);
-  let best = list[0]?.id, bestD = 99;
-  list.forEach((s, i) => { const d = Math.abs(hours[i] - h); if (d < bestD) { bestD = d; best = s.id; } });
-  return best;
+  const want = h < 10.5 ? "breakfast" : h >= 15.5 && h < 18.5 ? "snack" : "meal";
+  let c = list.filter((s) => s.type === want);
+  if (!c.length) c = list.filter((s) => s.type === "meal");
+  if (!c.length) c = list;
+  return (h < 15 ? c[0] : c.at(-1))?.id;
 }
 const slot = () => slotList().find((s) => s.id === slotId) || slotList()[0];
 function eaten(filterSlot) {
@@ -1166,7 +1214,7 @@ function renderSlots() {
   const rem = remaining(), s = slot();
   $("remaining").innerHTML = MACROS.map((m) => gaugeHTML(m.k, rem[m.k], s.t[m.k], m.color, m.unit)).join("");
   const done = eaten(slotId).kcal;
-  $("remainingCaption").textContent = done > 0 ? t("leftFor", s.name, r0(done)) : t("goalFor", s.sub, s.name);
+  $("remainingCaption").textContent = done > 0 ? t("leftFor", slotLabel(s), r0(done)) : t("goalFor", slotLabel(s));
 }
 function renderCart() {
   $("count").textContent = cart.length ? t("products", cart.length) : "";
@@ -1265,6 +1313,30 @@ function renderShopResult() {
       ? `<div class="big-qty extra"><b>${q.g > 0 ? "≤ " + fmtWeight(q.g) : "0 g"}</b><span>${t("maxWeek")}</span></div>`
       : `<div class="big-qty"><b>${fmtWeight(q.g)}</b><span>${t("forWeek")} · ${fmtAlt(q.g)}${eggs}${RAW.test(nm(p)) ? " · " + t("rawWeight") : ""}</span></div>`;
   const packs = fam === "extras" || ex ? "" : packsText(q.g, p.packG);
+  const row = !ex && p.match != null ? shopList[p.match] : null;
+  const open = shopList.map((x, i) => [x, i]).filter(([x, i]) => !x.done || i === p.match);
+  const matchSel = ex || !open.length ? "" : `<label class="field"><span>${t("matchFor")}</span><select id="shopMatch">
+      <option value="">${t("noListRow")}</option>${open.map(([x, i]) => `<option value="${i}" ${i === p.match ? "selected" : ""}>${esc(x.ref ? nm(x.ref) : x.name)} · ${fmtWeight(needOf(x))}</option>`).join("")}</select></label>`;
+  let listHTML = "";
+  if (row) {
+    const need = needOf(row), got = row.got || 0, left = Math.max(0, need - got);
+    const take = p.take ?? (p.packG ? Math.max(1, Math.ceil(left / p.packG)) : r0(left));
+    listHTML = `<div class="card match-box">
+      <span class="caption">${t("forList")}</span>
+      ${matchSel}
+      <div class="big-qty"><b>${left > 0 ? fmtWeight(left) : "✓"}</b><span>${left > 0 ? t("leftToTake") : t("enough")} · ${t("listNeed", fmtWeight(need), fmtWeight(got))}</span></div>
+      ${left > 0 && p.packG ? `<p class="caption" style="text-align:center">${packsText(left, p.packG)}</p>` : ""}
+      <div class="stepper">
+        <p>${t("takeQty")}${p.packG ? ` (${t("packsW")} ${fmtWeight(p.packG)})` : " (g)"}</p>
+        ${p.packG ? `<button type="button" data-take="-1" aria-label="−">−</button><output>${take}</output><button type="button" data-take="1" aria-label="+">+</button>`
+          : `<input id="takeG" inputmode="numeric" value="${take}" style="width:96px;text-align:center">`}
+      </div>
+      <div class="row">
+        <button class="btn secondary" type="button" id="shopCancel" style="flex:0 0 34%">${t("close")}</button>
+        <button class="btn" type="button" id="shopTake">${t("putCart")}</button>
+      </div>
+    </div>`;
+  }
   box.innerHTML = `
     <div class="card">
       <div class="item" style="grid-template-columns:54px 1fr">
@@ -1283,7 +1355,8 @@ function renderShopResult() {
       </div>
       ${reasons.length ? `<ul class="reasons">${reasons.map((r) => `<li class="${r.bad ? "bad" : "good"}">${esc(r.t)}</li>`).join("")}</ul>` : ""}
     </div>
-    <div class="card">
+    ${row ? listHTML : matchSel ? `<div class="card">${matchSel}</div>` : ""}
+    <div class="card" ${row ? "hidden" : ""}>
       <span class="caption">${t("aisle")}</span>
       <div class="family-chips">${Object.keys(FAMILIES).map((k) => `<button class="chip" type="button" data-fam="${k}" aria-pressed="${k === fam}">${famLabel(k)}</button>`).join("")}</div>
       ${qtyHTML}
@@ -1299,17 +1372,22 @@ function renderShopResult() {
       </div>
     </div>`;
 }
+const needOf = (x) => x.fixedG ?? (x.ref ? weeklyQty(x.ref, x.fam).g : x.g);
 function renderShopList() {
   $("shopCount").textContent = shopList.length ? t("inCart", shopList.filter((x) => x.done).length, shopList.length) : "";
   $("clearShop").hidden = !shopList.length;
-  $("shopList").innerHTML = shopList.length ? shopList.map((x, i) => {
-    const q = x.fixedG ?? (x.ref ? weeklyQty(x.ref, x.fam).g : x.g);
-    const packs = x.fam === "extras" || !x.ref ? "" : packsText(q, x.ref.packG);
+  // Ce qui reste à prendre en haut, ce qui est rayé en bas
+  const order = shopList.map((x, i) => i).sort((a, b) => shopList[a].done - shopList[b].done);
+  $("shopList").innerHTML = shopList.length ? order.map((i) => {
+    const x = shopList[i], q = needOf(x), got = x.got || 0;
+    const left = Math.max(0, q - got);
+    const packs = x.fam === "extras" || !x.ref || x.done ? "" : packsText(got ? left : q, x.ref.packG);
     return `<li class="${x.done ? "done" : ""}">
       <input type="checkbox" data-done="${i}" ${x.done ? "checked" : ""} aria-label="✓">
-      <span class="info"><span class="name">${esc(x.ref ? nm(x.ref) : x.name)}</span><span class="note">${esc(famLabel(x.fam))}${packs ? " · " + esc(packs) : ""}</span></span>
-      <span class="q">${x.fam === "extras" ? "≤ " : ""}${fmtWeight(q)}</span>
-      <button class="icon-btn" type="button" data-shopdel="${i}" aria-label="${t("remove")}">${X_ICON}</button></li>`;
+      <span class="info"><span class="name">${esc(x.ref ? nm(x.ref) : x.name)}</span><span class="note">${esc(famLabel(x.fam))}${packs ? " · " + esc(packs) : ""}${got && !x.done ? " · " + esc(fmtWeight(left)) + " " + t("leftToTake") : ""}</span></span>
+      <span class="q">${x.fam === "extras" ? "≤ " : ""}${got && !x.done ? fmtWeight(got) + " / " : ""}${fmtWeight(q)}</span>
+      <button class="icon-btn" type="button" data-shopdel="${i}" aria-label="${t("remove")}">${X_ICON}</button>
+      ${got && !x.done ? `<span class="prog"><i style="width:${Math.min(100, got / q * 100)}%"></i></span>` : ""}</li>`;
   }).join("")
     : `<li class="solo"><p class="empty"><b>${t("emptyListT")}</b>${t("emptyListD")}</p></li>`;
   store.set("shopList", shopList);
@@ -1327,6 +1405,24 @@ function renderIdeas() {
         <span class="q">${fmtWeight(weeklyQty(f, fam).g)}${t("perWeek")}</span>
         <button class="add-mini" type="button" data-idea="${f.id}" aria-label="${t("addList")}">+</button></li>`).join("")}</ul></details>`;
   }).join("");
+}
+// Retrouve la ligne de la liste qui correspond au produit scanné (mots du nom + rayon)
+const STOP = new Set(["de", "du", "des", "la", "le", "les", "au", "aux", "et", "en", "sans", "nature", "crue", "crues", "cru", "conserve", "seche", "seches", "egoutte", "surgele", "surgeles", "surgelees", "with", "and", "raw", "dry", "canned", "frozen", "plain"]);
+const words = (s) => norm(s || "").replace(/\([^)]*\)/g, " ").split(/[^a-z0-9]+/).filter((w) => w.length >= 3 && !STOP.has(w) && !/^\d+$/.test(w));
+function matchRow(p) {
+  if (excludedBy(p)) return null;
+  const hay = " " + norm([p.name, (p.cats || []).join(" ")].join(" ")).replace(/[^a-z0-9]+/g, " ") + " ";
+  let best = null, bestS = 0;
+  shopList.forEach((x, i) => {
+    if (x.done) return;
+    const ref = x.ref || { fr: x.name };
+    const ws = [...new Set([...words(ref.fr), ...words(ref.en)])];
+    const hits = ws.filter((w) => hay.includes(" " + w) || hay.includes(" " + w.replace(/s$/, ""))).length;
+    if (!hits) return;
+    const s = hits + (x.fam === p.fam ? 1.5 : 0);
+    if (s > bestS && (x.fam === p.fam || hits >= 2)) { bestS = s; best = i; }
+  });
+  return best;
 }
 function addShop(p, fam) {
   const ref = { foodId: p.id && p.id.startsWith("food") ? p.id : undefined, name: nm(p), fr: p.fr, en: p.en, n: p.n, packG: p.packG || 0, unit: p.unit };
@@ -1451,13 +1547,28 @@ const RECIPES = [
     sfr: "Trempe {P} dans l'œuf battu puis dans les flocons mixés avec paprika. Enfourne 20 min à 210 °C avec {C} en frites et {F}. Sers avec {V}.", sen: "Dip the {P} in beaten egg, then in blitzed oats with paprika. Bake 20 min at 210 °C with the {C} as fries and the {F}. Serve with the {V}." },
   { snack: true, fr: "Pancakes protéinés", en: "Protein pancakes", parts: [{ r: "P", o: [48, 12, 106] }, { r: "C", o: [25] }, { r: "X", o: [10], g: 55 }, { r: "R", o: [39, 37, 92] }],
     sfr: "Mixe {C}, {P} et {X} avec un peu d'eau. Cuis 3 petits pancakes à la poêle et garnis de {R}.", sen: "Blend the {C}, {P} and {X} with a little water. Cook 3 small pancakes and top with the {R}." },
+  // Petits-déjeuners
+  { kinds: ["breakfast"], fr: "Porridge protéiné", en: "Protein porridge", parts: [{ r: "P", o: [48, 12, 14, 106] }, { r: "C", o: [25] }, { r: "X", o: [63, 64], g: 200 }, { r: "R", o: [37, 39, 92] }],
+    sfr: "Fais cuire {C} 3 min dans {X}, ajoute {P} hors du feu, puis {R}.", sen: "Cook the {C} for 3 min in the {X}, stir in the {P} off the heat, then top with the {R}." },
+  { kinds: ["breakfast"], fr: "Œufs brouillés, jambon et toasts", en: "Scrambled eggs, ham and toast", parts: [{ r: "P", o: [10, 11] }, { r: "C", o: [29, 73] }, { r: "X", o: [7, 53], g: 40 }, { r: "V", o: [80, 36], g: 80 }, { r: "F", o: [41, 94] }],
+    sfr: "Brouille {P} à feu doux dans {F} avec {X} en dés. Sers sur {C} grillé avec {V}.", sen: "Gently scramble the {P} in the {F} with the diced {X}. Serve on toasted {C} with the {V}." },
+  { kinds: ["breakfast"], fr: "Overnight oats aux fruits rouges", en: "Berry overnight oats", parts: [{ r: "P", o: [12, 13, 14, 16] }, { r: "C", o: [25] }, { r: "X", o: [97], g: 10 }, { r: "R", o: [39, 89, 92] }],
+    sfr: "La veille, mélange {C}, {P}, {X} et un peu d'eau ou de lait. Le matin, ajoute {R}.", sen: "The night before, mix the {C}, {P}, {X} and a splash of water or milk. In the morning, add the {R}." },
+  { kinds: ["breakfast"], fr: "Tartines avocat et œufs", en: "Avocado and egg toast", parts: [{ r: "P", o: [10] }, { r: "C", o: [29, 73] }, { r: "X", o: [44], g: 50 }, { r: "V", o: [80], g: 60 }],
+    sfr: "Fais cuire {P} au plat ou mollets. Écrase {X} sur {C} grillé, ajoute {P} et {V}.", sen: "Fry or soft-boil the {P}. Mash the {X} on toasted {C}, top with the {P} and {V}." },
+  { kinds: ["breakfast"], fr: "Muffins œufs-jambon", en: "Egg and ham muffins", parts: [{ r: "P", o: [10, 11] }, { r: "X", o: [7, 53], g: 50 }, { r: "V", o: [35, 36, 80], g: 80 }, { r: "X", o: [68, 17], g: 20 }, { r: "C", o: [29, 73] }],
+    sfr: "Bats {P}, ajoute {X} en dés et {V}. Verse dans des moules et enfourne 15 min à 190 °C. Sers avec {C}.", sen: "Whisk the {P}, add the diced {X} and {V}. Pour into muffin tins and bake 15 min at 190 °C. Serve with the {C}." },
 ];
+// Collations qui font aussi un bon petit-déjeuner
+for (const i of [26, 27, 28, 30, 32, 39]) RECIPES[i].kinds = ["snack", "breakfast"];
+RECIPES.forEach((r) => { r.kinds = r.kinds || [r.snack ? "snack" : "meal"]; });
 // Style et temps de chaque recette, dans l'ordre de RECIPES : h healthy, g gourmand, q rapide, b batch cooking, w saveurs du monde
 const RMETA = [["hbw", 20], ["gb", 25], ["gbw", 30], ["gq", 15], ["hb", 40], ["g", 35], ["bw", 30], ["hqb", 15], ["qw", 15], ["gq", 15],
   ["g", 20], ["g", 30], ["hw", 35], ["hb", 30], ["g", 30], ["hq", 20], ["hqb", 15], ["gb", 45], ["gqw", 15], ["q", 20],
   ["hb", 30], ["gq", 15], ["h", 30], ["qw", 15], ["hqw", 15], ["hb", 30],
   ["hq", 2], ["q", 2], ["q", 5], ["h", 10], ["hq", 2], ["q", 5], ["gq", 2], ["hq", 5],
-  ["gq", 15], ["gq", 10], ["gb", 35], ["gqw", 20], ["g", 30], ["gq", 10]];
+  ["gq", 15], ["gq", 10], ["gb", 35], ["gqw", 20], ["g", 30], ["gq", 10],
+  ["hq", 5], ["gq", 10], ["hb", 5], ["hq", 10], ["hb", 20]];
 RECIPES.forEach((r, i) => { r.tags = (RMETA[i] || [""])[0].split(""); r.min = (RMETA[i] || [0, 0])[1]; });
 RECIPES.forEach((r, i) => { r.id = "r" + i; });
 const ROLE_DEFAULT_G = { V: 100, R: 100 };
@@ -1488,17 +1599,16 @@ function pickParts(tpl, keep = []) {
 }
 function recipeValid(tpl) { return tpl.parts.every((p) => p.r === "X" || partChoices(p).length); }
 function recipeLikes(tpl) { return tpl.parts.reduce((a, p) => a + (p.o.some((i) => pref(FOODS[i]) === 1) ? 1 : 0), 0); }
-function poolFor(slotT) {
-  const snack = slotT.kcal < 450;
+function poolFor(type) {
   // Les recettes végétariennes ne sortent pour un mangeur de viande que s'il aime leur protéine
   const vegDiet = ["veg", "vegan"].includes(S.diet.type);
   const styles = store.get("recipeStyles", []);
-  return RECIPES.filter((r) => !!r.snack === snack && recipeValid(r) &&
+  return RECIPES.filter((r) => r.kinds.includes(type) && recipeValid(r) &&
     (!styles.length || styles.some((st) => r.tags.includes(st))) &&
     (!r.veg || vegDiet || r.parts[0].o.some((i) => pref(FOODS[i]) === 1)));
 }
-function drawRecipes(n, slotT, avoid = []) {
-  const pool = poolFor(slotT);
+function drawRecipes(n, type, avoid = []) {
+  const pool = poolFor(type);
   const out = [], used = new Set(avoid);
   for (let k = 0; k < n; k++) {
     let cand = pool.filter((r) => !used.has(r.id));
@@ -1536,52 +1646,79 @@ function buildRecipe(rec, slotT) {
   return { tpl, items, tot, steps };
 }
 let recipeEdit = null;
-function renderRecipes() {
-  const R = store.get("recipes", null);
-  const list = slotList();
-  const target = list.find((s) => s.id === recipesSlot()) || list[0];
-  $("recN").textContent = recipeN();
-  $("recSlots").innerHTML = list.map((s) => `<button class="chip" type="button" data-rslot="${s.id}" aria-pressed="${s.id === target.id}">${esc(s.name)} · ${esc(s.sub)}</button>`).join("");
-  const styles = store.get("recipeStyles", []);
-  $("recStyles").innerHTML = `<button class="chip" type="button" data-rstyle="" aria-pressed="${!styles.length}">${t("styleAll")}</button>` +
-    Object.entries(t("styles")).map(([k, l]) => `<button class="chip" type="button" data-rstyle="${k}" aria-pressed="${styles.includes(k)}">${l}</button>`).join("");
-  $("recGo").textContent = t("recGo", recipeN());
-  const box = $("recList");
-  if (!R || !R.items.length) { box.innerHTML = `<div class="card"><p class="empty"><b>${t(R ? "recNoneT" : "recEmptyT")}</b>${t(R ? "recNoneD" : "recEmptyD")}</p></div>`; $("recShop").hidden = true; return; }
-  const slotT = (list.find((s) => s.id === R.slot) || target).t;
-  box.innerHTML = R.items.map((rec, idx) => {
-    const { tpl, items, tot, steps } = buildRecipe(rec, slotT);
-    const editing = recipeEdit === idx;
-    return `<article class="card recipe">
-      <div class="rec-head"><span class="rec-n">${idx + 1}</span><h3>${esc(tpl[S.lang])}</h3></div>
+const RTYPES = ["breakfast", "meal", "snack"];
+const recipeCounts = () => store.get("recipeCounts", null) ||
+  Object.fromEntries(RTYPES.map((k) => [k, k === "meal" ? Math.max(1, S.slots.filter((s) => s.type === k).length) : S.slots.filter((s) => s.type === k).length]));
+const countTotal = () => Object.values(recipeCounts()).reduce((a, b) => a + b, 0);
+// Anciennes versions : une seule liste de recettes pour un créneau → on repart de zéro
+function getRecipes() { const R = store.get("recipes", null); return R && R.groups ? R : null; }
+function recipeCard(rec, gi, idx, n, slotT) {
+  const { tpl, items, tot, steps } = buildRecipe(rec, slotT);
+  const editing = recipeEdit === gi + ":" + idx;
+  return `<article class="card recipe">
+      <div class="rec-head"><span class="rec-n">${n}</span><h3>${esc(tpl[S.lang])}</h3></div>
       <div class="rec-tags"><span class="rec-time">${tpl.min} min</span>${tpl.tags.map((k) => `<span class="rec-tag t-${k}">${t("styles")[k]}</span>`).join("")}</div>
       <div class="rec-macros"><span><b>${r0(tot.kcal)}</b> kcal</span><span style="color:var(--p)"><b>${r0(tot.p)}</b> g P</span><span style="color:var(--c)"><b>${r0(tot.c)}</b> g ${S.lang === "fr" ? "G" : "C"}</span><span style="color:var(--f)"><b>${r0(tot.f)}</b> g ${S.lang === "fr" ? "L" : "F"}</span></div>
       <ul class="rec-ing">${items.filter((it) => it.g > 0 || editing).map((it) => {
         const ch = partChoices(tpl.parts[it.part]);
         const u = it.unit && it.g > 0 ? ` <span class="note">${fr(it.g / it.unit.g)} ${unitName(it.unit, it.g / it.unit.g > 1)}</span>` : "";
         const name = editing && ch.length > 1
-          ? `<select data-rec="${idx}" data-part="${it.part}" aria-label="${t("swap")}">${ch.map((f) => `<option value="${f.id}" ${f.id === it.food.id ? "selected" : ""}>${esc(f[S.lang])}${pref(f) === 1 ? " ♥" : ""}</option>`).join("")}</select>`
+          ? `<select data-g="${gi}" data-rec="${idx}" data-part="${it.part}" aria-label="${t("swap")}">${ch.map((f) => `<option value="${f.id}" ${f.id === it.food.id ? "selected" : ""}>${esc(f[S.lang])}${pref(f) === 1 ? " ♥" : ""}</option>`).join("")}</select>`
           : `<span class="name" style="font-size:15px">${esc(it.food[S.lang])}${pref(it.food) === 1 ? '<span class="heart">♥</span>' : ""}</span>`;
         return `<li>${badge(it.food)}<span class="info">${name}</span><span class="rec-g">${it.g} g${u}</span></li>`;
       }).join("")}</ul>
       <p class="rec-steps">${esc(steps)}</p>
       <div class="row rec-actions">
-        <button class="btn secondary small" type="button" data-rchange="${idx}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>${t("change")}</button>
-        <button class="btn secondary small" type="button" data-redit="${idx}" aria-pressed="${editing}">${editing ? t("done") : t("modify")}</button>
-        <button class="btn small" type="button" data-rcook="${idx}">${t("cook")}</button>
+        <button class="btn secondary small" type="button" data-g="${gi}" data-rchange="${idx}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>${t("change")}</button>
+        <button class="btn secondary small" type="button" data-g="${gi}" data-redit="${idx}" aria-pressed="${editing}">${editing ? t("done") : t("modify")}</button>
+        <button class="btn small" type="button" data-g="${gi}" data-rcook="${idx}">${t("cook")}</button>
       </div>
     </article>`;
-  }).join("");
+}
+// Toutes les recettes réunies : quantité totale par produit (additionnée si plusieurs recettes l'utilisent)
+function recipeTotals(R) {
+  const sum = new Map();
+  for (const G of R.groups) {
+    const slotT = typeTarget(G.type);
+    for (const rec of G.items) for (const it of buildRecipe(rec, slotT).items) {
+      if (!(it.g > 0)) continue;
+      const x = sum.get(it.food.id) || { food: it.food, g: 0, k: 0 };
+      x.g += it.g; x.k++; sum.set(it.food.id, x);
+    }
+  }
+  return [...sum.values()].sort((a, b) => FAM_ORDER.indexOf(a.food.fam) - FAM_ORDER.indexOf(b.food.fam) || b.g - a.g);
+}
+const FAM_ORDER = ["viandes", "oeufs", "laitiers", "fromages", "feculents", "legumes", "fruits", "graisses", "sauces", "poudre", "extras"];
+function renderRecipes() {
+  const R = getRecipes(), counts = recipeCounts();
+  $("recTypes").innerHTML = RTYPES.map((k) => `<div class="stepper"><p>${t("mtypes")[k]}</p>
+      <button type="button" data-rtype="${k}" data-d="-1" aria-label="−">−</button><output>${counts[k]}</output><button type="button" data-rtype="${k}" data-d="1" aria-label="+">+</button></div>`).join("");
+  const styles = store.get("recipeStyles", []);
+  $("recStyles").innerHTML = `<button class="chip" type="button" data-rstyle="" aria-pressed="${!styles.length}">${t("styleAll")}</button>` +
+    Object.entries(t("styles")).map(([k, l]) => `<button class="chip" type="button" data-rstyle="${k}" aria-pressed="${styles.includes(k)}">${l}</button>`).join("");
+  $("recGo").textContent = t("recGo", countTotal());
+  $("recGo").disabled = !countTotal();
+  const box = $("recList");
+  const nRec = R ? R.groups.reduce((a, G) => a + G.items.length, 0) : 0;
+  if (!nRec) {
+    box.innerHTML = `<div class="card"><p class="empty"><b>${t(R ? "recNoneT" : "recEmptyT")}</b>${t(R ? "recNoneD" : "recEmptyD")}</p></div>`;
+    $("recShop").hidden = true; $("recSum").hidden = true; return;
+  }
+  let n = 0;
+  box.innerHTML = R.groups.map((G, gi) => !G.items.length ? "" : `<div class="rec-group">
+      <h2 class="step-title">${t("mtypes")[G.type]}<span class="hint">${G.items.length}</span></h2>
+      ${G.items.map((rec, idx) => recipeCard(rec, gi, idx, ++n, typeTarget(G.type))).join("")}</div>`).join("");
+  const tot = recipeTotals(R);
+  $("recSum").hidden = false;
+  $("recSum").innerHTML = `<h2 class="step-title">${t("recSumT", nRec)}</h2><p class="caption">${t("recSumD")}</p>
+    <div class="card rec-sum"><ul>${tot.map((x) => `<li>${badge(x.food)}<span class="info"><span class="name" style="font-size:15px">${esc(x.food[S.lang])}</span>${x.k > 1 ? `<span class="note">${t("inRecipes", x.k)}</span>` : ""}</span><span class="q">${fmtWeight(x.g)}</span></li>`).join("")}</ul></div>`;
   $("recShop").hidden = false;
   store.set("recipes", R);
 }
-const recipeN = () => store.get("recipeN", 2);
-const recipesSlot = () => store.get("recipeSlot", null) || [...slotList()].sort((a, b) => b.t.kcal - a.t.kcal)[0].id;
 function newRecipes() {
-  const slotIdR = recipesSlot();
-  const s = slotList().find((x) => x.id === slotIdR) || slotList()[0];
+  const counts = recipeCounts();
   recipeEdit = null;
-  store.set("recipes", { slot: s.id, items: drawRecipes(recipeN(), s.t) });
+  store.set("recipes", { groups: RTYPES.filter((k) => counts[k] > 0).map((k) => ({ type: k, items: drawRecipes(counts[k], k) })) });
   renderRecipes();
 }
 
@@ -1631,8 +1768,7 @@ function renderCalc() {
 }
 function renderSlotEditor() {
   $("slotRows").innerHTML = S.slots.map((s, i) => `<div class="slotrow">
-      <input data-slot="${i}" data-k="time" value="${esc(s.time)}" aria-label="${t("mealTime")}">
-      <input data-slot="${i}" data-k="name" value="${esc(s.name)}" aria-label="${t("mealName")}" style="font-family:var(--font-body)">
+      <select data-slot="${i}" data-k="type" aria-label="${t("mealTime")}">${Object.entries(t("mtypes")).map(([k, l]) => `<option value="${k}" ${k === s.type ? "selected" : ""}>${l}</option>`).join("")}</select>
       <input data-slot="${i}" data-k="pk" inputmode="numeric" value="${s.pk}" aria-label="% kcal">
       <input data-slot="${i}" data-k="pp" inputmode="numeric" value="${s.pp}" aria-label="% prot">
       <button class="icon-btn" type="button" data-slotdel="${i}" aria-label="${t("removeMeal")}" ${S.slots.length < 2 ? "disabled" : ""}>${X_ICON}</button>
@@ -1644,7 +1780,7 @@ function renderSlotPreview() {
   $("slotWarn").hidden = sk === 100 && sp === 100;
   $("slotWarn").textContent = t("sumWarn", sk, sp);
   $("slotPreview").innerHTML = slotList().map((s) =>
-    `<div class="line"><span>${esc(s.name)} · ${esc(s.sub)}</span><b>${s.t.kcal} kcal · P ${s.t.p} · ${S.lang === "fr" ? "G" : "C"} ${s.t.c} · ${S.lang === "fr" ? "L" : "F"} ${s.t.f}</b></div>`).join("");
+    `<div class="line"><span>${esc(slotLabel(s))}</span><b>${s.t.kcal} kcal · P ${s.t.p} · ${S.lang === "fr" ? "G" : "C"} ${s.t.c} · ${S.lang === "fr" ? "L" : "F"} ${s.t.f}</b></div>`).join("");
 }
 const THUMB_UP = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 11v9H4v-9h3zM7 11l4-8a2 2 0 0 1 2 2v4h5.5a2 2 0 0 1 2 2.3l-1.3 7A2 2 0 0 1 17.2 20H7"/></svg>`;
 const THUMB_DOWN = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="transform:rotate(180deg)"><path d="M7 11v9H4v-9h3zM7 11l4-8a2 2 0 0 1 2 2v4h5.5a2 2 0 0 1 2 2.3l-1.3 7A2 2 0 0 1 17.2 20H7"/></svg>`;
@@ -1736,7 +1872,7 @@ async function lookup(code, where) {
     const item = await fetchProduct(code);
     if (item.missing) return showErr(err, item.name ? t("noValues", item.name) : t("notInOFF"));
     if (where === "meal") { addToCart(item); $("mealCode").value = ""; }
-    else { shopItem = item; renderShopResult(); $("shopCode").value = ""; $("shopResult").scrollIntoView({ behavior: "smooth", block: "start" }); }
+    else { shopItem = item; shopItem.match = matchRow(item); renderShopResult(); $("shopCode").value = ""; $("shopResult").scrollIntoView({ behavior: "smooth", block: "start" }); }
   } catch {
     showErr(err, t("offline"));
   }
@@ -1844,6 +1980,24 @@ $("shopResult").addEventListener("click", (e) => {
   }
   if (e.target.closest("#shopAdd")) { addShop(shopItem, shopItem.fam); shopItem = null; renderShopResult(); return; }
   if (e.target.closest("#shopCancel")) { shopItem = null; renderShopResult(); }
+  const tk = e.target.closest("[data-take]");
+  if (tk) { const o = tk.parentElement.querySelector("output"); shopItem.take = Math.max(1, +o.textContent + +tk.dataset.take); renderShopResult(); return; }
+  if (e.target.closest("#shopTake")) {
+    const row = shopList[shopItem.match]; if (!row) return;
+    const g = shopItem.packG ? +$("shopResult").querySelector(".stepper output").textContent * shopItem.packG : num($("takeG").value) || 0;
+    row.got = (row.got || 0) + g;
+    if (shopItem.packG && row.ref) row.ref.packG = shopItem.packG;
+    const need = needOf(row), name = row.ref ? nm(row.ref) : row.name;
+    row.done = row.got >= need * 0.95;
+    renderShopList();
+    flash("shopToast", row.done ? t("struck", name) : t("stillNeed", name, fmtWeight(need - row.got)));
+    shopItem = null; renderShopResult();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+});
+$("shopResult").addEventListener("change", (e) => {
+  if (e.target.id !== "shopMatch") return;
+  shopItem.match = e.target.value === "" ? null : +e.target.value; shopItem.take = undefined; renderShopResult();
 });
 $("shopList").addEventListener("change", (e) => {
   const i = e.target.dataset.done; if (i == null) return;
@@ -1860,9 +2014,12 @@ $("ideas").addEventListener("click", (e) => {
 });
 
 /* ================= Événements : Recettes ================= */
-$("recMinus").addEventListener("click", () => { store.set("recipeN", Math.max(1, recipeN() - 1)); renderRecipes(); });
-$("recPlus").addEventListener("click", () => { store.set("recipeN", Math.min(14, recipeN() + 1)); renderRecipes(); });
-$("recSlots").addEventListener("click", (e) => { const b = e.target.closest("[data-rslot]"); if (!b) return; store.set("recipeSlot", b.dataset.rslot); renderRecipes(); });
+$("recTypes").addEventListener("click", (e) => {
+  const b = e.target.closest("[data-rtype]"); if (!b) return;
+  const c = recipeCounts();
+  c[b.dataset.rtype] = Math.min(14, Math.max(0, c[b.dataset.rtype] + +b.dataset.d));
+  store.set("recipeCounts", c); renderRecipes();
+});
 $("recGo").addEventListener("click", newRecipes);
 $("recStyles").addEventListener("click", (e) => {
   const b = e.target.closest("[data-rstyle]"); if (!b) return;
@@ -1872,46 +2029,42 @@ $("recStyles").addEventListener("click", (e) => {
   store.set("recipeStyles", styles); renderRecipes();
 });
 $("recList").addEventListener("click", (e) => {
-  const R = store.get("recipes", null); if (!R) return;
-  const slotT = (slotList().find((s) => s.id === R.slot) || slotList()[0]).t;
-  const ch = e.target.closest("[data-rchange]");
-  if (ch) {
-    const i = +ch.dataset.rchange;
-    const fresh = drawRecipes(1, slotT, R.items.map((x) => x.tpl))[0];
-    if (fresh) R.items[i] = fresh;
+  const R = getRecipes(); if (!R) return;
+  const b = e.target.closest("[data-g]"); if (!b) return;
+  const G = R.groups[+b.dataset.g], slotT = typeTarget(G.type);
+  if (b.dataset.rchange != null) {
+    const i = +b.dataset.rchange;
+    const fresh = drawRecipes(1, G.type, G.items.map((x) => x.tpl))[0];
+    if (fresh) G.items[i] = fresh;
     store.set("recipes", R); recipeEdit = null; renderRecipes(); return;
   }
-  const ed = e.target.closest("[data-redit]");
-  if (ed) { const i = +ed.dataset.redit; recipeEdit = recipeEdit === i ? null : i; renderRecipes(); return; }
-  const ck = e.target.closest("[data-rcook]");
-  if (ck) {
-    const { items } = buildRecipe(R.items[+ck.dataset.rcook], slotT);
+  if (b.dataset.redit != null) { const key = b.dataset.g + ":" + b.dataset.redit; recipeEdit = recipeEdit === key ? null : key; renderRecipes(); return; }
+  if (b.dataset.rcook != null) {
+    const { items } = buildRecipe(G.items[+b.dataset.rcook], slotT);
     cart = items.filter((it) => it.g > 0).map((it) => ({ foodId: it.food.id, name: it.food[S.lang], fr: it.food.fr, en: it.food.en, fam: it.food.fam, tags: it.food.tags, nova: it.food.nova, unit: it.food.unit, n: { ...it.food.n }, fixed: it.g }));
-    slotId = R.slot; doses = solve(cart, remaining());
+    const same = slotList().filter((s) => s.type === G.type);
+    slotId = (same.find((s) => s.id === guessSlot()) || same[0] || slot()).id;
+    doses = solve(cart, remaining());
     tab = "meal"; renderSlots(); renderCart(); renderResult(); renderTabs(); window.scrollTo({ top: 0 });
   }
 });
 $("recList").addEventListener("change", (e) => {
   const sel = e.target.closest("select[data-rec]"); if (!sel) return;
-  const R = store.get("recipes", null);
-  R.items[+sel.dataset.rec].picks[+sel.dataset.part] = sel.value;
+  const R = getRecipes();
+  R.groups[+sel.dataset.g].items[+sel.dataset.rec].picks[+sel.dataset.part] = sel.value;
   store.set("recipes", R); renderRecipes();
 });
+// Envoie le total des recettes à la liste de courses (remplace l'envoi précédent)
 $("recShop").addEventListener("click", () => {
-  const R = store.get("recipes", null); if (!R) return;
-  const slotT = (slotList().find((s) => s.id === R.slot) || slotList()[0]).t;
-  const sum = new Map();
-  for (const rec of R.items) for (const it of buildRecipe(rec, slotT).items) if (it.g > 0) sum.set(it.food.id, (sum.get(it.food.id) || 0) + it.g);
-  for (const [id, g] of sum) {
-    const f = FOODS.find((x) => x.id === id);
-    const ref = { foodId: f.id, name: f[S.lang], fr: f.fr, en: f.en, n: f.n, packG: 0, unit: f.unit };
-    const i = shopList.findIndex((x) => x.ref && x.ref.foodId === id);
-    if (i >= 0 && shopList[i].fixedG != null) shopList[i].fixedG += g;
-    else if (i >= 0) shopList[i] = { fam: f.fam, ref, fixedG: g, done: false };
-    else shopList.push({ fam: f.fam, ref, fixedG: g, done: false });
+  const R = getRecipes(); if (!R) return;
+  const tot = recipeTotals(R);
+  shopList = shopList.filter((x) => !x.fromRec && !(x.ref && tot.some((y) => y.food.id === x.ref.foodId)));
+  for (const { food: f, g } of tot) {
+    shopList.push({ fam: f.fam, ref: { foodId: f.id, name: f[S.lang], fr: f.fr, en: f.en, n: f.n, packG: 0, unit: f.unit }, fixedG: r0(g), got: 0, done: false, fromRec: true });
   }
   renderShopList();
-  flash("recToast", t("recAdded", sum.size));
+  tab = "shop"; renderTabs(); window.scrollTo({ top: 0 });
+  flash("shopToast", t("recSent", tot.length));
 });
 
 /* ================= Événements : Réglages ================= */
@@ -1949,13 +2102,14 @@ $("slotRows").addEventListener("input", (e) => {
   const k = e.target.dataset.k;
   S.slots[+i][k] = k === "pk" || k === "pp" ? (num(e.target.value) || 0) : e.target.value;
   saveSettings(); renderSlotPreview(); renderSlots(); renderCalc();
+  if (k === "type") renderSlotEditor();
 });
 $("slotRows").addEventListener("click", (e) => {
   const b = e.target.closest("[data-slotdel]"); if (!b || S.slots.length < 2) return;
   S.slots.splice(+b.dataset.slotdel, 1); saveSettings(); renderSlotEditor(); renderSlots(); renderCalc();
 });
 $("addSlot").addEventListener("click", () => {
-  S.slots.push({ id: "s" + Date.now(), time: "10h", name: S.lang === "fr" ? "Collation" : "Snack", pk: 10, pp: 10 });
+  S.slots.push({ id: "s" + Date.now(), type: "snack", pk: 10, pp: 10 });
   saveSettings(); renderSlotEditor(); renderSlots(); renderCalc();
 });
 function onDietChanged() { saveSettings(); renderSettings(); renderQuick(); renderIdeas(); renderCart(); renderShopResult(); }
