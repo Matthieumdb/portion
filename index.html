@@ -54,6 +54,25 @@
 button, a, input, select, label, .chip, .stepper { touch-action: manipulation; }
 @supports (-webkit-touch-callout: none) { input, select, textarea { font-size: 16px !important; } }
 [hidden] { display: none !important; }
+.w-row { display: flex; gap: 8px; align-items: center; }
+.w-row input { flex: 1; text-align: center; font: 600 20px var(--font-display); }
+.w-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; text-align: center; }
+.w-stats div { background: var(--bg); border-radius: 14px; padding: 8px 4px; }
+.w-stats b { display: block; font: 600 19px var(--font-display); }
+.w-stats small { font: 700 11px var(--font-body); color: var(--muted); text-transform: uppercase; }
+.spark { width: 100%; height: 70px; display: block; }
+.notice { background: var(--accent-soft); border-radius: 14px; padding: 10px 12px; font-size: 14px; margin: 0; }
+.plan-day { display: flex; flex-direction: column; gap: 6px; padding: 10px 0; border-top: 1px dashed var(--line); }
+.plan-day:first-child { border-top: 0; }
+.plan-day h3 { margin: 0; font: 600 17px var(--font-display); }
+.plan-day.today h3 { color: var(--accent); }
+.plan-cell { display: grid; grid-template-columns: 96px 1fr; gap: 8px; align-items: center; font-size: 14px; }
+.plan-cell span { color: var(--muted); font-weight: 700; font-size: 13px; }
+.plan-cell select { width: 100%; padding: 7px 8px; }
+.fav-btn[aria-pressed="true"] { color: var(--accent); }
+.fav-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.price-tot { display: flex; justify-content: space-between; align-items: baseline; background: var(--bg); border-radius: 14px; padding: 10px 12px; font-size: 14px; }
+.price-tot b { font: 600 20px var(--font-display); }
 html, body { margin: 0; }
 body {
   background: var(--bg); color: var(--ink); font: 600 16px/1.45 var(--font-body);
@@ -376,6 +395,17 @@ input[type="search"]::-webkit-search-cancel-button { cursor: pointer; }
       <div class="card" id="totals"></div>
     </section>
 
+    <section aria-labelledby="wh">
+      <h2 class="step-title" id="wh" data-i18n="wTitle"></h2>
+      <div class="card" id="weightCard">
+        <div class="w-row">
+          <input id="wInput" inputmode="decimal" aria-label="kg">
+          <button class="btn small" type="button" id="wSave" style="flex:0 0 auto" data-i18n="wSave"></button>
+        </div>
+        <div id="wBody"></div>
+      </div>
+    </section>
+
     <section>
       <div class="card">
         <details>
@@ -407,6 +437,7 @@ input[type="search"]::-webkit-search-cancel-button { cursor: pointer; }
     <section aria-labelledby="listh">
       <h2 class="step-title" id="listh"><span data-i18n="weekList"></span><span class="hint" id="shopCount"></span></h2>
       <div class="card">
+        <div class="price-tot" id="priceTot" hidden></div>
         <ul class="shop" id="shopList"></ul>
         <button class="btn secondary small" id="clearShop" type="button" hidden style="align-self:flex-start" data-i18n="clearList"></button>
       </div>
@@ -425,6 +456,7 @@ input[type="search"]::-webkit-search-cancel-button { cursor: pointer; }
       <div class="card">
         <p class="score-label" style="font-size:18px" data-i18n="recHowMany"></p>
         <div class="rtypes" id="recTypes"></div>
+        <div class="field" id="favBox" hidden><span data-i18n="favs"></span><div class="fav-chips" id="favChips"></div></div>
         <div class="field"><span data-i18n="recStyle"></span><div class="seg2" id="recStyles"></div></div>
         <button class="btn" type="button" id="recGo"></button>
         <p class="caption" data-i18n="recHint"></p>
@@ -432,6 +464,7 @@ input[type="search"]::-webkit-search-cancel-button { cursor: pointer; }
     </section>
     <section id="recList"></section>
     <section id="recSum" hidden></section>
+    <section id="recPlan" hidden></section>
     <button class="btn" type="button" id="recShop" hidden data-i18n="recToShop"></button>
     <p class="toast" id="recToast" hidden></p>
   </div>
@@ -501,6 +534,8 @@ input[type="search"]::-webkit-search-cancel-button { cursor: pointer; }
           <div class="seg2" id="sLang"><button class="chip" type="button" data-v="fr">Français</button><button class="chip" type="button" data-v="en">English</button></div></div>
         <div class="field"><span data-i18n="units"></span>
           <div class="seg2" id="sUnits"><button class="chip" type="button" data-v="metric" data-i18n="metric"></button><button class="chip" type="button" data-v="imperial" data-i18n="imperial"></button></div></div>
+        <div class="field"><span data-i18n="currency"></span>
+          <div class="seg2" id="sCur"><button class="chip" type="button" data-v="€">€</button><button class="chip" type="button" data-v="$">$</button><button class="chip" type="button" data-v="£">£</button></div></div>
         <div class="field"><span data-i18n="theme"></span>
           <div class="seg2" id="sTheme"><button class="chip" type="button" data-v="auto" data-i18n="themeAuto"></button><button class="chip" type="button" data-v="light" data-i18n="themeLight"></button><button class="chip" type="button" data-v="dark" data-i18n="themeDark"></button></div></div>
       </div>
@@ -510,8 +545,11 @@ input[type="search"]::-webkit-search-cancel-button { cursor: pointer; }
       <h2 class="step-title" data-i18n="setData"></h2>
       <div class="card">
         <p class="caption" data-i18n="setDataD"></p>
+        <p class="caption" id="backupInfo"></p>
         <div class="row" style="flex-wrap:wrap">
           <button class="btn secondary small" type="button" id="exportBtn" data-i18n="export"></button>
+          <button class="btn secondary small" type="button" id="importBtn" data-i18n="import"></button>
+          <input type="file" id="importFile" accept="application/json,.json" hidden>
           <button class="btn secondary small" type="button" id="clearLogBtn" data-i18n="clearToday"></button>
           <button class="btn small danger" type="button" id="resetBtn" data-i18n="resetAll"></button>
         </div>
@@ -628,7 +666,22 @@ const STR = {
     youDislike: "Tu n'aimes pas cet aliment",
     setDisplay: "Affichage", language: "Langue", units: "Unités", metric: "Métrique (kg, cm)", imperial: "Impérial (lb, in)",
     theme: "Thème", themeAuto: "Auto", themeLight: "Clair", themeDark: "Sombre",
-    setData: "Mes données", setDataD: "Tout reste sur ton téléphone. Tu peux l'exporter ou repartir de zéro.",
+    wTitle: "Mon poids", wSave: "Noter", wPh: (u) => `Poids du jour (${u})`, wToday: "Aujourd'hui", wAvg: "Moy. 7 jours", wTrend: "Sur 7 jours",
+    wEmpty: "Pèse-toi le matin à jeun, après les toilettes. Note-le ici chaque jour : je fais la moyenne sur 7 jours pour lisser l'eau et le sel.",
+    wNeed: (n) => `Encore ${n} pesée${n > 1 ? "s" : ""} et je pourrai juger ta tendance.`,
+    wOnTrack: "Tu es dans le bon rythme, on ne touche à rien.", wWait: (d) => `Prochain bilan dans ${d} jour${d > 1 ? "s" : ""}.`,
+    adjDown: (k) => `Ta moyenne stagne : j'ai baissé tes calories de ${k} kcal par jour.`, adjUp: (k) => `Tu perds trop vite : j'ai remonté tes calories de ${k} kcal par jour pour protéger tes muscles.`,
+    adjUpGain: (k) => `Ta prise est trop lente : +${k} kcal par jour.`, adjDownGain: (k) => `Ta prise est trop rapide : −${Math.abs(k)} kcal par jour.`,
+    adjFloor: "Ta moyenne stagne, mais je ne descends pas plus bas en calories : bouge un peu plus (pas, marche inclinée).",
+    adjLine: "Ajustement auto (poids)", adjReset: "Remettre à 0",
+    favs: "Mes favoris", favAdd: "Ajouter aux favoris", favAdded: (n) => `${n} ajouté à ta sélection`,
+    planT: "Ma semaine", planD: "Tes portions réparties jour par jour. Touche un repas pour le changer.", planFree: "Libre", planToday: "Aujourd'hui", planTomorrow: "Demain",
+    planExtra: (n) => `${n} portion${n > 1 ? "s" : ""} en trop pour la semaine.`, planReset: "Répartir automatiquement",
+    days: ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"],
+    currency: "Devise", priceTot: "Estimation de la liste", priceLeft: (x) => `reste ≈ ${x}`, packPrice: "Prix du paquet (facultatif)",
+    import: "Importer", imported: "Sauvegarde restaurée", importErr: "Fichier non reconnu", backupNever: "Aucune sauvegarde pour l'instant : exporte de temps en temps (iCloud Drive, Fichiers).",
+    backupAgo: (d) => d === 0 ? "Dernière sauvegarde : aujourd'hui." : `Dernière sauvegarde : il y a ${d} jour${d > 1 ? "s" : ""}.`,
+    setData: "Mes données", setDataD: "Tout reste sur ton téléphone. Exporte une sauvegarde pour ne rien perdre, et importe-la sur un autre appareil.",
     export: "Exporter", clearToday: "Effacer aujourd'hui", resetAll: "Tout réinitialiser", confirm: "Sûr ? Touche encore",
     exported: "Fichier exporté", cleared: "Journal du jour effacé",
     families: {
@@ -726,7 +779,22 @@ const STR = {
     youDislike: "You dislike this food",
     setDisplay: "Display", language: "Language", units: "Units", metric: "Metric (kg, cm)", imperial: "Imperial (lb, in)",
     theme: "Theme", themeAuto: "Auto", themeLight: "Light", themeDark: "Dark",
-    setData: "My data", setDataD: "Everything stays on your phone. You can export it or start over.",
+    wTitle: "My weight", wSave: "Log", wPh: (u) => `Today's weight (${u})`, wToday: "Today", wAvg: "7-day avg", wTrend: "Over 7 days",
+    wEmpty: "Weigh yourself in the morning, before eating. Log it here every day: I average 7 days to smooth out water and salt.",
+    wNeed: (n) => `${n} more weigh-in${n > 1 ? "s" : ""} and I can judge your trend.`,
+    wOnTrack: "You're on pace, nothing to change.", wWait: (d) => `Next check-in in ${d} day${d > 1 ? "s" : ""}.`,
+    adjDown: (k) => `Your average has stalled: I lowered your calories by ${k} kcal a day.`, adjUp: (k) => `You're losing too fast: I raised your calories by ${k} kcal a day to protect muscle.`,
+    adjUpGain: (k) => `Gaining too slowly: +${k} kcal a day.`, adjDownGain: (k) => `Gaining too fast: −${Math.abs(k)} kcal a day.`,
+    adjFloor: "Your average has stalled, but I won't go lower on calories: move a bit more (steps, incline walking).",
+    adjLine: "Auto adjustment (weight)", adjReset: "Reset to 0",
+    favs: "My favorites", favAdd: "Add to favorites", favAdded: (n) => `${n} added to your selection`,
+    planT: "My week", planD: "Your servings spread day by day. Tap a meal to change it.", planFree: "Free", planToday: "Today", planTomorrow: "Tomorrow",
+    planExtra: (n) => `${n} extra serving${n > 1 ? "s" : ""} for the week.`, planReset: "Spread automatically",
+    days: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+    currency: "Currency", priceTot: "List estimate", priceLeft: (x) => `left ≈ ${x}`, packPrice: "Pack price (optional)",
+    import: "Import", imported: "Backup restored", importErr: "File not recognized", backupNever: "No backup yet: export now and then (iCloud Drive, Files).",
+    backupAgo: (d) => d === 0 ? "Last backup: today." : `Last backup: ${d} day${d > 1 ? "s" : ""} ago.`,
+    setData: "My data", setDataD: "Everything stays on your phone. Export a backup so you never lose it, and import it on another device.",
     export: "Export", clearToday: "Clear today", resetAll: "Reset everything", confirm: "Sure? Tap again",
     exported: "File exported", cleared: "Today's log cleared",
     families: {
@@ -909,6 +977,8 @@ S.profile = Object.assign(clone(DEFAULT_SETTINGS.profile), S.profile);
 // Ancien format du régime (cases à cocher) → type de régime
 if (S.diet && !S.diet.type) S.diet = { type: S.diet.veg ? "veg" : S.diet.pork ? "nopork" : "omni", seafood: S.diet.seafood ?? true, tuna: S.diet.tuna ?? true };
 S.diet = Object.assign(clone(DEFAULT_SETTINGS.diet), S.diet);
+S.adj = Object.assign({ kcal: 0 }, S.adj);
+S.currency = S.currency || "€";
 // Anciennes versions : créneaux à l'heure → type de repas
 S.slots = S.slots.map((s) => s.type ? s : { id: s.id, pk: s.pk, pp: s.pp, type: /collation|snack|go[uû]ter/i.test(s.name || "") ? "snack" : /petit|breakfast|matin/i.test(s.name || "") ? "breakfast" : "meal" });
 S.prefs = S.prefs || {};
@@ -939,7 +1009,7 @@ function computeTargets() {
   const p = S.profile;
   const bmr = 10 * p.weight + 6.25 * p.height - 5 * p.age + (p.sex === "f" ? -161 : 5);
   const tdee = bmr * ACT[p.act];
-  const kcal = Math.round((tdee + GOAL[p.goal]) / 50) * 50;
+  const kcal = Math.round((tdee + GOAL[p.goal] + (S.adj?.kcal || 0)) / 50) * 50;
   const prot = Math.round(p.protKg * p.weight);
   const fat = Math.round(p.fatKg * p.weight);
   const carbs = Math.max(0, Math.round((kcal - prot * 4 - fat * 9) / 4));
@@ -1007,6 +1077,74 @@ function remaining(id = slotId) {
   const e = eaten(s.id), r = {};
   for (const m of MACROS) r[m.k] = Math.max(0, s.t[m.k] - e[m.k]);
   return r;
+}
+
+
+/* ================= Suivi du poids =================
+   Une pesée par jour ; on compare la moyenne des 7 derniers jours à celle des 7 jours d'avant.
+   Une fois par semaine, si la tendance s'écarte de l'objectif, on corrige les calories de 100 kcal. */
+let weights = store.get("weights", {});
+const dayOff = (n) => { const d = new Date(); d.setDate(d.getDate() - n); return d.toLocaleDateString("fr-CA"); };
+function avgRange(from, to) {
+  const v = [];
+  for (let i = from; i <= to; i++) { const w = weights[dayOff(i)]; if (w) v.push(w); }
+  return { n: v.length, avg: v.length ? v.reduce((a, b) => a + b, 0) / v.length : null };
+}
+const wFmt = (kg) => isImp() ? `${fr(kg * 2.2046)} lb` : `${fr(kg)} kg`;
+function checkAdjust() {
+  if (S.manual.on || GOAL[S.profile.goal] === 0) return null;
+  if (S.adj.last && (new Date(dayKey()) - new Date(S.adj.last)) / 864e5 < 7) return null;
+  const now = avgRange(0, 6), prev = avgRange(7, 13);
+  if (now.n < 3 || prev.n < 3) return null;
+  const change = now.avg - prev.avg, exp = GOAL[S.profile.goal] * 7 / 7700;
+  S.profile.weight = r1(now.avg);
+  let step = 0, msg = "wOnTrack";
+  if (exp < 0) {
+    if (change > exp * 0.3) { step = -100; msg = "adjDown"; }
+    else if (change < exp * 1.6 && change < -0.01 * now.avg) { step = 100; msg = "adjUp"; }
+  } else {
+    if (change < exp * 0.3) { step = 100; msg = "adjUpGain"; }
+    else if (change > exp * 2) { step = -100; msg = "adjDownGain"; }
+  }
+  if (step < 0) {
+    const c = computeTargets();
+    if (c.kcal + step < Math.max(c.bmr, S.profile.sex === "f" ? 1200 : 1500)) { step = 0; msg = "adjFloor"; }
+  }
+  S.adj.kcal += step; S.adj.last = dayKey(); S.adj.msg = msg; S.adj.step = Math.abs(step);
+  saveSettings();
+  return msg;
+}
+function renderWeight() {
+  $("wInput").placeholder = t("wPh", isImp() ? "lb" : "kg");
+  const today = weights[dayKey()];
+  const now = avgRange(0, 6), prev = avgRange(7, 13);
+  const days = Object.keys(weights).sort();
+  if (!days.length) { $("wBody").innerHTML = `<p class="caption">${t("wEmpty")}</p>`; return; }
+  const trend = now.n >= 3 && prev.n >= 3 ? now.avg - prev.avg : null;
+  const good = trend == null ? "" : (GOAL[S.profile.goal] <= 0 ? trend <= 0 : trend >= 0) ? "var(--herb)" : "var(--warn)";
+  // Courbe des 30 derniers jours : points = pesées, trait = moyenne glissante sur 7 jours
+  const pts = [], avg = [];
+  for (let i = 29; i >= 0; i--) {
+    const w = weights[dayOff(i)]; if (w) pts.push([29 - i, w]);
+    let s = 0, n = 0; for (let j = i; j < i + 7; j++) { const x = weights[dayOff(j)]; if (x) { s += x; n++; } }
+    if (n) avg.push([29 - i, s / n]);
+  }
+  const all = pts.map((p) => p[1]).concat(avg.map((p) => p[1]));
+  const lo = Math.min(...all) - 0.3, hi = Math.max(...all) + 0.3;
+  const X = (i) => 4 + i * (292 / 29), Y = (v) => 64 - ((v - lo) / (hi - lo)) * 58;
+  const spark = pts.length > 1 ? `<svg class="spark" viewBox="0 0 300 70" preserveAspectRatio="none" aria-hidden="true">
+      <polyline fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" points="${avg.map((p) => `${X(p[0])},${Y(p[1])}`).join(" ")}"/>
+      ${pts.map((p) => `<circle cx="${X(p[0])}" cy="${Y(p[1])}" r="2.6" fill="var(--muted)" opacity=".55"/>`).join("")}</svg>` : "";
+  let note = "";
+  if (S.adj.msg && S.adj.last && (new Date(dayKey()) - new Date(S.adj.last)) / 864e5 < 7) note = t(S.adj.msg, S.adj.step);
+  else if (now.n < 3 || prev.n < 3) note = t("wNeed", Math.max(0, 3 - now.n) + Math.max(0, 3 - prev.n) || 1);
+  const wait = S.adj.last ? 7 - Math.round((new Date(dayKey()) - new Date(S.adj.last)) / 864e5) : 0;
+  $("wBody").innerHTML = `<div class="w-stats">
+      <div><b>${today ? wFmt(today) : "—"}</b><small>${t("wToday")}</small></div>
+      <div><b>${now.avg ? wFmt(now.avg) : "—"}</b><small>${t("wAvg")}</small></div>
+      <div><b style="color:${good}">${trend == null ? "—" : (trend > 0 ? "+" : "") + wFmt(trend)}</b><small>${t("wTrend")}</small></div></div>
+    ${spark}
+    ${note ? `<p class="notice">${esc(note)}${wait > 0 && wait < 7 ? " " + t("wWait", wait) : ""}</p>` : ""}`;
 }
 
 /* ================= Exclusions du régime ================= */
@@ -1337,6 +1475,7 @@ function renderShopResult() {
         ${p.packG ? `<button type="button" data-take="-1" aria-label="−">−</button><output>${take}</output><button type="button" data-take="1" aria-label="+">+</button>`
           : `<input id="takeG" inputmode="numeric" value="${take}" style="width:96px;text-align:center">`}
       </div>
+      ${p.packG ? `<label class="field"><span>${t("packPrice")}</span><input id="packPrice" inputmode="decimal" placeholder="${S.currency}" value="${row.ppk ? fr(row.ppk * p.packG / 1000) : ""}"></label>` : ""}
       <div class="row">
         <button class="btn secondary" type="button" id="shopCancel" style="flex:0 0 34%">${t("close")}</button>
         <button class="btn" type="button" id="shopTake">${t("putCart")}</button>
@@ -1378,10 +1517,25 @@ function renderShopResult() {
       </div>
     </div>`;
 }
+
+/* ================= Prix estimés (par kg, ordre de grandeur supermarché) ================= */
+const PRICE_FAM = { viandes: 12, oeufs: 4.5, laitiers: 4, fromages: 12, feculents: 2.5, legumes: 3, fruits: 3.5, graisses: 10, sauces: 5, poudre: 28, extras: 10 };
+const PRICE_FOOD = { 0: 13, 1: 12, 2: 9, 3: 13, 5: 25, 7: 16, 8: 14, 12: 4, 19: 2.5, 21: 1.8, 22: 2.2, 23: 1.5, 25: 2, 41: 9, 42: 12, 43: 18, 48: 30, 49: 22, 50: 25, 51: 25, 52: 11, 56: 14 };
+function pricePerKg(x) {
+  if (x.ppk) return x.ppk;
+  const id = x.ref?.foodId;
+  if (id && PRICE_FOOD[+id.slice(4)] != null) return PRICE_FOOD[+id.slice(4)];
+  return PRICE_FAM[x.fam] ?? 6;
+}
+const money = (v) => (S.lang === "fr" ? (v.toFixed(2).replace(".", ",") + " " + S.currency) : (S.currency + v.toFixed(2)));
 const needOf = (x) => x.fixedG ?? (x.ref ? weeklyQty(x.ref, x.fam).g : x.g);
 function renderShopList() {
   $("shopCount").textContent = shopList.length ? t("inCart", shopList.filter((x) => x.done).length, shopList.length) : "";
   $("clearShop").hidden = !shopList.length;
+  const tot = shopList.reduce((a, x) => a + pricePerKg(x) * needOf(x) / 1000, 0);
+  const left = shopList.reduce((a, x) => a + (x.done ? 0 : pricePerKg(x) * Math.max(0, needOf(x) - (x.got || 0)) / 1000), 0);
+  $("priceTot").hidden = !shopList.length;
+  $("priceTot").innerHTML = `<span>${t("priceTot")}<br><span class="note">${t("priceLeft", money(left))}</span></span><b>≈ ${money(tot)}</b>`;
   // Ce qui reste à prendre en haut, ce qui est rayé en bas
   const order = shopList.map((x, i) => i).sort((a, b) => shopList[a].done - shopList[b].done);
   $("shopList").innerHTML = shopList.length ? order.map((i) => {
@@ -1390,7 +1544,7 @@ function renderShopList() {
     const packs = x.fam === "extras" || !x.ref || x.done ? "" : packsText(got ? left : q, x.ref.packG);
     return `<li class="${x.done ? "done" : ""}">
       <input type="checkbox" data-done="${i}" ${x.done ? "checked" : ""} aria-label="✓">
-      <span class="info"><span class="name">${esc(x.ref ? nm(x.ref) : x.name)}</span><span class="note">${esc(famLabel(x.fam))}${packs ? " · " + esc(packs) : ""}${got && !x.done ? " · " + esc(fmtWeight(left)) + " " + t("leftToTake") : ""}</span></span>
+      <span class="info"><span class="name">${esc(x.ref ? nm(x.ref) : x.name)}</span><span class="note">${esc(famLabel(x.fam))} · ≈ ${money(pricePerKg(x) * q / 1000)}${packs ? " · " + esc(packs) : ""}${got && !x.done ? " · " + esc(fmtWeight(left)) + " " + t("leftToTake") : ""}</span></span>
       <span class="q">${x.fam === "extras" ? "≤ " : ""}${got && !x.done ? fmtWeight(got) + " / " : ""}${fmtWeight(q)}</span>
       <button class="icon-btn" type="button" data-shopdel="${i}" aria-label="${t("remove")}">${X_ICON}</button>
       ${got && !x.done ? `<span class="prog"><i style="width:${Math.min(100, got / q * 100)}%"></i></span>` : ""}</li>`;
@@ -1676,7 +1830,8 @@ function drawRecipes(n, type, avoid = []) {
     if (!cand.length) cand = pool;
     if (!cand.length) break;
     // Léger bonus aux recettes avec des aliments aimés, sans qu'elles écrasent les autres
-    const w = cand.map((r) => 1 + 0.25 * Math.min(recipeLikes(r), 3));
+    const favIds = new Set(store.get("recFavs", []).map((f) => f.tpl));
+    const w = cand.map((r) => 1 + 0.25 * Math.min(recipeLikes(r), 3) + (favIds.has(r.id) ? 1 : 0));
     let x = Math.random() * w.reduce((a, b) => a + b, 0), pick = cand[0];
     for (let i = 0; i < cand.length; i++) { x -= w[i]; if (x <= 0) { pick = cand[i]; break; } }
     used.add(pick.id); seen.add(pick.id);
@@ -1736,6 +1891,7 @@ function recipeCard(rec, gi, idx, n, slotT) {
       <div class="row rec-actions">
         <button class="btn secondary small" type="button" data-g="${gi}" data-rchange="${idx}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>${t("change")}</button>
         <button class="btn secondary small" type="button" data-g="${gi}" data-redit="${idx}" aria-pressed="${editing}">${editing ? t("done") : t("modify")}</button>
+        <button class="btn secondary small fav-btn" type="button" data-g="${gi}" data-rfav="${idx}" aria-pressed="${isFav(rec.tpl)}" aria-label="${t("favAdd")}" style="flex:0 0 auto">${isFav(rec.tpl) ? "★" : "☆"}</button>
         <button class="btn small" type="button" data-g="${gi}" data-rcook="${idx}">${t("cook")}</button>
       </div>
     </article>`;
@@ -1754,7 +1910,54 @@ function recipeTotals(R) {
   return [...sum.values()].sort((a, b) => FAM_ORDER.indexOf(a.food.fam) - FAM_ORDER.indexOf(b.food.fam) || b.g - a.g);
 }
 const FAM_ORDER = ["viandes", "oeufs", "laitiers", "fromages", "feculents", "legumes", "fruits", "graisses", "sauces", "poudre", "extras"];
+const favs = () => store.get("recFavs", []);
+const isFav = (tpl) => favs().some((f) => f.tpl === tpl);
+function renderFavs() {
+  const F = favs();
+  $("favBox").hidden = !F.length;
+  $("favChips").innerHTML = F.map((f, i) => { const r = RECIPES.find((x) => x.id === f.tpl); return r ? `<button class="chip" type="button" data-fav="${i}">★ ${esc(r[S.lang])}</button>` : ""; }).join("");
+}
+// Planning : les portions sont posées dans l'ordre sur les créneaux de la semaine ; l'utilisateur peut changer chaque case
+const recKey = (gi, idx) => gi + ":" + idx;
+function planCells(R) {
+  const over = store.get("planOver", {});
+  const start = new Date(); const cells = [];
+  const queues = {};
+  for (const [gi, G] of R.groups.entries()) {
+    // Alterner les recettes (A, B, A, B, A) plutôt que tout enchaîner
+    const left = G.items.map((r, idx) => ({ key: recKey(gi, idx), n: r.n || 1 }));
+    const q = [];
+    while (left.some((x) => x.n > 0)) for (const x of left) if (x.n > 0) { q.push(x.key); x.n--; }
+    queues[G.type] = (queues[G.type] || []).concat(q);
+  }
+  for (let d = 0; d < 7; d++) {
+    const date = new Date(start); date.setDate(start.getDate() + d);
+    const row = { d, date, cells: [] };
+    for (const s of slotList()) {
+      const id = d + "-" + s.id;
+      const auto = (queues[s.type] || []).shift() || "";
+      row.cells.push({ id, s, key: id in over ? over[id] : auto });
+    }
+    cells.push(row);
+  }
+  const extra = Object.values(queues).reduce((a, q) => a + q.length, 0);
+  return { days: cells, extra };
+}
+function renderPlan(R) {
+  const box = $("recPlan");
+  const { days, extra } = planCells(R);
+  const opts = (type) => R.groups.flatMap((G, gi) => G.type !== type ? [] : G.items.map((r, idx) => [recKey(gi, idx), RECIPES.find((x) => x.id === r.tpl)[S.lang]]));
+  const dayName = (row) => row.d === 0 ? t("planToday") : row.d === 1 ? t("planTomorrow") : t("days")[row.date.getDay()];
+  box.hidden = false;
+  box.innerHTML = `<h2 class="step-title">${t("planT")}</h2><p class="caption">${t("planD")}</p>
+    <div class="card">${days.map((row) => `<div class="plan-day ${row.d === 0 ? "today" : ""}"><h3>${dayName(row)}</h3>
+      ${row.cells.map((c) => `<label class="plan-cell"><span>${esc(slotLabel(c.s))}</span><select data-plan="${c.id}">
+        <option value="">${t("planFree")}</option>${opts(c.s.type).map(([k, n]) => `<option value="${k}" ${k === c.key ? "selected" : ""}>${esc(n)}</option>`).join("")}</select></label>`).join("")}</div>`).join("")}
+      ${extra ? `<p class="warnline">${t("planExtra", extra)}</p>` : ""}
+      <button class="btn secondary small" type="button" id="planReset" style="align-self:flex-start">${t("planReset")}</button></div>`;
+}
 function renderRecipes() {
+  renderFavs();
   const R = getRecipes(), counts = recipeCounts();
   $("recTypes").innerHTML = RTYPES.map((k) => `<div class="stepper"><p>${t("mtypes")[k]}</p>
       <button type="button" data-rtype="${k}" data-d="-1" aria-label="−">−</button><output>${counts[k]}</output><button type="button" data-rtype="${k}" data-d="1" aria-label="+">+</button></div>`).join("");
@@ -1767,7 +1970,7 @@ function renderRecipes() {
   const nRec = R ? R.groups.reduce((a, G) => a + G.items.length, 0) : 0;
   if (!nRec) {
     box.innerHTML = `<div class="card"><p class="empty"><b>${t(R ? "recNoneT" : "recEmptyT")}</b>${t(R ? "recNoneD" : "recEmptyD")}</p></div>`;
-    $("recShop").hidden = true; $("recSum").hidden = true; return;
+    $("recShop").hidden = true; $("recSum").hidden = true; $("recPlan").hidden = true; return;
   }
   let n = 0;
   box.innerHTML = R.groups.map((G, gi) => !G.items.length ? "" : `<div class="rec-group">
@@ -1778,6 +1981,7 @@ function renderRecipes() {
   const nPor = R.groups.reduce((a, G) => a + G.items.reduce((b, r) => b + (r.n || 1), 0), 0);
   $("recSum").innerHTML = `<h2 class="step-title">${t("recSumT", nPor)}</h2><p class="caption">${t("recSumD")}</p>
     <div class="card rec-sum"><ul>${tot.map((x) => `<li>${badge(x.food)}<span class="info"><span class="name" style="font-size:15px">${esc(x.food[S.lang])}</span>${x.k > 1 ? `<span class="note">${t("inRecipes", x.k)}</span>` : ""}</span><span class="q">${fmtWeight(x.g)}</span></li>`).join("")}</ul></div>`;
+  renderPlan(R);
   $("recShop").hidden = false;
   store.set("recipes", R);
 }
@@ -1785,6 +1989,7 @@ function newRecipes() {
   const counts = recipeCounts();
   recipeEdit = null;
   store.set("recipes", { groups: RTYPES.filter((k) => counts[k] > 0).map((k) => ({ type: k, items: drawRecipes(counts[k], k) })) });
+  store.set("planOver", {});
   renderRecipes();
 }
 
@@ -1811,6 +2016,9 @@ function renderSettings() {
   for (const b of $("sLang").children) b.setAttribute("aria-pressed", b.dataset.v === S.lang);
   for (const b of $("sUnits").children) b.setAttribute("aria-pressed", b.dataset.v === S.units);
   for (const b of $("sTheme").children) b.setAttribute("aria-pressed", b.dataset.v === S.theme);
+  for (const b of $("sCur").children) b.setAttribute("aria-pressed", b.dataset.v === S.currency);
+  const lb = store.get("lastBackup", null);
+  $("backupInfo").textContent = lb ? t("backupAgo", Math.round((new Date(dayKey()) - new Date(lb)) / 864e5)) : t("backupNever");
   const fishOk = !["veg", "vegan"].includes(S.diet.type);
   $("diet").innerHTML = `<div class="diet-types">${Object.keys(t("dietTypes")).map((k) =>
       `<button type="button" data-dtype="${k}" aria-pressed="${S.diet.type === k}">${t("dietTypes")[k]}<small>${t("dietTypesD")[k]}</small></button>`).join("")}</div>` +
@@ -1825,6 +2033,7 @@ function renderCalc() {
     ${S.manual.on ? "" : `<div class="line"><span>${t("bmr")}</span><b>${r0(c.bmr)} kcal</b></div>
     <div class="line"><span>${t("tdee")}</span><b>${r0(c.tdee)} kcal</b></div>`}
     <div class="line total"><span>${t("target")}<br><span class="note">${lossKg > 0.05 ? t("weekLoss", isImp() ? `${fr(lossKg * 2.2046)} lb` : `${fr(lossKg)} kg`) : t("perDay")}</span></span><b>${r0(T.kcal)} kcal</b></div>
+    ${S.adj.kcal && !S.manual.on ? `<div class="line"><span>${t("adjLine")} <button class="chip" type="button" id="adjReset" style="padding:2px 8px;font-size:12px">${t("adjReset")}</button></span><b>${S.adj.kcal > 0 ? "+" : ""}${S.adj.kcal} kcal</b></div>` : ""}
     <div class="macro-pills">
       <div><b style="color:var(--p)">${T.p} g</b><small>${t("protS")}</small></div>
       <div><b style="color:var(--c)">${T.c} g</b><small>${t("carbS")}</small></div>
@@ -1890,7 +2099,7 @@ function applyLang() {
 }
 // Tout ce qui dépend des cibles ou de la langue est redessiné
 function renderAll() {
-  applyLang(); renderQuick(); renderSlots(); renderCart(); renderResult(); renderLog();
+  applyLang(); renderQuick(); renderSlots(); renderCart(); renderResult(); renderLog(); renderWeight();
   renderShopList(); renderIdeas(); renderShopResult(); renderTabs();
   if (tab === "set") renderSettings();
   if (tab === "rec") renderRecipes();
@@ -2053,6 +2262,8 @@ $("shopResult").addEventListener("click", (e) => {
     const g = shopItem.packG ? +$("shopResult").querySelector(".stepper output").textContent * shopItem.packG : num($("takeG").value) || 0;
     row.got = (row.got || 0) + g;
     if (shopItem.packG && row.ref) row.ref.packG = shopItem.packG;
+    const pp = $("packPrice") ? num($("packPrice").value) : NaN;
+    if (pp > 0 && shopItem.packG) row.ppk = pp / (shopItem.packG / 1000);
     const need = needOf(row), name = row.ref ? nm(row.ref) : row.name;
     row.done = row.got >= need * 0.95;
     renderShopList();
@@ -2087,6 +2298,25 @@ $("recTypes").addEventListener("click", (e) => {
   store.set("recipeCounts", c); renderRecipes();
 });
 $("recGo").addEventListener("click", newRecipes);
+$("favChips").addEventListener("click", (e) => {
+  const b = e.target.closest("[data-fav]"); if (!b) return;
+  const f = favs()[+b.dataset.fav];
+  const R = getRecipes() || { groups: [] };
+  let G = R.groups.find((x) => x.type === f.type);
+  if (!G) { G = { type: f.type, items: [] }; R.groups.push(G); R.groups.sort((a, b) => RTYPES.indexOf(a.type) - RTYPES.indexOf(b.type)); }
+  G.items.push({ tpl: f.tpl, picks: [...f.picks] });
+  const c = recipeCounts(); c[f.type] = G.items.length; store.set("recipeCounts", c);
+  store.set("recipes", R); renderRecipes();
+  flash("recToast", t("favAdded", RECIPES.find((x) => x.id === f.tpl)[S.lang]));
+});
+$("recPlan").addEventListener("change", (e) => {
+  const sel = e.target.closest("select[data-plan]"); if (!sel) return;
+  const over = store.get("planOver", {}); over[sel.dataset.plan] = sel.value; store.set("planOver", over);
+});
+$("recPlan").addEventListener("click", (e) => {
+  if (!e.target.closest("#planReset")) return;
+  store.set("planOver", {}); renderRecipes();
+});
 $("recStyles").addEventListener("click", (e) => {
   const b = e.target.closest("[data-rstyle]"); if (!b) return;
   const k = b.dataset.rstyle;
@@ -2104,7 +2334,14 @@ $("recList").addEventListener("click", (e) => {
     if (fresh) { fresh.n = G.items[i].n; G.items[i] = fresh; }
     store.set("recipes", R); recipeEdit = null; renderRecipes(); return;
   }
+  if (b.dataset.rfav != null) {
+    const r = G.items[+b.dataset.rfav];
+    let F = favs();
+    F = isFav(r.tpl) ? F.filter((f) => f.tpl !== r.tpl) : [...F, { tpl: r.tpl, picks: r.picks, type: G.type }];
+    store.set("recFavs", F); renderRecipes(); return;
+  }
   if (b.dataset.rdel != null) {
+    store.set("planOver", {});
     G.items.splice(+b.dataset.rdel, 1);
     const c = recipeCounts(); c[G.type] = G.items.length; store.set("recipeCounts", c);
     store.set("recipes", R); recipeEdit = null; renderRecipes(); return;
@@ -2217,16 +2454,63 @@ $("copyTastes").addEventListener("click", async () => {
 });
 $("sLang").addEventListener("click", (e) => { const b = e.target.closest("[data-v]"); if (!b) return; S.lang = b.dataset.v; saveSettings(); renderAll(); });
 $("sUnits").addEventListener("click", (e) => { const b = e.target.closest("[data-v]"); if (!b) return; S.units = b.dataset.v; saveSettings(); renderAll(); });
+$("sCur").addEventListener("click", (e) => { const b = e.target.closest("[data-v]"); if (!b) return; S.currency = b.dataset.v; saveSettings(); renderSettings(); renderShopList(); });
 $("sTheme").addEventListener("click", (e) => { const b = e.target.closest("[data-v]"); if (!b) return; S.theme = b.dataset.v; saveSettings(); applyTheme(); renderSettings(); });
-$("exportBtn").addEventListener("click", () => {
-  const data = { settings: S, shopList, variety, logs: {} };
-  try { for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k.startsWith("log-")) data.logs[k.slice(4)] = JSON.parse(localStorage.getItem(k)); } } catch {}
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }));
-  a.download = `portion-${dayKey()}.json`;
-  document.body.appendChild(a); a.click(); a.remove();
+// Sauvegarde : tout le stockage de l'app dans un fichier JSON (sur iPhone, la feuille de partage permet de l'envoyer dans Fichiers / iCloud)
+$("exportBtn").addEventListener("click", async () => {
+  store.set("lastBackup", dayKey());
+  const all = {};
+  try { for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); all[k] = localStorage.getItem(k); } } catch {}
+  const name = `portion-${dayKey()}.json`;
+  const file = new File([JSON.stringify({ app: "portion", v: 2, date: dayKey(), all }, null, 1)], name, { type: "application/json" });
+  try {
+    if (navigator.canShare && navigator.canShare({ files: [file] })) await navigator.share({ files: [file], title: name });
+    else throw 0;
+  } catch (err) {
+    if (err && err.name === "AbortError") return;
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(file); a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+  }
   $("exportBtn").textContent = t("exported");
   setTimeout(() => { $("exportBtn").textContent = t("export"); }, 2000);
+  renderSettings();
+});
+$("importBtn").addEventListener("click", () => $("importFile").click());
+$("importFile").addEventListener("change", async (e) => {
+  const f = e.target.files[0]; if (!f) return;
+  try {
+    const data = JSON.parse(await f.text());
+    if (data.app === "portion" && data.all) {
+      localStorage.clear();
+      for (const [k, v] of Object.entries(data.all)) localStorage.setItem(k, v);
+    } else if (data.settings) {
+      // Ancien format d'export
+      store.set("settings", data.settings);
+      if (data.shopList) store.set("shopList", data.shopList);
+      if (data.variety) store.set("variety", data.variety);
+      for (const [d, l] of Object.entries(data.logs || {})) store.set("log-" + d, l);
+    } else throw 0;
+    $("importBtn").textContent = t("imported");
+    setTimeout(() => location.reload(), 600);
+  } catch {
+    $("importBtn").textContent = t("importErr");
+    setTimeout(() => { $("importBtn").textContent = t("import"); }, 2500);
+  }
+  e.target.value = "";
+});
+$("wSave").addEventListener("click", () => {
+  let v = num($("wInput").value); if (!(v > 20 && v < 700)) return;
+  if (isImp()) v /= 2.2046;
+  weights[dayKey()] = r1(v); store.set("weights", weights);
+  $("wInput").value = "";
+  if (checkAdjust()) onTargetsChanged();
+  renderWeight();
+});
+$("wInput").addEventListener("keydown", (e) => { if (e.key === "Enter") $("wSave").click(); });
+document.addEventListener("click", (e) => {
+  if (!e.target.closest("#adjReset")) return;
+  S.adj = { kcal: 0 }; onTargetsChanged(); renderWeight();
 });
 $("clearLogBtn").addEventListener("click", () => {
   log = []; store.set("log-" + dayKey(), log); renderSlots(); renderLog();
@@ -2247,6 +2531,7 @@ $("resetBtn").addEventListener("click", () => {
 // Anciennes versions : la liste de courses stockait juste un nom et un poids
 shopList = shopList.map((x) => (x.ref || !x.name ? x : { fam: x.fam, done: x.done, name: x.name, g: x.g }));
 applyTheme();
+checkAdjust();
 slotId = guessSlot();
 renderAll();
 </script>
