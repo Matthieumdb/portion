@@ -1715,7 +1715,8 @@ function recipeCard(rec, gi, idx, n, slotT) {
   const editing = recipeEdit === gi + ":" + idx;
   return `<article class="card recipe">
       <div class="rec-head"><span class="rec-n">${n}</span><h3>${esc(tpl[S.lang])}</h3>
-        <div class="rec-qty" aria-label="${t("portions")}"><button type="button" data-g="${gi}" data-rqty="${idx}" data-d="-1" aria-label="−">−</button><output>×${rec.n || 1}</output><button type="button" data-g="${gi}" data-rqty="${idx}" data-d="1" aria-label="+">+</button></div></div>
+        <div class="rec-qty" aria-label="${t("portions")}"><button type="button" data-g="${gi}" data-rqty="${idx}" data-d="-1" aria-label="−">−</button><output>×${rec.n || 1}</output><button type="button" data-g="${gi}" data-rqty="${idx}" data-d="1" aria-label="+">+</button></div>
+        <button class="icon-btn" type="button" data-g="${gi}" data-rdel="${idx}" aria-label="${t("remove")}">${X_ICON}</button></div>
       <div class="rec-tags"><span class="rec-time">${tpl.min} min</span>${tpl.tags.map((k) => `<span class="rec-tag t-${k}">${t("styles")[k]}</span>`).join("")}</div>
       <div class="rec-macros"><span><b>${r0(tot.kcal)}</b> kcal</span><span style="color:var(--p)"><b>${r0(tot.p)}</b> g P</span><span style="color:var(--c)"><b>${r0(tot.c)}</b> g ${S.lang === "fr" ? "G" : "C"}</span><span style="color:var(--f)"><b>${r0(tot.f)}</b> g ${S.lang === "fr" ? "L" : "F"}</span></div>
       <ul class="rec-ing">${items.filter((it) => it.g > 0 || editing).map((it) => {
@@ -2097,6 +2098,11 @@ $("recList").addEventListener("click", (e) => {
     const i = +b.dataset.rchange;
     const fresh = drawRecipes(1, G.type, G.items.map((x) => x.tpl))[0];
     if (fresh) { fresh.n = G.items[i].n; G.items[i] = fresh; }
+    store.set("recipes", R); recipeEdit = null; renderRecipes(); return;
+  }
+  if (b.dataset.rdel != null) {
+    G.items.splice(+b.dataset.rdel, 1);
+    const c = recipeCounts(); c[G.type] = G.items.length; store.set("recipeCounts", c);
     store.set("recipes", R); recipeEdit = null; renderRecipes(); return;
   }
   if (b.dataset.rqty != null) {
