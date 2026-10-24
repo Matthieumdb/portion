@@ -251,6 +251,12 @@ details[open] summary::after { content: "−"; }
 .rec-g .note { font-family: var(--font-body); }
 .rec-steps { margin: 0; font-size: 15px; line-height: 1.5; background: var(--bg); border-radius: 14px; padding: 12px 14px; }
 .rec-actions { flex-wrap: wrap; }
+.rec-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: -4px; }
+.rec-tags span { font: 800 12px var(--font-body); border-radius: 999px; padding: 3px 9px; background: var(--bg); color: var(--muted); }
+.rec-tags .t-h { background: var(--herb-soft); color: var(--herb); }
+.rec-tags .t-g { background: var(--accent-soft); color: var(--accent); }
+.rec-tags .t-q { color: var(--p); }
+.rec-tags .t-w { color: var(--f); }
 .rec-actions .btn { flex: 1 1 auto; }
 .rec-actions [aria-pressed="true"] { border-color: var(--ink); }
 .field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
@@ -403,6 +409,7 @@ input[type="search"]::-webkit-search-cancel-button { cursor: pointer; }
           <button type="button" id="recMinus" aria-label="−">−</button><output id="recN"></output><button type="button" id="recPlus" aria-label="+">+</button>
         </div>
         <div class="field"><span data-i18n="recFor"></span><div class="seg2" id="recSlots"></div></div>
+        <div class="field"><span data-i18n="recStyle"></span><div class="seg2" id="recStyles"></div></div>
         <button class="btn" type="button" id="recGo"></button>
         <p class="caption" data-i18n="recHint"></p>
       </div>
@@ -522,6 +529,9 @@ const STR = {
     recHint: "Les recettes suivent ton régime et tes goûts (onglet Réglages), et les quantités collent aux macros du repas choisi.",
     recEmptyT: "Pas encore de recettes", recEmptyD: "Choisis le nombre de repas et appuie sur « Proposer ».",
     change: "Changer", modify: "Modifier", done: "Terminé", cook: "Je cuisine ça", swap: "Changer d'ingrédient",
+    recStyle: "Style", styleAll: "Tout",
+    styles: { h: "Healthy", g: "Gourmand", q: "Rapide", b: "Batch cooking", w: "Saveurs du monde" },
+    recNoneT: "Aucune recette pour ces styles", recNoneD: "Retire un style ou change de repas, puis relance.",
     recToShop: "Ajouter tous les ingrédients à ma liste de courses", recAdded: (n) => `${n} ingrédients ajoutés à ta liste`,
     hello: "Bonjour", evening: "Bonsoir",
     whichMeal: "Quel repas ?", whatYouEat: "Ce que tu manges", yourDoses: "Tes doses à peser",
@@ -610,6 +620,9 @@ const STR = {
     recHint: "Recipes follow your diet and tastes (Settings tab), and amounts fit the macros of the chosen meal.",
     recEmptyT: "No recipes yet", recEmptyD: "Pick how many meals and tap \"Suggest\".",
     change: "Change", modify: "Edit", done: "Done", cook: "Cook this", swap: "Swap ingredient",
+    recStyle: "Style", styleAll: "All",
+    styles: { h: "Healthy", g: "Comfort food", q: "Quick", b: "Batch cooking", w: "World flavours" },
+    recNoneT: "No recipe for these styles", recNoneD: "Remove a style or pick another meal, then try again.",
     recToShop: "Add all ingredients to my grocery list", recAdded: (n) => `${n} ingredients added to your list`,
     hello: "Hi", evening: "Good evening",
     whichMeal: "Which meal?", whatYouEat: "What you're eating", yourDoses: "Your portions to weigh",
@@ -1425,7 +1438,27 @@ const RECIPES = [
     sfr: "Ajoute {R} en rondelles et {X} sur {P}.", sen: "Top the {P} with the sliced {R} and the {X}." },
   { snack: true, fr: "Crudités, houmous et poulet", en: "Crudités, hummus and chicken", parts: [{ r: "P", o: [0, 7, 8] }, { r: "V", o: [79, 81, 35], g: 120 }, { r: "X", o: [105], g: 40 }],
     sfr: "Coupe {V} en bâtonnets, trempe-les dans {X}, avec {P} en lamelles.", sen: "Cut the {V} into sticks and dip in the {X}, with the sliced {P}." },
+  // Ajouts gourmands (toujours en fin de liste : les recettes enregistrées sont rangées par position)
+  { fr: "Pizza tortilla protéinée", en: "Protein tortilla pizza", parts: [{ r: "P", o: [0, 7, 1, 8] }, { r: "C", o: [72] }, { r: "X", o: [45], g: 60 }, { r: "X", o: [17, 68], g: 40 }, { r: "V", o: [36, 35], g: 80 }],
+    sfr: "Étale {X} sur {C}, ajoute {P} en morceaux et {V}. Enfourne 8 min à 220 °C.", sen: "Spread the {X} on the {C}, add the {P} in pieces and the {V}. Bake 8 min at 220 °C." },
+  { fr: "Croque-monsieur protéiné et salade", en: "Protein croque-monsieur and salad", parts: [{ r: "P", o: [7, 1] }, { r: "C", o: [73, 29] }, { r: "X", o: [68, 17], g: 25 }, { r: "V", o: [82, 80], g: 80 }],
+    sfr: "Monte {C} avec {P} et {X}, dore 5 min à la poêle ou au four. Sers avec {V}.", sen: "Layer the {C} with the {P} and {X}, toast 5 min in a pan or oven. Serve with the {V}." },
+  { fr: "Gratin de pâtes au poulet", en: "Chicken pasta bake", parts: [{ r: "P", o: [0, 1, 7] }, { r: "C", o: [21, 22] }, { r: "V", o: [36, 84] }, { r: "X", o: [63, 64], g: 100 }, { r: "X", o: [68, 17], g: 25 }, { r: "F", o: [41] }],
+    sfr: "Fais cuire {C}. Saisis {P} et {V} dans {F}. Mélange tout avec {X} dans un plat et gratine 15 min à 200 °C.", sen: "Cook the {C}. Sauté the {P} and {V} in the {F}. Mix everything with the {X} in a dish and bake 15 min at 200 °C." },
+  { fr: "Tacos de bœuf", en: "Beef tacos", parts: [{ r: "P", o: [3, 5, 1] }, { r: "C", o: [72] }, { r: "V", o: [80, 84] }, { r: "V", o: [82, 75] }, { r: "X", o: [69, 68], g: 20 }, { r: "X", o: [47], g: 30 }],
+    sfr: "Fais revenir {P} avec cumin et paprika. Garnis {C} de {P}, {V} et {X}.", sen: "Brown the {P} with cumin and paprika. Fill the {C} with the {P}, {V} and {X}." },
+  { fr: "Poulet croustillant au four", en: "Crispy oven chicken", parts: [{ r: "P", o: [0, 1] }, { r: "C", o: [23] }, { r: "X", o: [25], g: 20 }, { r: "X", o: [10], g: 55 }, { r: "V", o: [82, 31] }, { r: "F", o: [41] }],
+    sfr: "Trempe {P} dans l'œuf battu puis dans les flocons mixés avec paprika. Enfourne 20 min à 210 °C avec {C} en frites et {F}. Sers avec {V}.", sen: "Dip the {P} in beaten egg, then in blitzed oats with paprika. Bake 20 min at 210 °C with the {C} as fries and the {F}. Serve with the {V}." },
+  { snack: true, fr: "Pancakes protéinés", en: "Protein pancakes", parts: [{ r: "P", o: [48, 12, 106] }, { r: "C", o: [25] }, { r: "X", o: [10], g: 55 }, { r: "R", o: [39, 37, 92] }],
+    sfr: "Mixe {C}, {P} et {X} avec un peu d'eau. Cuis 3 petits pancakes à la poêle et garnis de {R}.", sen: "Blend the {C}, {P} and {X} with a little water. Cook 3 small pancakes and top with the {R}." },
 ];
+// Style et temps de chaque recette, dans l'ordre de RECIPES : h healthy, g gourmand, q rapide, b batch cooking, w saveurs du monde
+const RMETA = [["hbw", 20], ["gb", 25], ["gbw", 30], ["gq", 15], ["hb", 40], ["g", 35], ["bw", 30], ["hqb", 15], ["qw", 15], ["gq", 15],
+  ["g", 20], ["g", 30], ["hw", 35], ["hb", 30], ["g", 30], ["hq", 20], ["hqb", 15], ["gb", 45], ["gqw", 15], ["q", 20],
+  ["hb", 30], ["gq", 15], ["h", 30], ["qw", 15], ["hqw", 15], ["hb", 30],
+  ["hq", 2], ["q", 2], ["q", 5], ["h", 10], ["hq", 2], ["q", 5], ["gq", 2], ["hq", 5],
+  ["gq", 15], ["gq", 10], ["gb", 35], ["gqw", 20], ["g", 30], ["gq", 10]];
+RECIPES.forEach((r, i) => { r.tags = (RMETA[i] || [""])[0].split(""); r.min = (RMETA[i] || [0, 0])[1]; });
 RECIPES.forEach((r, i) => { r.id = "r" + i; });
 const ROLE_DEFAULT_G = { V: 100, R: 100 };
 
@@ -1459,7 +1492,9 @@ function poolFor(slotT) {
   const snack = slotT.kcal < 450;
   // Les recettes végétariennes ne sortent pour un mangeur de viande que s'il aime leur protéine
   const vegDiet = ["veg", "vegan"].includes(S.diet.type);
+  const styles = store.get("recipeStyles", []);
   return RECIPES.filter((r) => !!r.snack === snack && recipeValid(r) &&
+    (!styles.length || styles.some((st) => r.tags.includes(st))) &&
     (!r.veg || vegDiet || r.parts[0].o.some((i) => pref(FOODS[i]) === 1)));
 }
 function drawRecipes(n, slotT, avoid = []) {
@@ -1507,15 +1542,19 @@ function renderRecipes() {
   const target = list.find((s) => s.id === recipesSlot()) || list[0];
   $("recN").textContent = recipeN();
   $("recSlots").innerHTML = list.map((s) => `<button class="chip" type="button" data-rslot="${s.id}" aria-pressed="${s.id === target.id}">${esc(s.name)} · ${esc(s.sub)}</button>`).join("");
+  const styles = store.get("recipeStyles", []);
+  $("recStyles").innerHTML = `<button class="chip" type="button" data-rstyle="" aria-pressed="${!styles.length}">${t("styleAll")}</button>` +
+    Object.entries(t("styles")).map(([k, l]) => `<button class="chip" type="button" data-rstyle="${k}" aria-pressed="${styles.includes(k)}">${l}</button>`).join("");
   $("recGo").textContent = t("recGo", recipeN());
   const box = $("recList");
-  if (!R || !R.items.length) { box.innerHTML = `<div class="card"><p class="empty"><b>${t("recEmptyT")}</b>${t("recEmptyD")}</p></div>`; $("recShop").hidden = true; return; }
+  if (!R || !R.items.length) { box.innerHTML = `<div class="card"><p class="empty"><b>${t(R ? "recNoneT" : "recEmptyT")}</b>${t(R ? "recNoneD" : "recEmptyD")}</p></div>`; $("recShop").hidden = true; return; }
   const slotT = (list.find((s) => s.id === R.slot) || target).t;
   box.innerHTML = R.items.map((rec, idx) => {
     const { tpl, items, tot, steps } = buildRecipe(rec, slotT);
     const editing = recipeEdit === idx;
     return `<article class="card recipe">
       <div class="rec-head"><span class="rec-n">${idx + 1}</span><h3>${esc(tpl[S.lang])}</h3></div>
+      <div class="rec-tags"><span class="rec-time">${tpl.min} min</span>${tpl.tags.map((k) => `<span class="rec-tag t-${k}">${t("styles")[k]}</span>`).join("")}</div>
       <div class="rec-macros"><span><b>${r0(tot.kcal)}</b> kcal</span><span style="color:var(--p)"><b>${r0(tot.p)}</b> g P</span><span style="color:var(--c)"><b>${r0(tot.c)}</b> g ${S.lang === "fr" ? "G" : "C"}</span><span style="color:var(--f)"><b>${r0(tot.f)}</b> g ${S.lang === "fr" ? "L" : "F"}</span></div>
       <ul class="rec-ing">${items.filter((it) => it.g > 0 || editing).map((it) => {
         const ch = partChoices(tpl.parts[it.part]);
@@ -1825,6 +1864,13 @@ $("recMinus").addEventListener("click", () => { store.set("recipeN", Math.max(1,
 $("recPlus").addEventListener("click", () => { store.set("recipeN", Math.min(14, recipeN() + 1)); renderRecipes(); });
 $("recSlots").addEventListener("click", (e) => { const b = e.target.closest("[data-rslot]"); if (!b) return; store.set("recipeSlot", b.dataset.rslot); renderRecipes(); });
 $("recGo").addEventListener("click", newRecipes);
+$("recStyles").addEventListener("click", (e) => {
+  const b = e.target.closest("[data-rstyle]"); if (!b) return;
+  const k = b.dataset.rstyle;
+  let styles = store.get("recipeStyles", []);
+  styles = !k ? [] : styles.includes(k) ? styles.filter((x) => x !== k) : [...styles, k];
+  store.set("recipeStyles", styles); renderRecipes();
+});
 $("recList").addEventListener("click", (e) => {
   const R = store.get("recipes", null); if (!R) return;
   const slotT = (slotList().find((s) => s.id === R.slot) || slotList()[0]).t;
