@@ -79,7 +79,7 @@ details.group > *:not(summary) { margin: 0 0 4px; }
 .tile small { font: 800 11px var(--font-body); color: var(--muted); text-transform: uppercase; letter-spacing: .02em; }
 .tile b { font: 600 24px var(--font-display); font-variant-numeric: tabular-nums; }
 .tile span { font-size: 13px; color: var(--muted); }
-.chart { width: 100%; display: block; overflow: visible; }
+.chart { width: 100%; display: block; overflow: hidden; }
 .chart .bar { cursor: pointer; }
 .chart-tip { font-size: 14px; min-height: 20px; margin: 0; color: var(--ink); font-weight: 700; }
 .ax { font: 600 10px var(--font-body); fill: var(--muted); }
@@ -121,7 +121,7 @@ details.group > *:not(summary) { margin: 0 0 4px; }
 .fav-chips { display: flex; flex-wrap: wrap; gap: 6px; }
 .price-tot { display: flex; justify-content: space-between; align-items: baseline; background: var(--bg); border-radius: 14px; padding: 10px 12px; font-size: 14px; }
 .price-tot b { font: 600 20px var(--font-display); }
-html, body { margin: 0; }
+html, body { margin: 0; overflow-x: clip; }
 body {
   background: var(--bg); color: var(--ink); font: 600 16px/1.45 var(--font-body);
   padding-top: env(safe-area-inset-top, 0px);
@@ -2273,14 +2273,14 @@ const shortDate = (d) => { const [, m, j] = d.split("-"); return `${j}/${m}`; };
 const avgOf = (a, k) => a.length ? a.reduce((s, x) => s + x[k], 0) / a.length : 0;
 // Barres + ligne de cible en pointillés ; une seule série, une seule échelle
 function barChart(id, bars, target, color, unit) {
-  const W = 340, H = 150, L = 34, B = 18, top = 8;
+  const W = 340, H = 150, L = 34, B = 18, top = 8, R = 14;
   const max = Math.max(target * 1.25, ...bars.map((b) => b.v)) || 1;
-  const bw = (W - L) / bars.length, gap = Math.min(4, bw * 0.25);
+  const bw = (W - L - R) / bars.length, gap = Math.min(4, bw * 0.25);
   const y = (v) => top + (H - top - B) * (1 - v / max);
   const ticks = [0, target].filter((v, i, a) => a.indexOf(v) === i);
   const every = Math.ceil(bars.length / 7);
   return `<svg class="chart" id="${id}" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(bars.map((b) => b.label + " " + r0(b.v) + " " + unit).join(", "))}">
-    <line x1="${L}" x2="${W}" y1="${y(0)}" y2="${y(0)}" stroke="var(--line)" stroke-width="1"/>
+    <line x1="${L}" x2="${W - R}" y1="${y(0)}" y2="${y(0)}" stroke="var(--line)" stroke-width="1"/>
     ${ticks.map((v) => `<text class="ax" x="${L - 4}" y="${y(v) + 3}" text-anchor="end">${r0(v)}</text>`).join("")}
     ${bars.map((b, i) => {
       const x = L + i * bw + gap / 2, w = Math.max(1, bw - gap), hgt = Math.max(0, y(0) - y(b.v));
@@ -2290,7 +2290,7 @@ function barChart(id, bars, target, color, unit) {
         ${path ? `<path d="${path}" fill="${color}" opacity="${b.dim ? 0.35 : 1}"/>` : ""}
         ${i % every === 0 ? `<text class="ax" x="${x + w / 2}" y="${H - 4}" text-anchor="middle">${esc(b.short)}</text>` : ""}</g>`;
     }).join("")}
-    <line x1="${L}" x2="${W}" y1="${y(target)}" y2="${y(target)}" stroke="var(--ink)" stroke-width="1.5" stroke-dasharray="4 4" opacity=".6"/>
+    <line x1="${L}" x2="${W - R}" y1="${y(target)}" y2="${y(target)}" stroke="var(--ink)" stroke-width="1.5" stroke-dasharray="4 4" opacity=".6"/>
   </svg>`;
 }
 function renderStats() {
