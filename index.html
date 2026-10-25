@@ -54,6 +54,16 @@
 button, a, input, select, label, .chip, .stepper { touch-action: manipulation; }
 @supports (-webkit-touch-callout: none) { input, select, textarea { font-size: 16px !important; } }
 [hidden] { display: none !important; }
+.prot-day { gap: 8px; }
+.prot-day .ph { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.prot-day .ph span { font: 800 13px var(--font-body); color: var(--muted); text-transform: uppercase; }
+.prot-day .ph b { font: 600 22px var(--font-display); color: var(--p); }
+.prot-day .ph b small { font-size: 15px; color: var(--muted); }
+.prot-day .bar { height: 14px; border-radius: 10px; background: var(--line); overflow: hidden; }
+.prot-day .bar i { display: block; height: 100%; background: var(--p); border-radius: 10px; transition: width .3s; }
+.prot-day.alert { border: 2px solid var(--warn); background: var(--warn-soft); }
+.prot-day.alert .ph b { color: var(--warn); }
+.prot-day p { margin: 0; font-size: 14px; }
 .w-row { display: flex; gap: 8px; align-items: center; }
 .w-row input { flex: 1; text-align: center; font: 600 20px var(--font-display); }
 .w-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; text-align: center; }
@@ -366,6 +376,7 @@ input[type="search"]::-webkit-search-cancel-button { cursor: pointer; }
       <button class="btn small" type="button" id="nagExport" style="flex:0 0 auto" data-i18n="export"></button>
       <button class="btn secondary small" type="button" id="nagLater" style="flex:0 0 auto" data-i18n="later"></button>
     </div>
+    <div class="card prot-day" id="protDay"></div>
     <section aria-labelledby="s1">
       <h2 class="step-title" id="s1"><span class="n">1</span><span data-i18n="whichMeal"></span></h2>
       <div class="slots" id="slots"></div>
@@ -671,6 +682,8 @@ const STR = {
     youDislike: "Tu n'aimes pas cet aliment",
     setDisplay: "Affichage", language: "Langue", units: "Unités", metric: "Métrique (kg, cm)", imperial: "Impérial (lb, in)",
     theme: "Thème", themeAuto: "Auto", themeLight: "Clair", themeDark: "Sombre",
+    protDay: "Protéines du jour", protOk: "Objectif protéines atteint 💪", protLeft: (g) => `Encore ${g} g à manger aujourd'hui.`,
+    protAlert: (g) => `Il te manque ${g} g de protéines ce soir : ajoute par exemple un skyr (≈ 15 g par pot), du blanc de poulet (≈ 31 g / 100 g) ou une dose de whey (≈ 24 g).`,
     nagT: "Ça fait plus d'une semaine : exporte une sauvegarde dans iCloud Drive pour ne rien perdre si tu changes de téléphone.", later: "Plus tard",
     wTitle: "Mon poids", wSave: "Noter", wPh: (u) => `Poids du jour (${u})`, wToday: "Aujourd'hui", wAvg: "Moy. 7 jours", wTrend: "Sur 7 jours",
     wEmpty: "Pèse-toi le matin à jeun, après les toilettes. Note-le ici chaque jour : je fais la moyenne sur 7 jours pour lisser l'eau et le sel.",
@@ -785,6 +798,8 @@ const STR = {
     youDislike: "You dislike this food",
     setDisplay: "Display", language: "Language", units: "Units", metric: "Metric (kg, cm)", imperial: "Imperial (lb, in)",
     theme: "Theme", themeAuto: "Auto", themeLight: "Light", themeDark: "Dark",
+    protDay: "Today's protein", protOk: "Protein goal reached 💪", protLeft: (g) => `${g} g still to eat today.`,
+    protAlert: (g) => `You're ${g} g short on protein tonight: add a skyr (≈ 15 g a pot), chicken breast (≈ 31 g / 100 g) or a scoop of whey (≈ 24 g).`,
     nagT: "It's been over a week: export a backup to iCloud Drive so nothing is lost if you change phones.", later: "Later",
     wTitle: "My weight", wSave: "Log", wPh: (u) => `Today's weight (${u})`, wToday: "Today", wAvg: "7-day avg", wTrend: "Over 7 days",
     wEmpty: "Weigh yourself in the morning, before eating. Log it here every day: I average 7 days to smooth out water and salt.",
@@ -1392,7 +1407,17 @@ function gaugeHTML(k, value, total, color, unit) {
     <div class="track"><div class="fill" style="width:${pct}%;background:${color}"></div></div>
     <span class="l">${mShort(k)}</span></div>`;
 }
+// Protéines de la journée ; alerte le soir s'il en manque plus de 40 g
+function renderProtDay() {
+  const goal = dayTargets().p, got = eaten().p, left = Math.max(0, r0(goal - got));
+  const alert = new Date().getHours() >= 18 && left > 40;
+  $("protDay").classList.toggle("alert", alert);
+  $("protDay").innerHTML = `<div class="ph"><span>${t("protDay")}</span><b>${r0(got)}<small> / ${r0(goal)} g</small></b></div>
+    <div class="bar"><i style="width:${goal ? Math.min(100, got / goal * 100) : 0}%"></i></div>
+    <p>${left <= 0 ? t("protOk") : alert ? t("protAlert", left) : t("protLeft", left)}</p>`;
+}
 function renderSlots() {
+  renderProtDay();
   const list = slotList();
   if (!list.find((s) => s.id === slotId)) slotId = guessSlot();
   $("slots").style.gridTemplateColumns = `repeat(${Math.min(list.length, 4)}, 1fr)`;
