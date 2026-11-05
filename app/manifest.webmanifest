@@ -1,7 +1,7 @@
 {
   "name": "Musculation",
   "short_name": "Musculation",
-  "description": "Séances, progression et sauvegardes, sur ton téléphone.",
+  "description": "Séances, progression, nutrition et sauvegardes, sur ton téléphone.",
   "lang": "fr",
   "start_url": "./",
   "scope": "./",

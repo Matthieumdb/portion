@@ -2,7 +2,7 @@
 // IndexedDB is not touched by Portion's localStorage.clear() on the same site.
 
 const DB_NAME = "musculation";
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 const KEEP_SNAPSHOTS = 30;
 
 let dbPromise;
@@ -15,6 +15,7 @@ function open() {
         const db = req.result;
         if (!db.objectStoreNames.contains("state")) db.createObjectStore("state");
         if (!db.objectStoreNames.contains("snapshots")) db.createObjectStore("snapshots");
+        if (!db.objectStoreNames.contains("photos")) db.createObjectStore("photos");
       };
       req.onsuccess = () => resolve(req.result);
       req.onerror = () => reject(req.error);
@@ -61,6 +62,17 @@ export async function listSnapshotDays() {
 
 export function loadSnapshot(day) {
   return run("snapshots", "readonly", (s) => s.get(day));
+}
+
+// Progress photos: { id, date, pose, note, blob, thumb } (not in the backup file, like on the iPhone).
+export function listPhotos() {
+  return run("photos", "readonly", (s) => s.getAll());
+}
+export function putPhoto(photo) {
+  return run("photos", "readwrite", (s) => s.put(photo, photo.id));
+}
+export function deletePhoto(id) {
+  return run("photos", "readwrite", (s) => s.delete(id));
 }
 
 /** Asks the browser not to clear the data when space runs low. */
